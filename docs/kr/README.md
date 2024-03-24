@@ -8,7 +8,7 @@
 [![Docker Hub](https://img.shields.io/badge/Docker_Hub-longvinter-blue?logo=docker)](https://hub.docker.com/r/kimzuni/longvinter-docker-server)
 [![GHCR](https://img.shields.io/badge/GHCR-longvinter-blue?logo=docker)](https://github.com/kimzuni/longvinter-docker-server/pkgs/container/longvinter-docker-server)
 
-[English](/README.md) | [한국어](/README-kr.md)
+[English](/README.md) | [한국어](/docs/kr/README.md)
 
 롱빈터 전용 서버를 도커로 올릴 수 있습니다.
 
