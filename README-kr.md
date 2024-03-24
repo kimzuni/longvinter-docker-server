@@ -1,10 +1,17 @@
 # 롱빈터 전용 서버 도커
+
+[![Release](https://img.shields.io/github/v/release/kimzuni/longvinter-docker-server)](https://github.com/kimzuni/longvinter-docker-server/releases)
+[![Image Size](https://img.shields.io/docker/image-size/kimzuni/longvinter-docker-server/latest)](https://hub.docker.com/r/kimzuni/longvinter-docker-server/tags)
+
+[![Docker Hub](https://img.shields.io/badge/Docker_Hub-longvinter-blue?logo=docker)](https://hub.docker.com/r/kimzuni/longvinter-docker-server)
+[![GHCR](https://img.shields.io/badge/GHCR-longvinter-blue?logo=docker)](https://github.com/kimzuni/longvinter-docker-server/pkgs/container/longvinter-docker-server)
+
 [English](/README.md) | [한국어](/README-kr.md)
 
 롱빈터 전용 서버를 도커로 올릴 수 있습니다.
 
 해당 컨테이너는 아래 환경에서 테스트되었습니다.
-- Windows 11
+- Windows 11 AMD64 (WSL 2)
 - Ubuntu 22.04 AMD64
 - Ubuntu 22.04 ARM64 (Oracle Cloud)
 
