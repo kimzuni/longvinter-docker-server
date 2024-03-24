@@ -9,10 +9,11 @@ This Docker container has been tested and will work on the following OS:
 - Ubuntu 22.04 ARM64 (Oracle Cloud)
 
 ## Official URL
-- [Uuvana Youtube](https://www.youtube.com/@uuvana)
-- [Uuvana Contact](https://contact.uuvana.com/)
-- [Longvinter Server Docs](https://docs-server.longvinter.com/)
-- [Longvinter Discord](https://discord.gg/longvinter)
+- [\[Uuvana\] FAQ(Frequently Asked Questions)](https://contact.uuvana.com/)
+- [\[Uuvana\] Contact](https://contact.uuvana.com/)
+- [\[Uuvana\] Youtube](https://www.youtube.com/@uuvana)
+- [\[Longvinter\] Server Docs](https://docs-server.longvinter.com/)
+- [\[Longvinter\] Discord](https://discord.gg/longvinter)
 
 ## Server Requirements
 > - OS: Min. 64-bit
