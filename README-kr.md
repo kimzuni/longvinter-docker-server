@@ -1,6 +1,8 @@
 # 롱빈터 전용 서버 도커
 
 [![Release](https://img.shields.io/github/v/release/kimzuni/longvinter-docker-server)](https://github.com/kimzuni/longvinter-docker-server/releases)
+[![Docker Pulls](https://img.shields.io/docker/pulls/kimzuni/longvinter-docker-server)](https://hub.docker.com/r/kimzuni/longvinter-docker-server)
+[![Docker Stars](https://img.shields.io/docker/stars/kimzuni/longvinter-docker-server)](https://hub.docker.com/r/kimzuni/longvinter-docker-server)
 [![Image Size](https://img.shields.io/docker/image-size/kimzuni/longvinter-docker-server/latest)](https://hub.docker.com/r/kimzuni/longvinter-docker-server/tags)
 
 [![Docker Hub](https://img.shields.io/badge/Docker_Hub-longvinter-blue?logo=docker)](https://hub.docker.com/r/kimzuni/longvinter-docker-server)
@@ -9,6 +11,8 @@
 [English](/README.md) | [한국어](/README-kr.md)
 
 롱빈터 전용 서버를 도커로 올릴 수 있습니다.
+
+이 저장소는 [thijsvanloef/palworld-docker-server](https://github.com/thijsvanloef/palworld-server-docker)와 [Uuvana-Studios/longvinter-docker-server](https://github.com/Uuvana-Studios/longvinter-docker-server)를 참조하는 것으로 시작되었습니다.
 
 해당 컨테이너는 아래 환경에서 테스트되었습니다.
 - Windows 11 AMD64 (WSL 2)
@@ -223,10 +227,6 @@ Docker Compose로 사용하는 방법
 ```
 
 
-
-# Thanks to!
-- [Uuvana-Studios/longvinter-docker-server](https://github.com/Uuvana-Studios/longvinter-docker-server)
-- [thijsvanloef/palworld-docker-server](https://github.com/thijsvanloef/palworld-server-docker)
 
 # To do List
 - Update

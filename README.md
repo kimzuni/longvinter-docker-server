@@ -1,6 +1,8 @@
 # Longvinter Dedicated Server Docker
 
 [![Release](https://img.shields.io/github/v/release/kimzuni/longvinter-docker-server)](https://github.com/kimzuni/longvinter-docker-server/releases)
+[![Docker Pulls](https://img.shields.io/docker/pulls/kimzuni/longvinter-docker-server)](https://hub.docker.com/r/kimzuni/longvinter-docker-server)
+[![Docker Stars](https://img.shields.io/docker/stars/kimzuni/longvinter-docker-server)](https://hub.docker.com/r/kimzuni/longvinter-docker-server)
 [![Image Size](https://img.shields.io/docker/image-size/kimzuni/longvinter-docker-server/latest)](https://hub.docker.com/r/kimzuni/longvinter-docker-server/tags)
 
 [![Docker Hub](https://img.shields.io/badge/Docker_Hub-longvinter-blue?logo=docker)](https://hub.docker.com/r/kimzuni/longvinter-docker-server)
@@ -9,6 +11,8 @@
 [English](/README.md) | [한국어](/README-kr.md)
 
 This is a Docker container to help you get started with hosting your own Longvinter dedicated server.
+
+This repository was initially created by referring to [thijsvanloef/palworld-docker-server](https://github.com/thijsvanloef/palworld-server-docker) and [Uuvana-Studios/longvinter-docker-server](https://github.com/Uuvana-Studios/longvinter-docker-server).
 
 This Docker container has been tested and will work on the following OS:
 - Windows 11 AMD64 (WSL 2)
@@ -221,10 +225,6 @@ Send discord messages with docker compose:
 ```
 
 
-
-# Thanks to!
-- [Uuvana-Studios/longvinter-docker-server](https://github.com/Uuvana-Studios/longvinter-docker-server)
-- [thijsvanloef/palworld-docker-server](https://github.com/thijsvanloef/palworld-server-docker)
 
 # To do List
 - Update
