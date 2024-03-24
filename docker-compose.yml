@@ -1,0 +1,36 @@
+services:
+  longvinter-server:
+    container_name: longvinter-server
+    image: kimzuni/longvinter-docker-server
+    restart: unless-stopped
+    stop_grace_period: 30s # Set to however long you are willing to wait for the container to gracefully stop
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "7777:7777/tcp"
+      - "7777:7777/udp"
+      - "27016:27016/tcp"
+      - "27016:27016/udp"
+    environment:
+      TZ: "UTC"
+      PUID: 1000
+      PGID: 1000
+      PORT: 7777 # Optional but recommended
+      QUERY_PORT: 27016 # Optional but recommended
+      CFG_SERVER_NAME: "Unnamed Island"
+      CFG_MAX_PLAYERS: 32
+      CFG_SERVER_MOTD: "Welcome to Longvinter Island!"
+      CFG_PASSWORD: ""
+      CFG_COMMUNITY_WEBSITE: "www.longvinter.com"
+      CFG_COOP_PLAY: false
+      CFG_COOP_SPAWN: 0
+      CFG_SERVER_TAG: "none"
+      CFG_ADMIN_STEAM_ID: ""
+      CFG_ENABLE_PVP: true
+      CFG_TENT_DECAY: true
+      CFG_MAX_TENTS: 2
+    volumes:
+      - ./data:/data
