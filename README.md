@@ -15,9 +15,8 @@ This is a Docker container to help you get started with hosting your own [Longvi
 The source code started with applying [Uuvana-Studios/longvinter-docker-server](https://github.com/Uuvana-Studios/longvinter-docker-server) to [thijsvanloef/palworld-docker-server](https://github.com/thijsvanloef/palworld-server-docker).
 
 This Docker images has been tested and will work on the following OS:
-- Windows 11 AMD64 (WSL 2)
-- Ubuntu 22.04 AMD64
-- Ubuntu 22.04 ARM64 (Oracle Cloud)
+- Windows 11
+- Ubuntu 22.04
 
 ## Official URL
 - [\[Uuvana\] FAQ(Frequently Asked Questions)](https://contact.uuvana.com/)
@@ -187,6 +186,7 @@ List of available environment variables:
 | ARM_COMPATIBILITY_MODE                  | Switches the compatibility layer from Box86 to QEMU when executing steamcmd for server updates. This setting is only applicable for ARM64 hosts. | false                          | true/false                                                                                                 |
 
 \* highly recommended to set
+
 \*\* Make sure you know what you are doing when running this option enabled
 
 ## Configuring the Server Settings

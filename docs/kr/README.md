@@ -16,9 +16,8 @@
 
 
 도커 이미지는 아래 운영체제에서 테스트되었습니다.
-- Windows 11 AMD64 (WSL 2)
-- Ubuntu 22.04 AMD64
-- Ubuntu 22.04 ARM64 (Oracle Cloud)
+- Windows 11
+- Ubuntu 22.04
 
 ## 공식 사이트 및 커뮤니티
 - [\[우바나\] FAQ(자주 묻는 질문)](https://contact.uuvana.com/)
@@ -188,6 +187,7 @@ docker run -d \
 | ARM_COMPATIBILITY_MODE                  | 서버 업데이트를 위해 steamcmd를 실행할 때 Box86에서 QEMU로 호환성 계층을 전환합니다. 이 설정은 ARM64 호스트에만 적용 가능합니다.    | false                          | true/false                                                                                      |
 
 \* 권장사항
+
 \*\* 이 옵션이 어떠한 기능을 하는지 확실히 알고 사용해 주세요.
 
 ## 서버 설정 내용
