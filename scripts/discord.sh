@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+# shellcheck source=scripts/helper_functions.sh
 source "/home/steam/server/helper_functions.sh"
 
 # Defaults
@@ -64,7 +64,7 @@ else
 	COLOR=$DISCORD_BLUE
 fi
 
-if [ "${TITLE,,}" == "start" -a "$DISCORD_SERVER_INFO_MESSAGE_ENABLE" = true ]; then
+if [ "${TITLE,,}" == "start" -a "$DISCORD_SERVER_INFO_MESSAGE_ENABLED" = true ]; then
 	MESSAGE=`echo -e "$MESSAGE\n"; Server_Info | sed -E "s/([^:]+):(.+)/**\1**:\2/g"`
 fi
 

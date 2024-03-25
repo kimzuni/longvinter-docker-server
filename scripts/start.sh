@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
-
+# shellcheck source=scripts/helper_functions.sh
 source "/home/steam/server/helper_functions.sh"
+
+# Helper Functions for installation & updates
+# shellcheck source=scripts/helper_install.sh
 source "/home/steam/server/helper_install.sh"
+
+dirExists "$DATA_DIR" || exit
+isWritable "$DATA_DIR" || exit
+isExecutable "$DATA_DIR" || exit
 
 if [ "$architecture" == "arm64" ] && [ "${ARM_COMPATIBILITY_MODE,,}" = true ]; then
 	LogInfo "ARM compatibility mode enabled"
@@ -19,7 +26,8 @@ if [ "$ServerInstalled" == 1 ]; then
 	InstallServer
 fi
 
-cd $GIT_REPO_PATH || exit 1
+mkdir -p "$SERVER_BACKUP_DIR"
+cd "$GIT_REPO_PATH" || exit 1
 
 # Update Only If Already Installed
 if [ "$ServerInstalled" == 0 ] && [ "${UPDATE_ON_BOOT,,}" == true ]; then
@@ -53,7 +61,18 @@ if [ "$architecture" == "arm64" ]; then
 	sed -i "s|^\(\"\$UE4_PROJECT_ROOT\/Longvinter\/Binaries\/Linux\/LongvinterServer-Linux-Shipping\" Longvinter \"\$@\"\)|LD_LIBRARY_PATH=/home/steam/steamcmd/linux64:\$LD_LIBRARY_PATH $box64_binary \1|" $GIT_REPO_PATH/LongvinterServer.sh
 fi
 STARTCOMMAND=("$GIT_REPO_PATH/LongvinterServer.sh")
-chmod +x $GIT_REPO_PATH/LongvinterServer.sh
+
+#Validate Installation
+if ! fileExists "${STARTCOMMAND[0]}"; then
+	LogError "Server Not Installed Properly"
+	exit 1
+fi
+chmod +x "${STARTCOMMAND[0]}"
+
+isReadable "${STARTCOMMAND[0]}" || exit
+isExecutable "${STARTCOMMAND[0]}" || exit
+
+
 
 # Prepare Arguments
 if [ -n "${PORT}" ]; then
@@ -66,9 +85,31 @@ fi
 
 
 
-LogAction "GENERATING CONFIG"
-LogInfo "Using Env vars to create Game.ini"
-/home/steam/server/compile-settings.sh
+if [ "${DISABLE_GENERATE_SETTINGS,,}" = true ]; then
+	LogAction "GENERATING CONFIG"
+	LogWarn "Env vars will not be applied due to DISABLE_GENERATE_SETTINGS being set to TRUE!"
+	cp "$CONFIG_FILE_FULL_PATH".default "$CONFIG_FILE_FULL_PATH"
+else
+	LogAction "GENERATING CONFIG"
+	LogInfo "Using Env vars to create Game.ini"
+	/home/steam/server/compile-settings.sh || exit
+fi
+
+LogAction "GENERATING CRONTAB"
+truncate -s 0  "/home/steam/server/crontab"
+if [ "${BACKUP_ENABLED,,}" = true ]; then
+	LogInfo "BACKUP_ENABLED=${BACKUP_ENABLED,,}"
+	LogInfo "Adding cronjob for auto backups"
+	echo "$BACKUP_CRON_EXPRESSION bash /usr/local/bin/backup" >> "/home/steam/server/crontab"
+	supercronic -quiet -test "/home/steam/server/crontab" || exit
+fi
+
+if [ "${BACKUP_ENABLED,,}" = true ]; then
+	supercronic "/home/steam/server/crontab" &
+	LogInfo "Cronjobs started"
+else
+	LogInfo "No Cronjobs found"
+fi
 
 
 
@@ -79,5 +120,4 @@ echo "${STARTCOMMAND[*]}"
 "${STARTCOMMAND[@]}"
 
 DiscordMessage "Stop" "${DISCORD_POST_SHUTDOWN_MESSAGE}" "failure" "${DISCORD_POST_SHUTDOWN_MESSAGE_ENABLED}" "${DISCORD_POST_SHUTDOWN_MESSAGE_URL}"
-
 exit 0

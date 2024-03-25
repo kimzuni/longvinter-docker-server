@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+# shellcheck source=scripts/helper_functions.sh
 source "/home/steam/server/helper_functions.sh"
 
 LogAction "Compiling Game.ini"
