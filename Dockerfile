@@ -1,7 +1,7 @@
 FROM cm2network/steamcmd:root as base-amd64
 # Ignoring --platform=arm64 as this is required for the multi-arch build to continue to work on amd64 hosts
 # hadolint ignore=DL3029
-FROM --platform=arm64 sonroyaalmerol/steamcmd-arm64:root as base-arm64
+FROM --platform=arm64 sonroyaalmerol/steamcmd-arm64:root-2024-03-10 as base-arm64
 
 ARG TARGETARCH
 # Ignoring the lack of a tag here because the tag is defined in the above FROM lines
@@ -21,7 +21,7 @@ LABEL maintainer="me@kimzuni.com" \
 RUN apt-get update && \
     apt-get install --no-install-recommends --no-install-suggests -y \
       git \
-      git-lfs  \
+      git-lfs \
       wget \
       ca-certificates \
       lib32gcc1-amd64-cross \

@@ -28,7 +28,7 @@ UpdateRequired() {
 InstallServer() {
 	local update=${1,,}
 
-	if [ "$architecture" == "arm64" ] && [ "$kernel_page_size" != "4096" ]; then
+	if [ "$architecture" == "arm64" ] && [ "$pagesize" != "4096" ]; then
 		LogWarn "WARNING: Only ARM64 hosts with 4k page size is supported when running steamcmd. Expect server installation to fail."
 	fi
 
