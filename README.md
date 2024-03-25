@@ -156,7 +156,7 @@ List of available environment variables:
 
 | Variable                                   | Info                                                                                                                                             | Default Value                                                                                      | Allowed Values                                                                                                    |
 |--------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| TZ                                         | Timezone used for server. (Not applicable to Log)                                                                                                | UTC                                                                                                | See [TZ Identifiers](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#Time_Zone_abbreviations)        |
+| TZ                                         | Timezone used for Cron and Game server. (Not applicable to Log)                                                                                  | UTC                                                                                                | See [TZ Identifiers](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#Time_Zone_abbreviations)        |
 | PUID\*                                     | The uid of the user the server should run as.                                                                                                    | 1000                                                                                               | !0                                                                                                                |
 | PGID\*                                     | The gid of the user the server should run as.                                                                                                    | 1000                                                                                               | !0                                                                                                                |
 | PORT\*                                     | Game port that the server will expose.                                                                                                           | 7777                                                                                               | 1024-65535                                                                                                        |
@@ -208,6 +208,18 @@ List of available environment variables:
 \* highly recommended to set
 
 \*\* Make sure you know what you are doing when running this option enabled
+
+## Configuring Automatic Backups with Cron
+The server is automatically backed up everynight at midnight according to the timezone set with TZ
+
+Set BACKUP_ENABLED enable or disable automatic backups (Default is enabled)
+
+BACKUP_CRON_EXPRESSION is a cron expression, in a Cron-Expression you define an interval for when to run jobs.
+
+> [!TIP]
+> This image uses Supercronic for crons see [supercronic](https://github.com/aptible/supercronic#crontab-format) or [Crontab Generator](https://crontab-generator.org).
+
+Set BACKUP_CRON_EXPRESSION to change the default schedule. Example Usage: If BACKUP_CRON_EXPRESSION to `0 2 * * *`, the backup script will run every day at 2:00 AM.
 
 ## Configuring the Server Settings
 Used with [environment variables](#environment-variables).

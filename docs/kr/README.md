@@ -14,7 +14,6 @@
 
 소스 코드는 [thijsvanloef/palworld-docker-server](https://github.com/thijsvanloef/palworld-server-docker)에 [Uuvana-Studios/longvinter-docker-server](https://github.com/Uuvana-Studios/longvinter-docker-server)를 적용하는 것부터 시작되었습니다.
 
-
 도커 이미지는 아래 운영체제에서 테스트되었습니다.
 - Windows 11
 - Ubuntu 22.04
@@ -157,16 +156,16 @@ docker run -d \
 
 | 변수명                                     | 정보                                                                                                                      | 기본값                                                                                             | 설정 가능한 값                                                                                                    |
 |--------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| TZ                                         | 서버 시간대 설정 (로그 파일에는 적용되지 않음)                                                                               | UTC                                                                                                | [참고 바람](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#Time_Zone_abbreviations)                 |
+| TZ                                         | Cron 및 게임 서버에 사용되는 시간대 설정 (로그 파일에는 적용되지 않음)                                                        | UTC                                                                                                | [참고 바람](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#Time_Zone_abbreviations)                 |
 | PUID\*                                     | 서버가 해당 값을 가진 UID로 실행됩니다.                                                                                     | 1000                                                                                               | !0                                                                                                                |
 | PGID\*                                     | 서버가 해당 값을 가진 GID로 실행됩니다.                                                                                     | 1000                                                                                               | !0                                                                                                                |
 | PORT\*                                     | 서버 개임 포트 번호                                                                                                        | 7777                                                                                               | 1024-65535                                                                                                        |
 | QUERY_PORT                                 | 스팀 서버와 통신하기 위한 쿼리 포트 번호                                                                                     | 27016                                                                                              | 1024-65535                                                                                                       |
 | UPDATE_ON_BOOT\*\*                         | 이 설정 값이 `true`인 경우 서버가 시작될 때마다 업데이트를 자동으로 진행합니다.                                                | true                                                                                               | true/false                                                                                                        |
 | BACKUP_ENABLED                             | 이 설정 값이 `true`인 경우 일정 시간마다 자동으로 백업을 진행합니다.                                                          | true                                                                                               | true/false                                                                                                        |
-| BACKUP_CRON_EXPRESSION                     | 자동 백업 빈도 설정                                                                                                        | 0 0 * * *                                                                                          | Needs a Cron-Expression - See [Configuring Automatic Backups with Cron](#configuring-automatic-backups-with-cron) |
+| BACKUP_CRON_EXPRESSION                     | 자동 백업 빈도 설정                                                                                                        | 0 0 * * *                                                                                          | 크론식 표현 - [Cron으로 자동 백업 설정하는 방법](#cron으로-자동-백업-설정하는-방법) 참고 바람                          |
 | DELETE_OLD_BACKUPS                         | 이 설정 값이 `true`인 경우 오래된 백업 파일을 자동으로 삭제합니다.                                                            | false                                                                                              | true/false                                                                                                        |
-| OLD_BACKUP_DAYS                            | 지정한 날짜가 넘은 백업 파일만 제거합니다.                                                                                   | 30                                                                                                 | any positive integer                                                                                              |
+| OLD_BACKUP_DAYS                            | 지정한 날짜가 넘은 백업 파일만 제거합니다.                                                                                   | 30                                                                                                 | !0                                                                                              |
 | DISCORD_WEBHOOK_URL                        | 디스코드 서버에서 생성한 웹훅 URL                                                                                           | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
 | DISCORD_SUPPRESS_NOTIFICATIONS             | 서버 메시지에 대해 `@silent` 메시지를 활성화 및 비활성화합니다.                                                               | false                                                                                              | true/false                                                                                                        |
 | DISCORD_CONNECT_TIMEOUT                    | 지정된 시간동안 디스코드 웹훅에 연결할 수 없을 경우 연결을 취소합니다.                                                         | 30                                                                                                 | !0                                                                                                                |
@@ -208,7 +207,19 @@ docker run -d \
 
 \* 권장사항
 
-\*\* 이 옵션이 어떠한 기능을 하는지 확실히 알고 사용해 주세요.
+\*\* 해당 옵션이 어떠한 기능을 하는지 정확히 모른다면 수정하지 마세요.
+
+## Cron으로 자동 백업 설정하는 방법
+TZ로 설정된 시간대에 따라 매일 밤 자정에 서버가 자동으로 백업됩니다.
+
+BACKUP_ENABLED 값을 `false`로 설정하면 자동으로 백업되지 않습니다.
+
+BACKUP_CRON_EXPRESSION은 크론식으로, 자동 백업의 주기를 설정합니다.
+
+> [!TIP]
+> 이 이미지는 Supercronic으로 Cron을 사용합니다. 자세한 설정 방법은 [supercronic](https://github.com/aptible/supercronic#crontab-format) 또는 [Crontab Generator](https://crontab-generator.org)를 참고해 주세요.
+
+BACKUP_CRON_EXPRESSION 값을 변경하여 원하는 시간대에 백업을 시작하도록 할 수 있습니다. 예를 들면 BACKUP_CRON_EXPRESSION 값을 `0 2 * * *`로 설정할 경우 매일 오전 2시에 자동으로 백업이 시작됩나다.
 
 ## 서버 설정 내용
 [환경 변수](#환경-변수)와 함께 사용합니다.
