@@ -1,7 +1,7 @@
 services:
   longvinter-server:
     container_name: longvinter-server
-    image: kimzuni/longvinter-docker-server
+    image: kimzuni/longvinter-docker-server:latest
     restart: unless-stopped
     stop_grace_period: 30s # Set to however long you are willing to wait for the container to gracefully stop
     logging:

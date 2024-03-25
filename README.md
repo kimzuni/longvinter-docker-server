@@ -10,11 +10,11 @@
 
 [English](/README.md) | [한국어](/docs/kr/README.md)
 
-This is a Docker container to help you get started with hosting your own Longvinter dedicated server.
+This is a Docker container to help you get started with hosting your own [Longvinter](https://store.steampowered.com/app/1635450/Longvinter/) dedicated server.
 
-This repository was initially created by referring to [thijsvanloef/palworld-docker-server](https://github.com/thijsvanloef/palworld-server-docker) and [Uuvana-Studios/longvinter-docker-server](https://github.com/Uuvana-Studios/longvinter-docker-server).
+The source code started with applying [Uuvana-Studios/longvinter-docker-server](https://github.com/Uuvana-Studios/longvinter-docker-server) to [thijsvanloef/palworld-docker-server](https://github.com/thijsvanloef/palworld-server-docker).
 
-This Docker container has been tested and will work on the following OS:
+This Docker images has been tested and will work on the following OS:
 - Windows 11 AMD64 (WSL 2)
 - Ubuntu 22.04 AMD64
 - Ubuntu 22.04 ARM64 (Oracle Cloud)
@@ -39,11 +39,10 @@ Keep in mind that you'll need to change the [environment variables](#environment
 This repository includes an example [docker-compose.yml](/docker-compose.yml) file you can use to set up your server.
 
 ```yaml
-version: "3.9"
 services:
   longvinter-server:
     container_name: longvinter-server
-    image: kimzuni/longvinter-docker-server
+    image: kimzuni/longvinter-docker-server:latest
     restart: unless-stopped
     stop_grace_period: 30s # Set to however long you are willing to wait for the container to gracefully stop
     logging:
@@ -78,14 +77,13 @@ services:
       - ./data:/data
 ```
 
-As an alternative, you can copy the [.env.example](/.env.example) file to a new file called .env file. Modify it to your needs, check out the [environment variables](#environment-variables) section to check the correct values. Modify your [docker-compose.yml](/docker-compose.yml) to this:
+As an alternative, you can copy the [.env.example](/.env.example) file to a new file called `.env` file. It doesn't matter if the file name is not `.env`. Modify your [docker-compose.yml](/docker-compose.yml) to this:
 
 ```yml
-version: "3.9"
 services:
   longvinter-server:
     container_name: longvinter-server
-    image: longvinter-docker-server
+    image: kimzuni/longvinter-docker-server:latest
     restart: unless-stopped
     logging:
       driver: json-file
@@ -102,6 +100,8 @@ services:
     volumes:
       - ./data:/data
 ```
+
+After you finish setting up, you must run the `docker compose up -d` command where the `docker-compose.yml` file is located.
 
 ### Docker Run
 Change every <> to your own configuration.
@@ -136,7 +136,7 @@ docker run -d \
     kimzuni/longvinter-docker-server:latest
 ```
 
-As an alternative, you can copy the [.env.example](/.env.example) file to a new file called .env file. Modify it to your needs, check out the [environment variables](#environment-variables) section to check the correct values. Change your docker run command to this:
+As an alternative, you can copy the [.env.example](/.env.example) file to a new file called .env file. Change your docker run command to this:
 
 ```bash
 docker run -d \
@@ -153,60 +153,59 @@ docker run -d \
 ```
 
 ## Environment variables
-You can use the following values to change the settings of the server on boot. It is highly recommended you set the following environment values before starting the server:
-- PORT
-- QUERY_PORT
+List of available environment variables:
 
-| Variable                                | Info                                                                                                                                                                                                                                          | Default Value                  |
-|-----------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------|
-| TZ                                      | Timezone used for server. (Not applicable to Log)                                                                                                                                                                                             | UTC                            |
-| PORT                                    | Game port that the server will expose.                                                                                                                                                                                                        | 7777                           |
-| QUERY_PORT                              | Query port used to communicate with Steam servers.                                                                                                                                                                                            | 27016                          |
-| PUID                                    | The uid of the user the server should run as.                                                                                                                                                                                                 | 1000                           |
-| PGID                                    | The gid of the user the server should run as.                                                                                                                                                                                                 | 1000                           |
-| UPDATE_ON_BOOT                          | Update the server when the docker container starts.                                                                                                                                                                                           | true                           |
-| DISCORD_WEBHOOK_URL                     | Discord webhook url found after creating a webhook on a discord server.                                                                                                                                                                       | _(empty)_                      |
-| DISCORD_SUPPRESS_NOTIFICATIONS          | Enables/Disables `@silent` messages for the server messages.                                                                                                                                                                                  | _(empty)_                      |
-| DISCORD_CONNECT_TIMEOUT                 | Discord command initial connection timeout.                                                                                                                                                                                                   | 30                             |
-| DISCORD_MAX_TIMEOUT                     | Discord total hook timeout.                                                                                                                                                                                                                   | 30                             |
-| DISCORD_PRE_INSTALL_MESSAGE             | Discord message sent when server begins installing.                                                                                                                                                                                           | Server is installing...        |
-| DISCORD_PRE_INSTALL_MESSAGE_ENABLED     | If the Discord message is enabled for this message.                                                                                                                                                                                           | true                           |
-| DISCORD_PRE_INSTALL_MESSAGE_URL         | Discord Webhook URL for this message. (if left empty will use DISCORD_WEBHOOK_URL)                                                                                                                                                            | _(empty)_                      |
-| DISCORD_PRE_UPDATE_BOOT_MESSAGE         | Discord message sent when server begins updating.                                                                                                                                                                                             | Server is updating...          |
-| DISCORD_PRE_UPDATE_BOOT_MESSAGE_ENABLED | If the Discord message is enabled for this message.                                                                                                                                                                                           | true                           |
-| DISCORD_PRE_UPDATE_BOOT_MESSAGE_URL     | Discord Webhook URL for this message. (if left empty will use DISCORD_WEBHOOK_URL)                                                                                                                                                            | _(empty)_                      |
-| DISCORD_PRE_START_MESSAGE               | Discord message sent when server begins to start.                                                                                                                                                                                             | Server has been started!       |
-| DISCORD_PRE_START_MESSAGE_ENABLED       | If the Discord message is enabled for this message.                                                                                                                                                                                           | true                           |
-| DISCORD_PRE_START_MESSAGE_URL           | Discord Webhook URL for this message. (if left empty will use DISCORD_WEBHOOK_URL)                                                                                                                                                            | _(empty)_                      |
-| DISCORD_PRE_SHUTDOWN_MESSAGE            | Discord message sent when server begins to shutdown.                                                                                                                                                                                          | Server is shutting down...     |
-| DISCORD_PRE_SHUTDOWN_MESSAGE_ENABLED    | If the Discord message is enabled for this message.                                                                                                                                                                                           | true                           |
-| DISCORD_PRE_SHUTDOWN_MESSAGE_URL        | Discord Webhook URL for this message. (if left empty will use DISCORD_WEBHOOK_URL)                                                                                                                                                            | _(empty)_                      |
-| DISCORD_POST_SHUTDOWN_MESSAGE           | Discord message sent when server begins to shutdown.                                                                                                                                                                                          | Server is stopped!             |
-| DISCORD_POST_SHUTDOWN_MESSAGE_ENABLED   | If the Discord message is enabled for this message.                                                                                                                                                                                           | true                           |
-| DISCORD_POST_SHUTDOWN_MESSAGE_URL       | Discord Webhook URL for this message. (if left empty will use DISCORD_WEBHOOK_URL)                                                                                                                                                            | _(empty)_                      |
-| DISCORD_SERVER_INFO_MESSAGE_ENABLE      | Send the server settings with DISCORD_PRE_START_MESSAGE.                                                                                                                                                                                      | true                           |
-| DISCORD_SERVER_INFO_MESSAGE_WITH_IP     | Send the server IP and Port with server info. This is required for direct connection.                                                                                                                                                         | false                          |
-| ARM_COMPATIBILITY_MODE                  | Switches the compatibility layer from Box86 to QEMU when executing steamcmd for server updates. This setting is only applicable for ARM64 hosts.                                                                                              | false                          |
+| Variable                                | Info                                                                                                                                             | Default Value                  | Allowed Values                                                                                             |
+|-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------|------------------------------------------------------------------------------------------------------------|
+| TZ                                      | Timezone used for server. (Not applicable to Log)                                                                                                | UTC                            | See [TZ Identifiers](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#Time_Zone_abbreviations) |
+| PUID\*                                  | The uid of the user the server should run as.                                                                                                    | 1000                           | !0                                                                                                         |
+| PGID\*                                  | The gid of the user the server should run as.                                                                                                    | 1000                           | !0                                                                                                         |
+| PORT\*                                  | Game port that the server will expose.                                                                                                           | 7777                           | 1024-65535                                                                                                 |
+| QUERY_PORT                              | Query port used to communicate with Steam servers.                                                                                               | 27016                          | 1024-65535                                                                                                 |
+| UPDATE_ON_BOOT\*\*                      | Update the server when the docker container starts.                                                                                              | true                           | true/false                                                                                                 |
+| DISCORD_WEBHOOK_URL                     | Discord webhook url found after creating a webhook on a discord server.                                                                          | _(empty)_                      | `https://discord.com/api/webhooks/<webhook_id>`                                                            |
+| DISCORD_SUPPRESS_NOTIFICATIONS          | Enables/Disables `@silent` messages for the server messages.                                                                                     | false                          | true/false                                                                                                 |
+| DISCORD_CONNECT_TIMEOUT                 | Discord command initial connection timeout.                                                                                                      | 30                             | !0                                                                                                         |
+| DISCORD_MAX_TIMEOUT                     | Discord total hook timeout.                                                                                                                      | 30                             | !0                                                                                                         |
+| DISCORD_PRE_INSTALL_MESSAGE             | Discord message sent when server begins installing.                                                                                              | Server is installing...        | "string"                                                                                                   |
+| DISCORD_PRE_INSTALL_MESSAGE_ENABLED     | If the Discord message is enabled for this message.                                                                                              | true                           | true/false                                                                                                 |
+| DISCORD_PRE_INSTALL_MESSAGE_URL         | Discord Webhook URL for this message. (if left empty will use DISCORD_WEBHOOK_URL)                                                               | _(empty)_                      | `https://discord.com/api/webhooks/<webhook_id>`                                                            |
+| DISCORD_PRE_UPDATE_BOOT_MESSAGE         | Discord message sent when server begins updating.                                                                                                | Server is updating...          | "string"                                                                                                   |
+| DISCORD_PRE_UPDATE_BOOT_MESSAGE_ENABLED | If the Discord message is enabled for this message.                                                                                              | true                           | true/false                                                                                                 |
+| DISCORD_PRE_UPDATE_BOOT_MESSAGE_URL     | Discord Webhook URL for this message. (if left empty will use DISCORD_WEBHOOK_URL)                                                               | _(empty)_                      | `https://discord.com/api/webhooks/<webhook_id>`                                                            |
+| DISCORD_PRE_START_MESSAGE               | Discord message sent when server begins to start.                                                                                                | Server has been started!       | "string"                                                                                                   |
+| DISCORD_PRE_START_MESSAGE_ENABLED       | If the Discord message is enabled for this message.                                                                                              | true                           | true/false                                                                                                 |
+| DISCORD_PRE_START_MESSAGE_URL           | Discord Webhook URL for this message. (if left empty will use DISCORD_WEBHOOK_URL)                                                               | _(empty)_                      | `https://discord.com/api/webhooks/<webhook_id>`                                                            |
+| DISCORD_PRE_SHUTDOWN_MESSAGE            | Discord message sent when server begins to shutdown.                                                                                             | Server is shutting down...     | "string"                                                                                                   |
+| DISCORD_PRE_SHUTDOWN_MESSAGE_ENABLED    | If the Discord message is enabled for this message.                                                                                              | true                           | true/false                                                                                                 |
+| DISCORD_PRE_SHUTDOWN_MESSAGE_URL        | Discord Webhook URL for this message. (if left empty will use DISCORD_WEBHOOK_URL)                                                               | _(empty)_                      | `https://discord.com/api/webhooks/<webhook_id>`                                                            |
+| DISCORD_POST_SHUTDOWN_MESSAGE           | Discord message sent when server begins to shutdown.                                                                                             | Server is stopped!             | "string"                                                                                                   |
+| DISCORD_POST_SHUTDOWN_MESSAGE_ENABLED   | If the Discord message is enabled for this message.                                                                                              | true                           | true/false                                                                                                 |
+| DISCORD_POST_SHUTDOWN_MESSAGE_URL       | Discord Webhook URL for this message. (if left empty will use DISCORD_WEBHOOK_URL)                                                               | _(empty)_                      | `https://discord.com/api/webhooks/<webhook_id>`                                                            |
+| DISCORD_SERVER_INFO_MESSAGE_ENABLE      | Send the server settings with DISCORD_PRE_START_MESSAGE.                                                                                         | true                           | true/false                                                                                                 |
+| DISCORD_SERVER_INFO_MESSAGE_WITH_IP     | Send the server IP and Port with server info.                                                                                                    | false                          | true/false                                                                                                 |
+| ARM_COMPATIBILITY_MODE                  | Switches the compatibility layer from Box86 to QEMU when executing steamcmd for server updates. This setting is only applicable for ARM64 hosts. | false                          | true/false                                                                                                 |
+
+\* highly recommended to set
+\*\* Make sure you know what you are doing when running this option enabled
 
 ## Configuring the Server Settings
 Used with [environment variables](#environment-variables).
 
-| Variable              | Info                                                                                                                                                                                                                                           | Default Value                 |
-|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------|
-| CFG_SERVER_NAME       | Setting the server name that is displayed in the server list.                                                                                                                                                                                  | Unnamed Island                |
-| CFG_MAX_PLAYERS       | The maximum amount of players the server will allow at the same time.                                                                                                                                                                          | 32                            |
-| CFG_SERVER_MOTD       | A Message Of The Day that will be displayed to the player.                                                                                                                                                                                     | Welcome to Longvinter Island! |
-| CFG_PASSWORD          | Use this setting to require a password to join the server.                                                                                                                                                                                     | _(empty)_                     |
-| CFG_COMMUNITY_WEBSITE | When the server or community has a website, enter it here to display it to the player.                                                                                                                                                         | www.longvinter.com            |
-| CFG_COOP_PLAY         | When this setting is set to "true", Co-op Play will be enabled on the server. Set to "false" to disable PvP.                                                                                                                                   | false                         |
-| CFG_COOP_SPAWN        | All players will spawn here. (It only works when "CFG_COOP_PLAY" is "true".)                                                                                                                                                                   | 0                             |
-| CFG_SERVER_TAG        | Server tag that can be used to search for the server.                                                                                                                                                                                          | None                          |
-| CFG_ADMIN_STEAM_ID    | Add the SteamID64 values for the players that have admin rights to this setting. When there are multiple admins, add the SteamID64 values to this setting separated by a space.                                                                | _(empty)_                     |
-| CFG_ENABLE_PVP        | When this setting is set to "true", PvP will be enabled on the server. Set to "false" to disable PvP.                                                                                                                                          | true                          |
-| CFG_TENT_DECAY        | When this setting is set to "true", tents will decay and be destroyed after 48 hours unless they are upgraded to a house.                                                                                                                      | true                          |
-| CFG_MAX_TENTS         | Maximum number of tents/houses each player can have placed in the world at a time.                                                                                                                                                             | 2                             |
-
-**Note**: The value of `CFG_COOP_SPAWN` is expected to be: 0(West), 1(South), 2(East). (I haven't checked it out)
+| Variable              | Info                                                                                                                                                                            | Default Value                 | Allowed Values                                                   |
+|-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------|------------------------------------------------------------------|
+| CFG_SERVER_NAME       | Setting the server name that is displayed in the server list.                                                                                                                   | Unnamed Island                | "string"                                                         |
+| CFG_MAX_PLAYERS       | The maximum amount of players the server will allow at the same time.                                                                                                           | 32                            | 1-?                                                              |
+| CFG_SERVER_MOTD       | A Message Of The Day that will be displayed to the player.                                                                                                                      | Welcome to Longvinter Island! | "string"                                                         |
+| CFG_PASSWORD          | Use this setting to require a password to join the server.                                                                                                                      | _(empty)_                     | "string"                                                         |
+| CFG_COMMUNITY_WEBSITE | When the server or community has a website, enter it here to display it to the player.                                                                                          | www.longvinter.com            | `<example.com>`, `http://<example.com>`, `https://<example.com>` |
+| CFG_COOP_PLAY         | When this setting is set to "true", Co-op Play will be enabled on the server. Set to "false" to disable PvP.                                                                    | false                         | true/false                                                       |
+| CFG_COOP_SPAWN        | All players will spawn here. (It only works when "CFG_COOP_PLAY" is "true".)                                                                                                    | 0                             | 0(West), 1(South), 2(East). (I haven't checked it out)           |
+| CFG_SERVER_TAG        | Server tag that can be used to search for the server.                                                                                                                           | None                          | "string"                                                         |
+| CFG_ADMIN_STEAM_ID    | Add the SteamID64 values for the players that have admin rights to this setting. When there are multiple admins, add the SteamID64 values to this setting separated by a space. | _(empty)_                     | 0-9, a-f, " "(Space)                                             |
+| CFG_ENABLE_PVP        | When this setting is set to "true", PvP will be enabled on the server. Set to "false" to disable PvP.                                                                           | true                          | true/false                                                       |
+| CFG_TENT_DECAY        | When this setting is set to "true", tents will decay and be destroyed after 48 hours unless they are upgraded to a house.                                                       | true                          | true/false                                                       |
+| CFG_MAX_TENTS         | Maximum number of tents/houses each player can have placed in the world at a time.                                                                                              | 2                             | 1~?                                                              |
 
 ## Using discord webhooks
 1. Generate a webhook url for your discord server in your discord's server settings.
