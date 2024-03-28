@@ -76,33 +76,6 @@ isExecutable() {
 	return "$return_val"
 }
 
-# Lists players
-# Outputs nothing if RCON is not enabled and returns 1
-# Outputs player list if RCON is enabled and returns 0
-get_players_list() {
-	local return_val=0
-	if [ "${RCON_ENABLED,,}" != true ]; then
-		return_val=1
-	fi
-
-	RCON "ShowPlayers"
-	return "$return_val"
-}
-
-# Checks how many players are currently connected
-# Outputs 0 if RCON is not enabled and returns 1
-# Outputs the player count if rcon is enabled and returns 0
-get_player_count() {
-	local player_list
-	local return_val=0
-	if ! player_list=$(get_players_list); then
-		return_val=1
-	fi
-
-	echo -n "${player_list}" | wc -l
-	return "$return_val"
-}
-
 #
 # Log Definitions
 #
@@ -155,114 +128,14 @@ DiscordMessage() {
 	fi
 }
 
-# RCON Call # Not Support
-RCON() {
-#	local args="$1"
-#	rcon-cli -c /home/steam/server/rcon.yaml "$args"
-	:
-}
-
-# Given a message this will broadcast in game
-# Since RCON does not support spaces this will replace all spaces with underscores
-# Returns 0 on success
-# Returns 1 if not able to broadcast
-broadcast_command() {
-	local return_val=0
-	# Replaces spaces with underscore
-	local message="${1// /_}"
-	if [[ $TEXT = *[![:ascii:]]* ]]; then
-		LogWarn "Unable to broadcast since the message contains non-ascii characters: \"${message}\""
-		return_val=1
-	elif ! RCON "broadcast ${message}" > /dev/null; then
-		return_val=1
-	fi
-	return "$return_val"
-}
-
-# Saves the server
-# Returns 0 if it saves
-# Returns 1 if it is not able to save
-save_server() {
-	local return_val=0
-	if ! RCON save; then
-		return_val=1
-	fi
-	return "$return_val"
-}
-
 # Saves then shutdowns the server
 # Returns 0 if it is shutdown
 # Returns not 0 if it is not able to be shutdown
 shutdown_server() {
 	local return_val=0
-	# Do not shutdown if not able to save
-#	if save_server; then
-#		if ! RCON "Shutdown 1"; then
-#			return_val=1
-#		fi
-#	else
-#		return_val=1
-#	fi
 
 	kill -15 `pidof LongvinterServer-Linux-Shipping`
 	return $?
-}
-
-# Given an amount of time in minutes and a message prefix
-# Will skip countdown if no players are in the server, Will only check the mtime if there are players in the server
-# Returns 0 on success
-# Returns 1 if mtime is empty
-# Returns 2 if mtime is not an integer
-countdown_message() {
-	return 0
-
-	local mtime="$1"
-	local message_prefix="$2"
-	local return_val=0
-
-	# Only do countdown if there are players
-	if [ "$(get_player_count)" -gt 0 ]; then
-		if [[ "${mtime}" =~ ^[0-9]+$ ]]; then
-			for ((i = "${mtime}" ; i > 0 ; i--)); do
-				case "$i" in
-					1 )
-						broadcast_command "${message_prefix} in ${i} minute"
-						sleep 30s
-						broadcast_command "${message_prefix} in 30 seconds"
-						sleep 20s
-						broadcast_command "${message_prefix} in 10 seconds"
-						sleep 10s
-						;;
-					2 )
-						;&
-					3 )
-						;&
-					10 )
-						;&
-					15 )
-						;&
-					"$mtime" )
-						broadcast_command "${message_prefix} in ${i} minutes"
-						;&
-					* )
-						sleep 1m
-						# Checking for players every minute
-						# Checking after sleep since it is ran in the beginning of the function
-						if [ "$(get_player_count)" -eq 0 ]; then
-							break
-						fi
-						;;
-				esac
-			done
-		# If there are players but mtime is empty
-		elif [ -z "${mtime}" ]; then
-			return_val=1
-		# If there are players but mtime is not an integer
-		else
-			return_val=2
-		fi
-	fi
-	return "$return_val"
 }
 
 Server_Info() {

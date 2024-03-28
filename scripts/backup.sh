@@ -6,9 +6,6 @@ source "/home/steam/server/variables.sh"
 source "/home/steam/server/helper_functions.sh"
 
 DiscordMessage "Backup" "${DISCORD_PRE_BACKUP_MESSAGE}" "in-progress" "${DISCORD_PRE_BACKUP_MESSAGE_ENABLED}" "${DISCORD_PRE_BACKUP_MESSAGE_URL}"
-if [ "${RCON_ENABLED,,}" = true ]; then
-	save_server
-fi
 
 DATE=$(date +"%s")
 FILE_PATH="$SERVER_BACKUP_DIR/Saved-Backup-${DATE}.tar.gz"

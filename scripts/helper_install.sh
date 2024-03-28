@@ -25,30 +25,35 @@ UpdateRequired() {
 	return 0
 }
 
-InstallServer() {
-	local update=${1,,}
-
+BeforeInstall() {
 	if [ "$architecture" == "arm64" ] && [ "$pagesize" != "4096" ]; then
 		LogWarn "WARNING: Only ARM64 hosts with 4k page size is supported when running steamcmd. Expect server installation to fail."
 	fi
+}
+
+InstallServer() {
+	BeforeInstall
 
 	mkdir -p "$GIT_REPO_PATH" && cd "$GIT_REPO_PATH"
-	if [ "$update" != "update" ]; then
-		DiscordMessage "Install" "${DISCORD_PRE_INSTALL_MESSAGE}" "in-progress" "${DISCORD_PRE_INSTALL_MESSAGE_ENABLED}" "${DISCORD_PRE_INSTALL_MESSAGE_URL}"
+	DiscordMessage "Install" "${DISCORD_PRE_INSTALL_MESSAGE}" "in-progress" "${DISCORD_PRE_INSTALL_MESSAGE_ENABLED}" "${DISCORD_PRE_INSTALL_MESSAGE_URL}"
 
-		git init
-		git remote add origin $GIT_REPO_URL
-		git fetch origin $GIT_REPO_BRANCH
-		git checkout -b $GIT_REPO_BRANCH --track origin/$GIT_REPO_BRANCH
-	else
-		DiscordMessage "Update" "${DISCORD_PRE_UPDATE_BOOT_MESSAGE}" "in-progress" "${DISCORD_PRE_UPDATE_BOOT_MESSAGE_ENABLED}" "${DISCORD_PRE_UPDATE_BOOT_MESSAGE_URL}"
-		git stash
-		git pull $GIT_REPO_URL $GIT_REPO_BRANCH
-		git stash clear
-	fi
+	git init
+	git remote add origin $GIT_REPO_URL
+	git fetch origin $GIT_REPO_BRANCH
+	git checkout -b $GIT_REPO_BRANCH --track origin/$GIT_REPO_BRANCH
 
+	DiscordMessage "Install" "${DISCORD_POST_INSTALL_MESSAGE}" "in-progress" "${DISCORD_POST_INSTALL_MESSAGE_ENABLED}" "${DISCORD_POST_INSTALL_MESSAGE_URL}"
 }
 
 UpdateServer() {
-	InstallServer update
+	BeforeInstall
+
+	cd "$GIT_REPO_PATH"
+	DiscordMessage "Update" "${DISCORD_PRE_UPDATE_BOOT_MESSAGE}" "in-progress" "${DISCORD_PRE_UPDATE_BOOT_MESSAGE_ENABLED}" "${DISCORD_PRE_UPDATE_BOOT_MESSAGE_URL}"
+
+	git stash
+	git pull $GIT_REPO_URL $GIT_REPO_BRANCH
+	git stash clear
+
+	DiscordMessage "Update" "${DISCORD_POST_UPDATE_BOOT_MESSAGE}" "in-progress" "${DISCORD_POST_UPDATE_BOOT_MESSAGE_ENABLED}" "${DISCORD_POST_UPDATE_BOOT_MESSAGE_URL}"
 }
