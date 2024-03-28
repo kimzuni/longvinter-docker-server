@@ -166,6 +166,9 @@ List of available environment variables:
 | BACKUP_CRON_EXPRESSION                     | Setting affects frequency of automatic backups.                                                                                                  | 0 0 * * *                                                                                          | Needs a Cron-Expression - See [Configuring Automatic Backups with Cron](#configuring-automatic-backups-with-cron) |
 | DELETE_OLD_BACKUPS                         | Delete backups after a certain number of days.                                                                                                   | false                                                                                              | true/false                                                                                                        |
 | OLD_BACKUP_DAYS                            | How many days to keep backups.                                                                                                                   | 30                                                                                                 | any positive integer                                                                                              |
+| AUTO_UPDATE_ENABLED                        | Enables automatic updates.                                                                                                                       | false                                                                                              | true/false                                                                                                        |
+| AUTO_UPDATE_CRON_EXPRESSION                | Setting affects frequency of automatic updates.                                                                                                  | 0 0 * * *                                                                                          | Needs a Cron-Expression - See [Configuring Automatic Updates with Cron](#configuring-automatic-updates-with-cron) |
+| AUTO_UPDATE_WARN_MINUTES                   | How long to wait to update the server, after the player were informed.                                                                           | 30                                                                                                 | !0                                                                                                                |
 | DISCORD_WEBHOOK_URL                        | Discord webhook url found after creating a webhook on a discord server.                                                                          | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
 | DISCORD_SUPPRESS_NOTIFICATIONS             | Enables/Disables `@silent` messages for the server messages.                                                                                     | false                                                                                              | true/false                                                                                                        |
 | DISCORD_CONNECT_TIMEOUT                    | Discord command initial connection timeout.                                                                                                      | 30                                                                                                 | !0                                                                                                                |
@@ -226,6 +229,27 @@ BACKUP_CRON_EXPRESSION is a cron expression, in a Cron-Expression you define an 
 > This image uses Supercronic for crons see [supercronic](https://github.com/aptible/supercronic#crontab-format) or [Crontab Generator](https://crontab-generator.org).
 
 Set BACKUP_CRON_EXPRESSION to change the default schedule. Example Usage: If BACKUP_CRON_EXPRESSION to `0 2 * * *`, the backup script will run every day at 2:00 AM.
+
+## Configuring Automatic Updates with Cron
+To be able to use automatic Updates with this Server the following environment variables have to be set to `true`:
+- RCON_ENABLED
+- UPDATE_ON_BOOT
+
+> [!IMPORTANT]
+>
+> If docker restart is not set to policy `always` or `unless-stopped` then the server will shutdown and will need to be manually restarted.
+>
+> The example docker run command and docker compose file in [How to Use](#how-to-use) already use the needed policy.
+
+Set AUTO_UPDATE_ENABLED enable or disable automatic updates (Default is disabled)
+
+AUTO_UPDATE_CRON_EXPRESSION is a cron expression, in a Cron-Expression you define an interval for when to run jobs.
+
+> [!TIP]
+> This image uses Supercronic for crons see [supercronic](https://github.com/aptible/supercronic#crontab-format)
+> or [Crontab Generator](https://crontab-generator.org).
+
+Set AUTO_UPDATE_CRON_EXPRESSION to change the default schedule.
 
 ## Configuring the Server Settings
 Used with [environment variables](#environment-variables).

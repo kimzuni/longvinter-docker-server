@@ -163,9 +163,12 @@ docker run -d \
 | QUERY_PORT                                 | 스팀 서버와 통신하기 위한 쿼리 포트 번호                                                                                     | 27016                                                                                              | 1024-65535                                                                                                       |
 | UPDATE_ON_BOOT\*\*                         | 이 설정 값이 `true`인 경우 서버가 시작될 때마다 업데이트를 자동으로 진행합니다.                                                | true                                                                                               | true/false                                                                                                        |
 | BACKUP_ENABLED                             | 이 설정 값이 `true`인 경우 일정 시간마다 자동으로 백업을 진행합니다.                                                          | true                                                                                               | true/false                                                                                                        |
-| BACKUP_CRON_EXPRESSION                     | 자동 백업 빈도 설정                                                                                                        | 0 0 * * *                                                                                          | 크론식 표현 - [Cron으로 자동 백업 설정하는 방법](#cron으로-자동-백업-설정하는-방법) 참고 바람                          |
+| BACKUP_CRON_EXPRESSION                     | 자동 백업 빈도 설정                                                                                                        | 0 0 * * *                                                                                          | 크론식 표현 - [Cron으로 자동 백업 설정하는 방법](#cron으로-자동-백업-설정하는-방법) 참고 바람                           |
 | DELETE_OLD_BACKUPS                         | 이 설정 값이 `true`인 경우 오래된 백업 파일을 자동으로 삭제합니다.                                                            | false                                                                                              | true/false                                                                                                        |
-| OLD_BACKUP_DAYS                            | 지정한 날짜가 넘은 백업 파일만 제거합니다.                                                                                   | 30                                                                                                 | !0                                                                                              |
+| OLD_BACKUP_DAYS                            | 지정한 날짜가 넘은 백업 파일만 제거합니다.                                                                                   | 30                                                                                                 | !0                                                                                                                |
+| AUTO_UPDATE_ENABLED                        | 이 설정 값이 `true`인 경우 일정 시간마다 자동으로 업데이트를 진행합니다.                                                      | false                                                                                               |  true/false                                                                                                       |
+| AUTO_UPDATE_CRON_EXPRESSION                | 자동 업데이트 빈도 설정                                                                                                    | 0 0 * * *                                                                                           | 크론식 표현 - [Cron으로 자동 업데이트 설정하는 방법](#cron으로-자동-업데이트-설정하는-방법) 참고 바람                   |
+| AUTO_UPDATE_WARN_MINUTES                   | 플레이어에게 디스코드 알림을 전송한 후 지정한 시간(분)이 지나면 서버 업데이트를 진행합니다.                                      | 30                                                                                                 | !0                                                                                                                |
 | DISCORD_WEBHOOK_URL                        | 디스코드 서버에서 생성한 웹훅 URL                                                                                           | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
 | DISCORD_SUPPRESS_NOTIFICATIONS             | 서버 메시지에 대해 `@silent` 메시지를 활성화 및 비활성화합니다.                                                               | false                                                                                              | true/false                                                                                                        |
 | DISCORD_CONNECT_TIMEOUT                    | 지정된 시간동안 디스코드 웹훅에 연결할 수 없을 경우 연결을 취소합니다.                                                         | 30                                                                                                 | !0                                                                                                                |
@@ -223,9 +226,31 @@ BACKUP_ENABLED 값을 `false`로 설정하면 자동으로 백업되지 않습�
 BACKUP_CRON_EXPRESSION은 크론식으로, 자동 백업의 주기를 설정합니다.
 
 > [!TIP]
-> 이 이미지는 Supercronic으로 Cron을 사용합니다. 자세한 설정 방법은 [supercronic](https://github.com/aptible/supercronic#crontab-format) 또는 [Crontab Generator](https://crontab-generator.org)를 참고해 주세요.
+> 이 이미지는 Supercronic으로 Cron을 사용합니다. 자세한 설정 방법은 [supercronic](https://github.com/aptible/supercronic#crontab-format)
+> 또는 [Crontab Generator](https://crontab-generator.org)를 참고해 주세요.
 
 BACKUP_CRON_EXPRESSION 값을 변경하여 원하는 시간대에 백업을 시작하도록 할 수 있습니다. 예를 들면 BACKUP_CRON_EXPRESSION 값을 `0 2 * * *`로 설정할 경우 매일 오전 2시에 자동으로 백업이 시작됩나다.
+
+## Cron으로 자동 업데이트 설정하는 방법
+자동 업데이트를 사용하려면 아래 환경 변수를 true로 설정해야 합니다.
+- RCON_ENABLED
+- UPDATE_ON_BOOT
+
+> [!IMPORTANT]
+>
+> 도커 재시작 옵션이 `always` 또는 `unless-stopped`로 설정되어 있지 않으면 서버가 종료된 후 수동으로 재시작해야 합니다.
+>
+> [사용법](#사용법)에 기재된 `docker compose` 및 `docker run`의 예시는 이미 해당 설정이 적용되어 있습니다.
+
+자동 업데이트를 사용하려면 AUTO_UPDATE_ENABLED 값을 `true`로 설정해 주세요.
+
+AUTO_UPDATE_CRON_EXPRESSION은 크론식으로, 자동 업데이트의 주기를 설정합니다.
+
+> [!TIP]
+> 이 이미지는 Supercronic으로 Cron을 사용합니다. 자세한 설정 방법은 [supercronic](https://github.com/aptible/supercronic#crontab-format)
+> 또는 [Crontab Generator](https://crontab-generator.org)를 참고해 주세요.
+
+AUTO_UPDATE_CRON_EXPRESSION 값을 변경해 원하는 주기를 설정해 주세요. 기본 값은 매일 밤 자정입니다.
 
 ## 서버 설정 내용
 [환경 변수](#환경-변수)와 함께 사용합니다.
