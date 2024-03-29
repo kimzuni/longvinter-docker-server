@@ -139,16 +139,20 @@ shutdown_server() {
 }
 
 Server_Info() {
+	local HTTP URL="$CFG_COMMUNITY_WEBSITE"
+	if ! [[ "$URL" =~ ^https?:// ]] && [ -n "$URL" ]; then
+		HTTP="http://"
+	fi
+
+	echo "Server Name: $CFG_SERVER_NAME"
 	if [ "$DISCORD_SERVER_INFO_MESSAGE_WITH_IP" = true ]; then
 		echo "Server IP: `curl -sfL icanhazip.com`"
 		echo "Server Port: $PORT"
-		echo
 	fi
-	echo "Server Name: $CFG_SERVER_NAME"
 	echo "Server Password: $CFG_PASSWORD"
-	echo "Message of the Day: $CFG_SERVER_MOTD"
-	echo "Community URL: $COMMUNITY_URL"
 	echo
+	echo "Message of the Day: $CFG_SERVER_MOTD"
+	echo "Community URL: $HTTP${URL:-None}"
 	echo "Max Player: $CFG_MAX_PLAYERS"
 	echo "PVP: $CFG_ENABLE_PVP"
 	echo "Tent Decay: $CFG_TENT_DECAY"
