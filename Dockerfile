@@ -35,6 +35,7 @@ RUN apt-get update && \
       procps=2:4.0.2-3 \
       xdg-user-dirs=0.18-1 \
       jo=1.9-1 \
+      jq=1.6-2.1 \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 RUN su steam -c "/home/steam/steamcmd/steamcmd.sh +login anonymous +app_update 1007 +quit"
@@ -111,12 +112,19 @@ ENV TZ="UTC" \
     DISABLE_GENERATE_SETTINGS=false \
     ARM_COMPATIBILITY_MODE=false
 
+# Passed from Github Actions
+ARG GIT_VERSION_TAG=unspecified
+
 COPY --chmod=755 ./scripts /home/steam/server
 RUN for file in backup.sh; do \
         mv /home/steam/server/$file /usr/local/bin/${file%.sh}; \
     done
 
 WORKDIR /home/steam/server
+
+# Make GIT_VERSION_TAG file to be able to check the version
+RUN echo $GIT_VERSION_TAG > GIT_VERSION_TAG
+
 RUN touch crontab \
  && rm -rf /tmp/dumps \
  && mkdir -p /home/steam/Steam/package \

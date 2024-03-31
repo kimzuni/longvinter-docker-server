@@ -22,6 +22,7 @@ fi
 
 if ! CheckCommitID "$TARGET_COMMIT_ID"; then
 	LogError "Invalid TARGET_COMMIT_ID($TARGET_COMMIT_ID)"
+	# This is written because GitHub API can only be used 60 times per hour
 	sleep infinity
 	exit 1
 fi
@@ -77,8 +78,6 @@ chmod +x "${STARTCOMMAND[0]}"
 isReadable "${STARTCOMMAND[0]}" || exit
 isExecutable "${STARTCOMMAND[0]}" || exit
 
-
-
 # Prepare Arguments
 if [ -n "${PORT}" ]; then
 	STARTCOMMAND+=("-Port=${PORT}")
@@ -88,7 +87,8 @@ if [ -n "${QUERY_PORT}" ]; then
 	STARTCOMMAND+=("-QueryPort=${QUERY_PORT}")
 fi
 
-
+LogAction "Checking for available container updates"
+container_version_check
 
 if [ "${DISABLE_GENERATE_SETTINGS,,}" = true ]; then
 	LogAction "GENERATING CONFIG"
@@ -102,6 +102,7 @@ fi
 
 LogAction "GENERATING CRONTAB"
 truncate -s 0  "/home/steam/server/crontab"
+
 if [ "${BACKUP_ENABLED,,}" = true ]; then
 	LogInfo "BACKUP_ENABLED=${BACKUP_ENABLED,,}"
 	LogInfo "Adding cronjob for auto backups"

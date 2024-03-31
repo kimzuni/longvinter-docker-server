@@ -43,3 +43,4 @@ fi
 
 LogError "Unable to delete old backups, OLD_BACKUP_DAYS is not an integer. OLD_BACKUP_DAYS=${OLD_BACKUP_DAYS}"
 DiscordMessage "Backup" "${DISCORD_ERR_BACKUP_DELETE_MESSAGE//old_backup_days/${OLD_BACKUP_DAYS}}" "failure" "${DISCORD_ERR_BACKUP_DELETE_MESSAGE_ENABLED}" "${DISCORD_ERR_BACKUP_DELETE_MESSAGE_URL}"
+exit 1

@@ -12,7 +12,7 @@
 
 This is a Docker container to help you get started with hosting your own [Longvinter](https://store.steampowered.com/app/1635450/Longvinter/) dedicated server.
 
-The source code started with applying [Uuvana-Studios/longvinter-docker-server](https://github.com/Uuvana-Studios/longvinter-docker-server) to [thijsvanloef/palworld-docker-server](https://github.com/thijsvanloef/palworld-server-docker).
+Applying source code [Uuvana-Studios/longvinter-docker-server](https://github.com/Uuvana-Studios/longvinter-docker-server) to source code [thijsvanloef/palworld-server-docker](https://github.com/thijsvanloef/palworld-server-docker) to generate this image.
 
 This Docker images has been tested and will work on the following OS:
 - Windows 11
@@ -33,6 +33,8 @@ from https://docs-server.longvinter.com
 
 ## How to Use
 Keep in mind that you'll need to change the [environment variables](#environment-variables).
+
+After running the server, you can check the server log with the command `docker log longvinter-server`. To check in real time, add `-f` at the end.
 
 ### Docker Compose
 This repository includes an example [docker-compose.yml](/docker-compose.yml) file you can use to set up your server.
@@ -103,7 +105,7 @@ services:
 After you finish setting up, you must run the `docker compose up -d` command where the `docker-compose.yml` file is located.
 
 ### Docker Run
-Change every <> to your own configuration.
+You can also use the command `docker run` instead of `docker compose`. the server runs as soon as you run the command below.
 
 ```bash
 docker run -d \
@@ -169,6 +171,7 @@ List of available environment variables:
 | AUTO_UPDATE_ENABLED                        | Enables automatic updates.                                                                                                                       | false                                                                                              | true/false                                                                                                        |
 | AUTO_UPDATE_CRON_EXPRESSION                | Setting affects frequency of automatic updates.                                                                                                  | 0 0 * * *                                                                                          | Needs a Cron-Expression - See [Configuring Automatic Updates with Cron](#configuring-automatic-updates-with-cron) |
 | AUTO_UPDATE_WARN_MINUTES                   | How long to wait to update the server, after the player were informed.                                                                           | 30                                                                                                 | !0                                                                                                                |
+| TARGET_COMMIT_ID                           | Install and run the game server at the specified version.                                                                                        | _(empty)_                                                                                          | See [Target Commit ID](#target-commit-id)                                                                         |
 | DISCORD_WEBHOOK_URL                        | Discord webhook url found after creating a webhook on a discord server.                                                                          | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
 | DISCORD_SUPPRESS_NOTIFICATIONS             | Enables/Disables `@silent` messages for the server messages.                                                                                     | false                                                                                              | true/false                                                                                                        |
 | DISCORD_CONNECT_TIMEOUT                    | Discord command initial connection timeout.                                                                                                      | 30                                                                                                 | !0                                                                                                                |
@@ -285,8 +288,13 @@ Send discord messages with docker compose:
 - DISCORD_PRE_UPDATE_BOOT_MESSAGE="Server is updating..."
 ```
 
+## Target Commit ID
+> [!WARNING]
+> Downgrading to a lower game version is possible, but it is unknown what impact it will have on existing saves.
+>
+> **Please do so at your own risk!**
+
 
 
 # To do List
-- Update
 - Restore

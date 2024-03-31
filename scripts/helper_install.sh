@@ -25,23 +25,33 @@ IsInstalled() {
 # Returns 0 if Update Required
 # Returns 1 if Update NOT Required
 UpdateRequired() {
-	LogAction "Checking for new update"
+	LogAction "Checking for new Longvinter Server updates"
 
 	cd "$GIT_REPO_PATH"
 
 	local CURRENT_COMMIT=$(git log HEAD -1 | head -1 | awk '{print $2}')
-	local LATEST_COMMIT=$(curl -sfSL "$GIT_REPO_API/commits/main" | grep sha | head -1 | awk -F'"' '{print $4}')
+	local LATEST_COMMIT=$(curl -sfSL "$GIT_REPO_API/commits/main" | jq .sha -r)
+
+	LogInfo "Current Version: $CURRENT_COMMIT"
 
 	if [ -n "$TARGET_COMMIT_ID" ]; then
 		if [[ "$CURRENT_COMMIT" =~ ^"$TARGET_COMMIT_ID" ]]; then
+			LogSuccess "Game is the target version"
 			return 1
+		else
+			LogInfo "Game not at target version. Target Version: ${TARGET_COMMIT_ID}"
+			return 0
 		fi
 	else
 		if [ "$CURRENT_COMMIT" == "$LATEST_COMMIT" ]; then
+			return_val=1
+			LogSuccess "The server is up to date!"
 			return 1
+		else
+			LogInfo "An Update Is Available. Latest Version: $LATEST_MANIFEST."
+			return 0
 		fi
 	fi
-	return 0
 }
 
 BeforeInstall() {

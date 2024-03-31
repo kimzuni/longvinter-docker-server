@@ -12,9 +12,9 @@
 
 도커에 [롱빈터](https://store.steampowered.com/app/1635450/Longvinter/) 전용 서버를 올릴 수 있습니다.
 
-소스 코드는 [thijsvanloef/palworld-docker-server](https://github.com/thijsvanloef/palworld-server-docker)에 [Uuvana-Studios/longvinter-docker-server](https://github.com/Uuvana-Studios/longvinter-docker-server)를 적용하는 것부터 시작되었습니다.
+이 소스 코드는 [thijsvanloef/palworld-server-docker](https://github.com/thijsvanloef/palworld-server-docker) 저장소를 기반으로 [Uuvana-Studios/longvinter-docker-server](https://github.com/Uuvana-Studios/longvinter-docker-server) 저장소를 참고하여 작성되었습니다.
 
-도커 이미지는 아래 운영체제에서 테스트되었습니다.
+빌드된 이미지는 아래 운영체제에서 테스트되었습니다.
 - Windows 11
 - Ubuntu 22.04
 
@@ -34,8 +34,10 @@
 ## 사용법
 [환경 변수](#환경-변수)를 상황에 맞게 설정한 후 실행해 주세요.
 
+서버를 실행한 후 `docker log longvinter-server` 명령어로 서버 로그를 확인할 수 있습니다. 실시간으로 확인하려면 마지막에 `-f`를 추가해 주세요.
+
 ### Docker Compose
-아래는 서버 설정에 필요한 [docker-compose.yml](/docker-compose.yml) 예시 파일 내용입니다.
+아래는 서버 설정에 필요한 [docker-compose.yml](/docker-compose.yml) 예시 파일에서 TZ 값을 수정한 내용입니다.
 
 ```yaml
 services:
@@ -100,10 +102,10 @@ services:
       - ./data:/data
 ```
 
-설정을 마친 후 `docker-compose.yml` 파일이 있는 곳에서 `docker compose up -d` 명령어를 실행해야 서버가 도커에 올라갑니다.
+설정을 마친 후 `docker-compose.yml` 파일이 있는 곳에서 `docker compose up -d` 명령어를 실행해면 서버가 실행됩니다.
 
 ### Docker Run
-`docker compose` 대신 `docker run`을 사용할 수 있습니다.
+`docker compose` 대신 `docker run` 명령어를 사용할 수도 있습니다. 아래 명령어 실행 시 바로 서버가 실행됩니다.
 
 ```bash
 docker run -d \
@@ -135,7 +137,7 @@ docker run -d \
     kimzuni/longvinter-docker-server:latest
 ```
 
-위 방법 대신 [.env.example](/.env.example) 파일을 `.env` 파일로 복사한 후 내용을 수정하여 사용할 수도 있습니다. 이 경우 아래 명령어를 실행하여 롱빈터 서버를 도커에 올릴 수 있습니다.
+위 방법 대신 [.env.example](/.env.example) 파일을 `.env` 파일로 복사한 후 내용을 수정하여 사용할 수도 있습니다. 이 경우 위 명령어 대신 아래 명령어를 실행해야 합니다.
 
 ```bash
 docker run -d \
@@ -154,121 +156,114 @@ docker run -d \
 ## 환경 변수
 아래는 사용 가능한 환경 변수 목록입니다.
 
-| 변수명                                     | 정보                                                                                                                      | 기본값                                                                                             | 설정 가능한 값                                                                                                    |
-|--------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| TZ                                         | Cron 및 게임 서버에 사용되는 시간대 설정 (로그 파일에는 적용되지 않음)                                                        | UTC                                                                                                | [참고 바람](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#Time_Zone_abbreviations)                 |
-| PUID\*                                     | 서버가 해당 값을 가진 UID로 실행됩니다.                                                                                     | 1000                                                                                               | !0                                                                                                                |
-| PGID\*                                     | 서버가 해당 값을 가진 GID로 실행됩니다.                                                                                     | 1000                                                                                               | !0                                                                                                                |
-| PORT\*                                     | 서버 개임 포트 번호                                                                                                        | 7777                                                                                               | 1024-65535                                                                                                        |
-| QUERY_PORT                                 | 스팀 서버와 통신하기 위한 쿼리 포트 번호                                                                                     | 27016                                                                                              | 1024-65535                                                                                                       |
-| UPDATE_ON_BOOT\*\*                         | 이 설정 값이 `true`인 경우 서버가 시작될 때마다 업데이트를 자동으로 진행합니다.                                                | true                                                                                               | true/false                                                                                                        |
-| BACKUP_ENABLED                             | 이 설정 값이 `true`인 경우 일정 시간마다 자동으로 백업을 진행합니다.                                                          | true                                                                                               | true/false                                                                                                        |
-| BACKUP_CRON_EXPRESSION                     | 자동 백업 빈도 설정                                                                                                        | 0 0 * * *                                                                                          | 크론식 표현 - [Cron으로 자동 백업 설정하는 방법](#cron으로-자동-백업-설정하는-방법) 참고 바람                           |
-| DELETE_OLD_BACKUPS                         | 이 설정 값이 `true`인 경우 오래된 백업 파일을 자동으로 삭제합니다.                                                            | false                                                                                              | true/false                                                                                                        |
-| OLD_BACKUP_DAYS                            | 지정한 날짜가 넘은 백업 파일만 제거합니다.                                                                                   | 30                                                                                                 | !0                                                                                                                |
-| AUTO_UPDATE_ENABLED                        | 이 설정 값이 `true`인 경우 일정 시간마다 자동으로 업데이트를 진행합니다.                                                      | false                                                                                               |  true/false                                                                                                       |
-| AUTO_UPDATE_CRON_EXPRESSION                | 자동 업데이트 빈도 설정                                                                                                    | 0 0 * * *                                                                                           | 크론식 표현 - [Cron으로 자동 업데이트 설정하는 방법](#cron으로-자동-업데이트-설정하는-방법) 참고 바람                   |
-| AUTO_UPDATE_WARN_MINUTES                   | 플레이어에게 디스코드 알림을 전송한 후 지정한 시간(분)이 지나면 서버 업데이트를 진행합니다.                                      | 30                                                                                                 | !0                                                                                                                |
-| DISCORD_WEBHOOK_URL                        | 디스코드 서버에서 생성한 웹훅 URL                                                                                           | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
-| DISCORD_SUPPRESS_NOTIFICATIONS             | 서버 메시지에 대해 `@silent` 메시지를 활성화 및 비활성화합니다.                                                               | false                                                                                              | true/false                                                                                                        |
-| DISCORD_CONNECT_TIMEOUT                    | 지정된 시간동안 디스코드 웹훅에 연결할 수 없을 경우 연결을 취소합니다.                                                         | 30                                                                                                 | !0                                                                                                                |
-| DISCORD_MAX_TIMEOUT                        | 지정된 시간동안 작업이 끝나지 않으면 강제로 종료합니다.                                                                      | 30                                                                                                  | !0                                                                                                                |
-| DISCORD_PRE_INSTALL_MESSAGE                | 서버를 설치할 때 전송되는 메시지                                                                                            | Server is installing...                                                                            | "string"                                                                                                           |
-| DISCORD_PRE_INSTALL_MESSAGE_ENABLED        | 이 설정 값이 `true`인 경우에만 해당 메시지를 전송합니다.                                                                     | true                                                                                               | true/false                                                                                                         |
-| DISCORD_PRE_INSTALL_MESSAGE_URL            | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 값이 사용됩니다)                                | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                    |
-| DISCORD_POST_INSTALL_MESSAGE               | 서버 설치가 완료되었을 때 전송되는 메시지                                                                                   | Server install complete!                                                                           | "string"                                                                                                           |
-| DISCORD_POST_INSTALL_MESSAGE_ENABLED       | 이 설정 값이 `true`인 경우에만 해당 메시지를 전송합니다.                                                                     | true                                                                                               | true/false                                                                                                         |
-| DISCORD_POST_INSTALL_MESSAGE_URL           | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 값이 사용됩니다)                                | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                    |
-| DISCORD_PRE_UPDATE_BOOT_MESSAGE            | 서버가 업데이트될 때 전송되는 메시지                                                                                        | Server is updating...                                                                              | "string"                                                                                                           |
-| DISCORD_PRE_UPDATE_BOOT_MESSAGE_ENABLED    | 이 설정 값이 `true`인 경우에만 해당 메시지를 전송합니다.                                                                     | true                                                                                               | true/false                                                                                                         |
-| DISCORD_PRE_UPDATE_BOOT_MESSAGE_URL        | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 값이 사용됩니다)                                 | _(empty)_                                                                                         | `https://discord.com/api/webhooks/<webhook_id>`                                                                    |
-| DISCORD_POST_UPDATE_BOOT_MESSAGE           | 서버 업데이트가 완료된 후 전송되는 메시지                                                                                    | Server update complete!                                                                           | "string"                                                                                                           |
-| DISCORD_POST_UPDATE_BOOT_MESSAGE_ENABLED   | 이 설정 값이 `true`인 경우에만 해당 메시지를 전송합니다.                                                                     | true                                                                                               | true/false                                                                                                         |
-| DISCORD_POST_UPDATE_BOOT_MESSAGE_URL       | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 값이 사용됩니다)                                 | _(empty)_                                                                                         | `https://discord.com/api/webhooks/<webhook_id>`                                                                    |
-| DISCORD_PRE_START_MESSAGE                  | 서버가 시작될 때 전송되는 메시지                                                                                            | Server has been started!                                                                          | "string"                                                                                                           |
-| DISCORD_PRE_START_MESSAGE_ENABLED          | 이 설정 값이 `true`인 경우에만 해당 메시지를 전송합니다.                                                                     | true                                                                                              | true/false                                                                                                          |
-| DISCORD_PRE_START_MESSAGE_URL              | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 값이 사용됩니다)                                | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                    |
-| DISCORD_SERVER_INFO_MESSAGE_ENABLED        | 이 설정 값이 `true`인 경우 시작 메시지(DISCORD_PRE_START_MESSAGE)와 함께 서버 설정 내용을 전송합니다.                         | true                                                                                               | true/false                                                                                                         |
-| DISCORD_SERVER_INFO_MESSAGE_WITH_IP        | 이 설정 값이 `true`인 경우 서버 IP 및 포트 번호를 서버 설정 내용과 함께 전송합니다.                                           | false                                                                                              | true/false                                                                                                         |
-| DISCORD_PRE_SHUTDOWN_MESSAGE               | 서버가 종료되기 전에 전송되는 메시지                                                                                       | Server is shutting down...                                                                         | "string"                                                                                                           |
-| DISCORD_PRE_SHUTDOWN_MESSAGE_ENABLED       | 이 설정 값이 `true`인 경우에만 해당 메시지를 전송합니다.                                                                    | true                                                                                               | true/false                                                                                                         |
-| DISCORD_PRE_SHUTDOWN_MESSAGE_URL           | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 값이 사용됩니다)                                | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                    |
-| DISCORD_POST_SHUTDOWN_MESSAGE              | 서버가 종료된 후 전송되는 메시지                                                                                           | Server is stopped!                                                                                 | "string"                                                                                                           |
-| DISCORD_POST_SHUTDOWN_MESSAGE_ENABLED      | 이 설정 값이 `true`인 경우에만 해당 메시지를 전송합니다.                                                                    | true                                                                                               | true/false                                                                                                         |
-| DISCORD_POST_SHUTDOWN_MESSAGE_URL          | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 값이 사용됩니다)                                | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
-| DISCORD_PRE_BACKUP_MESSAGE                 | 백업이 시작될 때 전송되는 메시지                                                                                           | Creating backup...                                                                                 | "string"                                                                                                          |
-| DISCORD_PRE_BACKUP_MESSAGE_ENABLED         | 이 설정 값이 `true`인 경우에만 해당 메시지를 전송합니다e.                                                                   | true                                                                                               | true/false                                                                                                        |
-| DISCORD_PRE_BACKUP_MESSAGE_URL             | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 값이 사용됩니다)                                | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
-| DISCORD_POST_BACKUP_MESSAGE                | 백업이 완료된 후 전송되는 메시지                                                                                           | Backup created at `file_path`                                                                      | "string"                                                                                                          |
-| DISCORD_POST_BACKUP_MESSAGE_ENABLED        | 이 설정 값이 `true`인 경우에만 해당 메시지를 전송합니다.                                                                    | true                                                                                               | true/false                                                                                                        |
-| DISCORD_POST_BACKUP_MESSAGE_URL            | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 값이 사용됩니다)                                | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
-| DISCORD_PRE_BACKUP_DELETE_MESSAGE          | 오래된 백업 파일을 삭제할 때 전송되는 메시지                                                                                | Removing backups older than `old_backup_days` days                                                 | "string"                                                                                                          |
-| DISCORD_PRE_BACKUP_DELETE_MESSAGE_ENABLED  | 이 설정 값이 `true`인 경우에만 해당 메시지를 전송합니다.                                                                    | true                                                                                               | true/false                                                                                                        |
-| DISCORD_PRE_BACKUP_DELETE_MESSAGE_URL      | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 값이 사용됩니다)                                | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
-| DISCORD_POST_BACKUP_DELETE_MESSAGE         | 오래된 백업 파일을 정상적으로 삭제했을 때 전송되는 메시지                                                                    | Removed backups older than `old_backup_days` days                                                  | "string"                                                                                                          |
-| DISCORD_POST_BACKUP_DELETE_MESSAGE_ENABLED | 이 설정 값이 `true`인 경우에만 해당 메시지를 전송합니다.                                                                     | true                                                                                               | true/false                                                                                                       |
-| DISCORD_POST_BACKUP_DELETE_MESSAGE_URL     | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 값이 사용됩니다)                                | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
-| DISCORD_ERR_BACKUP_DELETE_MESSAGE          | 오래된 백업 파일을 정상적으로 삭제하지 못했을 때 전송되는 메시지                                                              | Unable to delete old backups, OLD_BACKUP_DAYS is not an integer. OLD_BACKUP_DAYS=`old_backup_days` | "string"                                                                                                          |
-| DISCORD_ERR_BACKUP_DELETE_MESSAGE_ENABLED  | 이 설정 값이 `true`인 경우에만 해당 메시지를 전송합니다.                                                                     | true                                                                                               | true/false                                                                                                        |
-| DISCORD_ERR_BACKUP_DELETE_MESSAGE_URL      | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 값이 사용됩니다)                                | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                    |
-| DISABLE_GENERATE_SETTINGS                  | 이 설정 값이 `true`인 경우 서버 설정 파일인 `Game.ini`에 적용되는 환경변수 값들은 무시되며. 모두 기본 설정 값으로 생성됩니다.    | false                                                                                              | true/false                                                                                                         |
-| ARM_COMPATIBILITY_MODE                     | 서버 업데이트를 위해 steamcmd를 실행할 때 Box86에서 QEMU로 호환성 계층을 전환합니다. 이 설정은 ARM64 호스트에만 적용 가능합니다. | false                                                                                              | true/false                                                                                                        |
+| 변수명                                      | 정보                                                                                                            | 기본값                                                                                              | 설정 가능한 값                                                                                                |
+|--------------------------------------------|----------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| TZ                                         | Cron 및 게임 서버에 사용되는 시간대 설정 (로그 파일에는 적용되지 않음)                                                      | UTC                                                                                                | [TZ Identifiers](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#Time_Zone_abbreviations) 참고 |
+| PUID\*                                     | 지정한 값을 가진 UID로 서버 실행                                                                                     | 1000                                                                                               | !0                                                                                                         |
+| PGID\*                                     | 지정한 값을 가진 GID로 서버 실행                                                                                     | 1000                                                                                               | !0                                                                                                         |
+| PORT\*                                     | 서버 게임 포트 번호                                                                                                | 7777                                                                                               | 1024-65535                                                                                                 |
+| QUERY_PORT                                 | 스팀 서버와 통신하기 위한 쿼리 포트 번호                                                                               | 27016                                                                                              | 1024-65535                                                                                                 |
+| UPDATE_ON_BOOT\*\*                         | 서버 시작 시 자동으로 서버 업데이트 진행                                                                               | true                                                                                               | true/false                                                                                                 |
+| BACKUP_ENABLED                             | 일정 시간마다 자동으로 서버 백업 진행                                                                                  | true                                                                                               | true/false                                                                                                 |
+| BACKUP_CRON_EXPRESSION                     | 자동 백업 빈도 설정                                                                                                | 0 0 * * *                                                                                         | 크론식 표현 - [Cron으로 자동 백업 설정하는 방법](#cron으로-자동-백업-설정하는-방법) 참고 바람                              |
+| DELETE_OLD_BACKUPS                         | 자동 백업 설정 시 오래된 백업 파일 자동 삭제                                                                            | false                                                                                             | true/false                                                                                                 |
+| OLD_BACKUP_DAYS                            | 지정한 일수가 지난 백업 파일만 삭제                                                                                    | 30                                                                                                | !0                                                                                                         |
+| AUTO_UPDATE_ENABLED                        | 일정 시간마다 자동으로 서버 업데이트 진행                                                                               | false                                                                                              |  true/false                                                                                                |
+| AUTO_UPDATE_CRON_EXPRESSION                | 자동 업데이트 빈도 설정                                                                                             | 0 0 * * *                                                                                         | 크론식 표현 - [Cron으로 자동 업데이트 설정하는 방법](#cron으로-자동-업데이트-설정하는-방법) 참고 바람                        |
+| AUTO_UPDATE_WARN_MINUTES                   | 지정한 시간(분)이 지난 후 서버 업데이트 진행                                                                           | 30                                                                                                | !0                                                                                                          |
+| TARGET_COMMIT_ID                           | 게임 서버를 지정한 Commit ID를 가진 버전으로 설치 및 실행                                                               | _(empty)_                                                                                         | [Target Commit ID](#target-commit-id) 참고                                                                   |
+| DISCORD_WEBHOOK_URL                        | 디스코드 서버에서 생성한 웹훅 URL                                                                                    | _(empty)_                                                                                         | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
+| DISCORD_SUPPRESS_NOTIFICATIONS             | 디스코드 메시지 전송 시 멤버들에게 알림을 보내지 않음                                                                     | false                                                                                             | true/false                                                                                                  |
+| DISCORD_CONNECT_TIMEOUT                    | 지정한 시간동안 디스코드 웹훅에 연결할 수 없을 경우 연결 취소                                                              | 30                                                                                                | !0                                                                                                          |
+| DISCORD_MAX_TIMEOUT                        | 지정한 시간동안 디스코드 메시지가 전송되지 않으면 강제 종료                                                                | 30                                                                                                | !0                                                                                                          |
+| DISCORD_PRE_INSTALL_MESSAGE                | 서버 설치 전 전송되는 메시지                                                                                         | Server is installing...                                                                           | "string"                                                                                                    |
+| DISCORD_PRE_INSTALL_MESSAGE_ENABLED        | 이 값이 `true`인 경우에만 해당 메시지 전송                                                                            | true                                                                                              | true/false                                                                                                  |
+| DISCORD_PRE_INSTALL_MESSAGE_URL            | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                       | _(empty)_                                                                                         | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
+| DISCORD_POST_INSTALL_MESSAGE               | 서버 설치 후 전송되는 메시지                                                                                        | Server install complete!                                                                          | "string"                                                                                                    |
+| DISCORD_POST_INSTALL_MESSAGE_ENABLED       | 이 값이 `true`인 경우에만 해당 메시지 전송                                                                            | true                                                                                              | true/false                                                                                                  |
+| DISCORD_POST_INSTALL_MESSAGE_URL           | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                       | _(empty)_                                                                                         | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
+| DISCORD_PRE_UPDATE_BOOT_MESSAGE            | 서버 업데이트 전 전송되는 메시지                                                                                     | Server is updating...                                                                             | "string"                                                                                                    |
+| DISCORD_PRE_UPDATE_BOOT_MESSAGE_ENABLED    | 이 값이 `true`인 경우에만 해당 메시지 전송                                                                           | true                                                                                              | true/false                                                                                                  |
+| DISCORD_PRE_UPDATE_BOOT_MESSAGE_URL        | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                      | _(empty)_                                                                                         | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
+| DISCORD_POST_UPDATE_BOOT_MESSAGE           | 서버 업데이트 후 전송되는 메시지                                                                                    | Server update complete!                                                                           | "string"                                                                                                    |
+| DISCORD_POST_UPDATE_BOOT_MESSAGE_ENABLED   | 이 값이 `true`인 경우에만 해당 메시지 전송                                                                           | true                                                                                              | true/false                                                                                                  |
+| DISCORD_POST_UPDATE_BOOT_MESSAGE_URL       | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                      | _(empty)_                                                                                         | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
+| DISCORD_PRE_START_MESSAGE                  | 서버 시작 시 전송되는 메시지                                                                                        | Server has been started!                                                                          | "string"                                                                                                    |
+| DISCORD_PRE_START_MESSAGE_ENABLED          | 이 값이 `true`인 경우에만 해당 메시지 전송                                                                           | true                                                                                              | true/false                                                                                                  |
+| DISCORD_PRE_START_MESSAGE_URL              | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                      | _(empty)_                                                                                         | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
+| DISCORD_SERVER_INFO_MESSAGE_ENABLED        | 서버 시작 메시지 전송 시 서버 설정 내용을 같이 전송                                                                     | true                                                                                               | true/false                                                                                                  |
+| DISCORD_SERVER_INFO_MESSAGE_WITH_IP        | 서버 설정 내용 전송 시 서버 IP 및 포트 번호를 같이 전송                                                                 | false                                                                                              | true/false                                                                                                  |
+| DISCORD_PRE_SHUTDOWN_MESSAGE               | 서버 종료 전 전송되는 메시지                                                                                        | Server is shutting down...                                                                         | "string"                                                                                                    |
+| DISCORD_PRE_SHUTDOWN_MESSAGE_ENABLED       | 이 값이 `true`인 경우에만 해당 메시지 전송                                                                           | true                                                                                               | true/false                                                                                                  |
+| DISCORD_PRE_SHUTDOWN_MESSAGE_URL           | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                      | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
+| DISCORD_POST_SHUTDOWN_MESSAGE              | 서버 종료 후 전송되는 메시지                                                                                        | Server is stopped!                                                                                 | "string"                                                                                                    |
+| DISCORD_POST_SHUTDOWN_MESSAGE_ENABLED      | 이 값이 `true`인 경우에만 해당 메시지 전송                                                                           | true                                                                                               | true/false                                                                                                  |
+| DISCORD_POST_SHUTDOWN_MESSAGE_URL          | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                      | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
+| DISCORD_PRE_BACKUP_MESSAGE                 | 백업 시작 전 전송되는 메시지                                                                                       | Creating backup...                                                                                 | "string"                                                                                                    |
+| DISCORD_PRE_BACKUP_MESSAGE_ENABLED         | 이 값이 `true`인 경우에만 해당 메시지 전송                                                                           | true                                                                                               | true/false                                                                                                  |
+| DISCORD_PRE_BACKUP_MESSAGE_URL             | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                      | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
+| DISCORD_POST_BACKUP_MESSAGE                | 백업 완료 후 전송되는 메시지                                                                                       | Backup created at `file_path`                                                                      | "string"                                                                                                    |
+| DISCORD_POST_BACKUP_MESSAGE_ENABLED        | 이 값이 `true`인 경우에만 해당 메시지 전송                                                                          | true                                                                                               | true/false                                                                                                  |
+| DISCORD_POST_BACKUP_MESSAGE_URL            | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                     | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
+| DISCORD_PRE_BACKUP_DELETE_MESSAGE          | 오래된 백업 파일 삭제 전 전송되는 메시지                                                                             | Removing backups older than `old_backup_days` days                                                 | "string"                                                                                                    |
+| DISCORD_PRE_BACKUP_DELETE_MESSAGE_ENABLED  | 이 값이 `true`인 경우에만 해당 메시지 전송                                                                          | true                                                                                               | true/false                                                                                                  |
+| DISCORD_PRE_BACKUP_DELETE_MESSAGE_URL      | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                     | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
+| DISCORD_POST_BACKUP_DELETE_MESSAGE         | 오래된 백업 파일 삭제 완료 후 전송되는 메시지                                                                         | Removed backups older than `old_backup_days` days                                                  | "string"                                                                                                    |
+| DISCORD_POST_BACKUP_DELETE_MESSAGE_ENABLED | 이 값이 `true`인 경우에만 해당 메시지 전송                                                                          | true                                                                                               | true/false                                                                                                  |
+| DISCORD_POST_BACKUP_DELETE_MESSAGE_URL     | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                     | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
+| DISCORD_ERR_BACKUP_DELETE_MESSAGE          | 오래된 백업 파일 삭제 실패 시 전송되는 메시지                                                                         | Unable to delete old backups, OLD_BACKUP_DAYS is not an integer. OLD_BACKUP_DAYS=`old_backup_days` | "string"                                                                                                     |
+| DISCORD_ERR_BACKUP_DELETE_MESSAGE_ENABLED  | 이 값이 `true`인 경우에만 해당 메시지 전송                                                                          | true                                                                                               | true/false                                                                                                   |
+| DISCORD_ERR_BACKUP_DELETE_MESSAGE_URL      | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                     | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                              |
+| DISABLE_GENERATE_SETTINGS                  | 서버 설정 파일 `Game.ini`에 적용되는 모든 환경변수 설정 무시 및 기본 값으로 설정                                          | false                                                                                              | true/false                                                                                                   |
+| ARM_COMPATIBILITY_MODE                     | 서버 업데이트를 위해 steamcmd를 실행할 때 Box86에서 QEMU로 호환성 계층을 전환합니다. 이 설정은 ARM64 호스트에만 적용 가능합니다. | false                                                                                               | true/false                                                                                                   |
 
-\* 권장사항
+\* 설정 권장사항
 
-\*\* 해당 옵션이 어떠한 기능을 하는지 정확히 모른다면 수정하지 마세요.
+\*\* 기본 값 사용을 권장
 
 ## Cron으로 자동 백업 설정하는 방법
-TZ로 설정된 시간대에 따라 매일 밤 자정에 서버가 자동으로 백업됩니다.
-
-BACKUP_ENABLED 값을 `false`로 설정하면 자동으로 백업되지 않습니다.
-
-BACKUP_CRON_EXPRESSION은 크론식으로, 자동 백업의 주기를 설정합니다.
+자동 백업을 사용하려면 환경 변수 BACKUP_ENABLED 값을 `true`로 설정되어 있어야 합니다. (기본값)
 
 > [!TIP]
 > 이 이미지는 Supercronic으로 Cron을 사용합니다. 자세한 설정 방법은 [supercronic](https://github.com/aptible/supercronic#crontab-format)
 > 또는 [Crontab Generator](https://crontab-generator.org)를 참고해 주세요.
 
-BACKUP_CRON_EXPRESSION 값을 변경하여 원하는 시간대에 백업을 시작하도록 할 수 있습니다. 예를 들면 BACKUP_CRON_EXPRESSION 값을 `0 2 * * *`로 설정할 경우 매일 오전 2시에 자동으로 백업이 시작됩나다.
+BACKUP_CRON_EXPRESSION 값을 변경하여 원하는 시간 및 주기마다 자동 백업을 진행할 수 있습니다. 기본 값은 매일 밤 자정이며, 환경 변수 TZ 값의 영향을 받습니다.
 
 ## Cron으로 자동 업데이트 설정하는 방법
-자동 업데이트를 사용하려면 아래 환경 변수를 true로 설정해야 합니다.
-- RCON_ENABLED
+자동 업데이트를 사용하려면 아래 환경 변수 모두 true로 설정해야 합니다.
+- AUTO_UPDATE_ENABLED
 - UPDATE_ON_BOOT
 
 > [!IMPORTANT]
 >
-> 도커 재시작 옵션이 `always` 또는 `unless-stopped`로 설정되어 있지 않으면 서버가 종료된 후 수동으로 재시작해야 합니다.
+> 자동 업데이트 진행 시 서버가 종료되기 때문에 도커 재시작 옵션이 `always` 또는 `unless-stopped`로 설정되어 있어야 합니다. 그렇지 않으면 수동으로 서버를 다시 올려야 합니다.
 >
-> [사용법](#사용법)에 기재된 `docker compose` 및 `docker run`의 예시는 이미 해당 설정이 적용되어 있습니다.
-
-자동 업데이트를 사용하려면 AUTO_UPDATE_ENABLED 값을 `true`로 설정해 주세요.
-
-AUTO_UPDATE_CRON_EXPRESSION은 크론식으로, 자동 업데이트의 주기를 설정합니다.
+> 참고로 [사용법](#사용법)에 기재된 `docker compose` 및 `docker run` 예시는 이미 해당 설정이 적용되어 있습니다.
 
 > [!TIP]
 > 이 이미지는 Supercronic으로 Cron을 사용합니다. 자세한 설정 방법은 [supercronic](https://github.com/aptible/supercronic#crontab-format)
 > 또는 [Crontab Generator](https://crontab-generator.org)를 참고해 주세요.
 
-AUTO_UPDATE_CRON_EXPRESSION 값을 변경해 원하는 주기를 설정해 주세요. 기본 값은 매일 밤 자정입니다.
+AUTO_UPDATE_CRON_EXPRESSION 값을 변경하여 원하는 시간 및 주기마다 업데이트를 진행할 수 있습니다. 기본 값은 매일 밤 자정이며, 환경 변수 TZ 값의 영향을 받습니다.
 
 ## 서버 설정 내용
-[환경 변수](#환경-변수)와 함께 사용합니다.
+[환경 변수](#환경-변수)와 함께 사용할 수 있습니다.
 
-| 변수                  | 정보                                                                                                      | 기본값                         | 설정 가능한 값                                                   |
-|-----------------------|-----------------------------------------------------------------------------------------------------------|-------------------------------|------------------------------------------------------------------|
-| CFG_SERVER_NAME       | 서버 목록에 표시되는 서버명                                                                                 | Unnamed Island                | "string"                                                         |
-| CFG_MAX_PLAYERS       | 서버 동시 접속 최대 인원                                                                                    | 32                            | 1-?                                                              |
-| CFG_SERVER_MOTD       | 플레이어에게 표시되는 오늘의 메시지(Message of the Day)                                                      | Welcome to Longvinter Island! | "string"                                                         |
-| CFG_PASSWORD          | 서버 접속을 위한 비밀번호                                                                                   | _(empty)_                     | "string"                                                         |
-| CFG_COMMUNITY_WEBSITE | 서버에서 운영하는 커뮤니티 및 웹사이트 URL                                                                   | www.longvinter.com            | `<example.com>`, `http://<example.com>`, `https://<example.com>` |
-| CFG_COOP_PLAY         | 협동 플레이 여부 (PvP를 활성화한 경우 이 설정은 무시됩니다)                                                   | false                         | true/false                                                       |
-| CFG_COOP_SPAWN        | 협동 플레이 시 스폰 장소 지정 (CFG_COOP_PLAY 값이 true일 때만 동작합니다)                                     | 0                             | 0(West), 1(South), 2(East). (확인 필요)                           |
-| CFG_SERVER_TAG        | 서버 검색에 사용되는 태그                                                                                   | none                          | "string"                                                         |
-| CFG_ADMIN_STEAM_ID    | 관리자 권한을 부여할 플레이어의 EOSID(SteamID64) 값을 넣어주세요. 여러명일 경우 공백으로 구분하여 입력해 주세요. | _(empty)_                     | 0-9, a-f, " "(Space)                                             |
-| CFG_ENABLE_PVP        | 이 값이 `true`인 경우 PvP를 활성화합니다.                                                                   | true                          | true/false                                                       |
-| CFG_TENT_DECAY        | 이 값이 `true`인 경우 텐트를 48시간 내 집으로 업그레이드하지 않으면 파괴됩니다.                                | true                          | true/false                                                       |
-| CFG_MAX_TENTS         | 플레이어당 최대로 설치할 수 있는 텐트 및 집의 개수를 설정합니다.                                              | 2                             | 1~?                                                               |
+| 변수                   | 정보                                                                            | 기본값                         | 설정 가능한 값                                                     |
+|-----------------------|--------------------------------------------------------------------------------|-------------------------------|-----------------------------------------------------------------|
+| CFG_SERVER_NAME       | 비공식 서버 목록에 표시되는 서버명                                                    | Unnamed Island                | "string"                                                         |
+| CFG_MAX_PLAYERS       | 동시 접속 최대 인원                                                                | 32                            | 1-?                                                              |
+| CFG_SERVER_MOTD       | 플레이어가 스폰되는 항구 앞 표지판에 표시되는 오늘의 메시지(Message of the Day)            | Welcome to Longvinter Island! | "string"                                                         |
+| CFG_PASSWORD          | 서버 접속을 위한 비밀번호                                                           | _(empty)_                     | "string"                                                         |
+| CFG_COMMUNITY_WEBSITE | 게임 내 서버 정보에 표시되는 커뮤니티 및 웹사이트 URL                                    | www.longvinter.com            | `<example.com>`, `http://<example.com>`, `https://<example.com>` |
+| CFG_COOP_PLAY         | 협동 플레이 여부 (PvP를 활성화한 경우 이 설정은 무시)                                   | false                         | true/false                                                       |
+| CFG_COOP_SPAWN        | 협동 플레이 활성화 시 스폰 장소 지정 (모두 같은 곳에서 스폰)                              | 0                             | 0(West), 1(South), 2(East). (확인 필요)                            |
+| CFG_SERVER_TAG        | 서버 검색에 사용되는 태그                                                           | none                          | "string"                                                         |
+| CFG_ADMIN_STEAM_ID    | 해당 EOSID(SteamID64) 값을 가진 플레이어를 관리자로 설정 (공백으로 구분하여 여러명 설정 가능) | _(empty)_                     | 0-9, a-f, " "(Space)                                             |
+| CFG_ENABLE_PVP        | PvP 활성화 여부                                                                  | true                          | true/false                                                       |
+| CFG_TENT_DECAY        | 텐트 자동 철거 활성화 여부                                                          | true                          | true/false                                                       |
+| CFG_MAX_TENTS         | 플레이어당 최대로 설치할 수 있는 텐트 및 집의 개수 설정                                   | 2                             | 1~?                                                              |
 
 ## 디스코드 웹훅 사용법
 1. 디스코드 서버 설정에서 웹훅 URL을 생성합니다.
@@ -286,8 +281,16 @@ Docker Compose로 사용하는 방법
 - DISCORD_PRE_UPDATE_BOOT_MESSAGE="Server is updating..."
 ```
 
+## Target Commit ID
+> [!WARNING]
+> 해당 설정 사용 시 서버를 구버전으로 설치 및 다운그레이드를 진행합니다. 이 설정으로 인해 어떠한 문제가 발생할 지 알 수 없음을 알려드립니다.
+>
+> **꼭 필요한 경우에만 사용해 주세요!**
+
+환경 변수 TARGET_COMMIT_ID 값을 설정하여 서버를 원하는 버전으로 설치 및 실행할 수 있습니다.
+
+Commit ID는 https://github.com/Uuvana-Studios/longvinter-linux-server/commits/main/ 페이지에서 확인할 수 있습니다. (0~9, a~f로 이루어진 16진수 7자리)
 
 
 # To do List
-- Update
 - Restore

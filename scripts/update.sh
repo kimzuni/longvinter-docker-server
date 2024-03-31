@@ -23,10 +23,10 @@ if [ "${UPDATE_ON_BOOT,,}" != true ]; then
 fi
 
 if [[ "${AUTO_UPDATE_WARN_MINUTES}" =~ ^[0-9]+$ ]]; then
-	DiscordMessage "Update" "Server will update in ${AUTO_UPDATE_WARN_MINUTES} minutes"
+	DiscordMessage "Update" "Server will update in ${AUTO_UPDATE_WARN_MINUTES} minutes" "warn"
 fi
 
-sleep $((AUTO_UPDATE_WARN_MINUTES * 60))
+sleep ${AUTO_UPDATE_WARN_MINUTES}m
 
 LogAction "Updating the server from $CURRENT_MANIFEST to $TARGET_MANIFEST."
 
