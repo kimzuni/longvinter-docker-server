@@ -287,7 +287,7 @@ Docker Compose로 사용하는 방법
 >
 > **꼭 필요한 경우에만 사용해 주세요!**
 
-환경 변수 TARGET_COMMIT_ID 값을 설정하여 서버를 원하는 버전으로 설치 및 실행할 수 있습니다.
+환경 변수 TARGET_COMMIT_ID 값에 특정 버전의 Commit ID을 지정하여 서버를 해당 버전으로 설치 및 다운그레이드하여 실행할 수 있습니다.
 
 Commit ID는 https://github.com/Uuvana-Studios/longvinter-linux-server/commits/main/ 페이지에서 확인할 수 있습니다. (0~9, a~f로 이루어진 16진수 7자리)
 

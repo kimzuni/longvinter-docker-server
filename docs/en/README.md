@@ -171,7 +171,7 @@ List of available environment variables:
 | AUTO_UPDATE_ENABLED                        | Enables automatic updates.                                                                                                                       | false                                                                                              | true/false                                                                                                        |
 | AUTO_UPDATE_CRON_EXPRESSION                | Setting affects frequency of automatic updates.                                                                                                  | 0 0 * * *                                                                                          | Needs a Cron-Expression - See [Configuring Automatic Updates with Cron](#configuring-automatic-updates-with-cron) |
 | AUTO_UPDATE_WARN_MINUTES                   | How long to wait to update the server, after the player were informed.                                                                           | 30                                                                                                 | !0                                                                                                                |
-| TARGET_COMMIT_ID                           | Install and run the game server at the specified version.                                                                                        | _(empty)_                                                                                          | See [Target Commit ID](#target-commit-id)                                                                         |
+| TARGET_COMMIT_ID                           | Install and run the game server at the specified version.                                                                                        | _(empty)_                                                                                          | See [Target Commit ID](#target-commit-id)(#target-commit-id)                                                                         |
 | DISCORD_WEBHOOK_URL                        | Discord webhook url found after creating a webhook on a discord server.                                                                          | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
 | DISCORD_SUPPRESS_NOTIFICATIONS             | Enables/Disables `@silent` messages for the server messages.                                                                                     | false                                                                                              | true/false                                                                                                        |
 | DISCORD_CONNECT_TIMEOUT                    | Discord command initial connection timeout.                                                                                                      | 30                                                                                                 | !0                                                                                                                |
@@ -293,6 +293,10 @@ Send discord messages with docker compose:
 > Downgrading to a lower game version is possible, but it is unknown what impact it will have on existing saves.
 >
 > **Please do so at your own risk!**
+
+If TARGET_COMMIT_ID environment variable is set, install and run the server to the specific version.
+
+The list of Commit ID can be found in https://github.com/Uuvana-Studios/longvinter-linux-server/commits/main/
 
 
 
