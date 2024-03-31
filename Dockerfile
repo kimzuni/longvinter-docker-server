@@ -33,7 +33,7 @@ RUN apt-get update && \
       ca-certificates \
       lib32gcc1-amd64-cross \
       procps=2:4.0.2-3 \
-      xdg-user-dirs \
+      xdg-user-dirs=0.18-1 \
       jo=1.9-1 \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
@@ -112,18 +112,18 @@ ENV TZ="UTC" \
     ARM_COMPATIBILITY_MODE=false
 
 COPY --chmod=755 ./scripts /home/steam/server
-RUN mv /home/steam/server/backup.sh /usr/local/bin/backup
+RUN for file in backup.sh; do \
+        mv /home/steam/server/$file /usr/local/bin/${file%.sh}; \
+    done
 
 WORKDIR /home/steam/server
 RUN touch crontab \
- && mkdir -p /home/steam/Steam/package \
- && chown steam:steam /home/steam/Steam/package \
  && rm -rf /tmp/dumps \
+ && mkdir -p /home/steam/Steam/package \
  && chmod o+w crontab /home/steam/Steam/package \
- && chown -R steam:steam /home/steam/server
+ && chown -R steam:steam /home/steam/{server,Steam}
 
 HEALTHCHECK --start-period=3m \
     CMD pidof "LongvinterServer-Linux-Shipping" > /dev/null || exit 1
 
-EXPOSE $PORT $QUERY_PORT
 ENTRYPOINT ["/home/steam/server/init.sh"]

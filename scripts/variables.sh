@@ -4,16 +4,17 @@ export HOME="/home/steam"
 export DATA_DIR="/data"
 export GIT_REPO_NAME="longvinter-linux-server"
 export GIT_REPO_BRANCH="main"
-export GIT_REPO_URL="https://github.com/Uuvana-Studios/$GIT_REPO_NAME.git"
+export GIT_REPO_URL="https://github.com/Uuvana-Studios/$GIT_REPO_NAME"
 export GIT_REPO_PATH="$DATA_DIR"
+export GIT_REPO_API="${GIT_REPO_URL/github\.com/api.github.com\/repos}"
 export SERVER_CONFIG_PATH="/Longvinter/Saved/Config/LinuxServer/Game.ini"
 export SERVER_BACKUP_DIR="$GIT_REPO_PATH/Longvinter/Backup"
 export SERVER_LOG_PATH="$GIT_REPO_PATH/Longvinter/Saved/Logs/Longvinter.log"
 export CONFIG_FILE_FULL_PATH="$GIT_REPO_PATH/$SERVER_CONFIG_PATH"
 
-architecture=$(dpkg --print-architecture)
-pagesize=$(getconf PAGESIZE)
-export architecture pagesize
+ARCHITECTURE=$(dpkg --print-architecture)
+PAGESIZE=$(getconf PAGESIZE)
+export ARCHITECTURE PAGESIZE
 
 
 

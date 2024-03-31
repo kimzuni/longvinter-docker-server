@@ -10,12 +10,20 @@ dirExists "$DATA_DIR" || exit
 isWritable "$DATA_DIR" || exit
 isExecutable "$DATA_DIR" || exit
 
-if [ "$architecture" == "arm64" ] && [ "${ARM_COMPATIBILITY_MODE,,}" = true ]; then
+cd "$GIT_REPO_PATH" || exit 1
+
+if [ "$ARCHITECTURE" == "arm64" ] && [ "${ARM_COMPATIBILITY_MODE,,}" = true ]; then
 	LogInfo "ARM compatibility mode enabled"
 	export DEBUGGER="/usr/bin/qemu-i386-static"
 
 	# Arbitrary number to avoid CPU_MHZ warning due to qemu and steamcmd
 	export CPU_MHZ=2000
+fi
+
+if ! CheckCommitID "$TARGET_COMMIT_ID"; then
+	LogError "Invalid TARGET_COMMIT_ID($TARGET_COMMIT_ID)"
+	sleep infinity
+	exit 1
 fi
 
 IsInstalled
@@ -25,9 +33,6 @@ if [ "$ServerInstalled" == 1 ]; then
 	LogAction "Starting Installation"
 	InstallServer
 fi
-
-mkdir -p "$SERVER_BACKUP_DIR"
-cd "$GIT_REPO_PATH" || exit 1
 
 # Update Only If Already Installed
 if [ "$ServerInstalled" == 0 ] && [ "${UPDATE_ON_BOOT,,}" == true ]; then
@@ -40,10 +45,10 @@ if [ "$ServerInstalled" == 0 ] && [ "${UPDATE_ON_BOOT,,}" == true ]; then
 fi
 
 # Check if the architecture is arm64
-if [ "$architecture" == "arm64" ]; then
+if [ "$ARCHITECTURE" == "arm64" ]; then
 	box64_binary="box64"
 
-	case $pagesize in
+	case $PAGESIZE in
 		8192)
 			LogInfo "Using Box64 for 8k pagesize"
 			box64_binary="box64-8k"

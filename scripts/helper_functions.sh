@@ -117,12 +117,9 @@ Log() {
 DiscordMessage() {
 	local title="$1"
 	local message="$2"
-	local level="${3}"
+	local level="${3:-info}"
 	local enabled="$4"
 	local webhook_url="$5"
-	if [ -z "$level" ]; then
-		level="info"
-	fi
 	if [ -n "${DISCORD_WEBHOOK_URL}" ]; then
 		/home/steam/server/discord.sh "$title" "$message" "$level" "$enabled" "$webhook_url" &
 	fi
@@ -132,8 +129,6 @@ DiscordMessage() {
 # Returns 0 if it is shutdown
 # Returns not 0 if it is not able to be shutdown
 shutdown_server() {
-	local return_val=0
-
 	kill -15 `pidof LongvinterServer-Linux-Shipping`
 	return $?
 }
@@ -146,7 +141,7 @@ Server_Info() {
 
 	echo "Server Name: $CFG_SERVER_NAME"
 	if [ "$DISCORD_SERVER_INFO_MESSAGE_WITH_IP" = true ]; then
-		echo "Server IP: `curl -sfL icanhazip.com`"
+		echo "Server IP: `curl -sfSL icanhazip.com`"
 		echo "Server Port: $PORT"
 	fi
 	echo "Server Password: $CFG_PASSWORD"

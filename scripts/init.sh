@@ -5,6 +5,14 @@ source "/home/steam/server/variables.sh"
 # shellcheck source=scripts/helper_functions.sh
 source "/home/steam/server/helper_functions.sh"
 
+
+
+if ! dirExists "$DATA_DIR"; then
+	LogError "$DATA_DIR is not mounted."
+	exit 1
+fi
+mkdir -p "$SERVER_BACKUP_DIR"
+
 if [[ "$(id -u)" -eq 0 ]] && [[ "$(id -g)" -eq 0 ]]; then
 	if [[ "${PUID}" -ne 0 ]] && [[ "${PGID}" -ne 0 ]]; then
 		LogAction "EXECUTING USERMOD"
@@ -20,18 +28,12 @@ elif [[ "$(id -u)" -eq 0 ]] || [[ "$(id -g)" -eq 0 ]]; then
 	exit 1
 fi
 
-if ! [ -w "$DATA_DIR" ]; then
-	LogError "$DATA_DIR is not writable."
-	exit 1
-fi
-
 
 
 term_handler() {
 	DiscordMessage "Shutdown" "${DISCORD_PRE_SHUTDOWN_MESSAGE}" "in-progress" "${DISCORD_PRE_SHUTDOWN_MESSAGE_ENABLED}" "${DISCORD_PRE_SHUTDOWN_MESSAGE_URL}"
 
 	if ! shutdown_server; then
-#		kill -SIGTERM "$(pidof PalServer-Linux-Test)"
 		LogWarn "Unable to shutdown the server for unknown reasons."
 		DiscordMessage "Shutdown" "Unable to shutdown the server for unknown reasons." "failure" "${DISCORD_PRE_SHUTDOWN_MESSAGE_ENABLED}" "${DISCORD_PRE_SHUTDOWN_MESSAGE_URL}"
 		return 1
