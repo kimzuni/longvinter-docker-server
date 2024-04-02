@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # This file contains functions which can be used in multiple scripts
 
 # Checks if a given path is a directory
@@ -129,7 +129,7 @@ DiscordMessage() {
 # Returns 0 if it is shutdown
 # Returns not 0 if it is not able to be shutdown
 shutdown_server() {
-	kill -15 `pidof LongvinterServer-Linux-Shipping`
+	kill -15 "$(pidof LongvinterServer-Linux-Shipping)"
 	return $?
 }
 
@@ -149,7 +149,7 @@ container_version_check() {
 	fi
 }
 
-# Get latest release version from thijsvanloef/palworld-server-docker repository
+# Get latest release version from kimzuni/longvinter-docker-server repository
 # Returns the latest release version
 get_latest_version() {
 	local latest_version
@@ -157,6 +157,17 @@ get_latest_version() {
 	latest_version=$(curl https://api.github.com/repos/kimzuni/longvinter-docker-server/releases/latest -s | jq .name -r)
 
 	echo "$latest_version"
+}
+
+# Use it when you have to wait for it to be saved automatically because it does not support RCON.
+wait_save() {
+	local path log
+	while path=$(inotifywait -q -e modify -r "$SERVER_LOG_DIR" | sed "s/ MODIFY //g"); do
+		log=$(tail -1 "$path")
+		if [[ "$log" =~ ^\[[a-zA-Z]+\ [0-9\ ,:]+\ [AP]M\]\ Game\ saved!$ ]]; then
+			break
+		fi
+	done
 }
 
 Server_Info() {
@@ -167,7 +178,7 @@ Server_Info() {
 
 	echo "Server Name: $CFG_SERVER_NAME"
 	if [ "$DISCORD_SERVER_INFO_MESSAGE_WITH_IP" = true ]; then
-		echo "Server IP: `curl -sfSL icanhazip.com`"
+		echo "Server IP: $(curl -sfSL icanhazip.com)"
 		echo "Server Port: $PORT"
 	fi
 	echo "Server Password: $CFG_PASSWORD"

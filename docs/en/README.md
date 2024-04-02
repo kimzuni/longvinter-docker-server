@@ -8,17 +8,33 @@
 [![Docker Hub](https://img.shields.io/badge/Docker_Hub-longvinter-blue?logo=docker)](https://hub.docker.com/r/kimzuni/longvinter-docker-server)
 [![GHCR](https://img.shields.io/badge/GHCR-longvinter-blue?logo=docker)](https://github.com/kimzuni/longvinter-docker-server/pkgs/container/longvinter-docker-server)
 
-[English](/README.md) | [한국어](/docs/kr/README.md)
+[English](/docs/en/README.md) | [한국어](/docs/kr/README.md)
 
-This is a Docker container to help you get started with hosting your own [Longvinter](https://store.steampowered.com/app/1635450/Longvinter/) dedicated server.
+This is a Docker container to help you get started with hosting your own
+[Longvinter](https://store.steampowered.com/app/1635450/Longvinter/) dedicated server.
 
-Applying source code [Uuvana-Studios/longvinter-docker-server](https://github.com/Uuvana-Studios/longvinter-docker-server) to source code [thijsvanloef/palworld-server-docker](https://github.com/thijsvanloef/palworld-server-docker) to generate this image.
+Applying source code
+[Uuvana-Studios/longvinter-docker-server](https://github.com/Uuvana-Studios/longvinter-docker-server)
+to source code
+[thijsvanloef/palworld-server-docker](https://github.com/thijsvanloef/palworld-server-docker)
+to generate this image.
 
-This Docker images has been tested and will work on the following OS:
+This Docker container has been tested and will work on the following OS:
+
 - Windows 11
 - Ubuntu 22.04
 
+This container has also been tested and will work on both `x64` and `ARM64` based CPU architecture.
+
+> [!WARNING]
+> At the moment, All related features have been replaced and removed because Longvinter does not support RCON.
+>
+> Therefore, we would like to inform you that if you do not save the server and proceed
+> with server shutdown, update, and backup recovery, the history of your play for up to 12 minutes may be rolled back.
+> (Server is Automatically saved every 12 minutes.)
+
 ## Official URL
+
 - [\[Uuvana\] FAQ(Frequently Asked Questions)](https://contact.uuvana.com/)
 - [\[Uuvana\] Contact](https://contact.uuvana.com/)
 - [\[Uuvana\] Youtube](https://www.youtube.com/@uuvana)
@@ -26,18 +42,23 @@ This Docker images has been tested and will work on the following OS:
 - [\[Longvinter\] Discord](https://discord.gg/longvinter)
 
 ## Server Requirements
+
 > - OS: Min. 64-bit
 > - RAM: Min. 2GB
 
-from https://docs-server.longvinter.com
+from: <https://docs-server.longvinter.com>
 
 ## How to Use
+
 Keep in mind that you'll need to change the [environment variables](#environment-variables).
 
-After running the server, you can check the server log with the command `docker log longvinter-server`. To check in real time, add `-f` at the end.
+After running the server, you can check the server log with the command `docker log longvinter-server`.
+To check in real time, add `-f` at the end.
 
 ### Docker Compose
+
 This repository includes an example [docker-compose.yml](/docker-compose.yml) file you can use to set up your server.
+Write the file first and then execute the command `docker compose up -d` from that directory.
 
 ```yaml
 services:
@@ -78,7 +99,9 @@ services:
       - ./data:/data
 ```
 
-As an alternative, you can copy the [.env.example](/.env.example) file to a new file called `.env` file. It doesn't matter if the file name is not `.env`. Modify your [docker-compose.yml](/docker-compose.yml) to this:
+As an alternative, you can copy the [.env.example](/.env.example) file to a new file called **.env** file.
+Modify it to your needs, check out the [environment variables](#environment-variables) section to check the correct values.
+Modify your [docker-compose.yml](docker-compose.yml) to this:
 
 ```yml
 services:
@@ -102,9 +125,8 @@ services:
       - ./data:/data
 ```
 
-After you finish setting up, you must run the `docker compose up -d` command where the `docker-compose.yml` file is located.
-
 ### Docker Run
+
 You can also use the command `docker run` instead of `docker compose`. the server runs as soon as you run the command below.
 
 ```bash
@@ -137,7 +159,9 @@ docker run -d \
     kimzuni/longvinter-docker-server:latest
 ```
 
-As an alternative, you can copy the [.env.example](/.env.example) file to a new file called .env file. Change your docker run command to this:
+As an alternative, you can copy the [.env.example](/.env.example) file to a new file called **.env** file.
+Modify it to your needs, check out the [environment variables](#environment-variables) section to check the correct values.
+Change your docker run command to this:
 
 ```bash
 docker run -d \
@@ -153,8 +177,33 @@ docker run -d \
     kimzuni/longvinter-docker-server:latest
 ```
 
+### Running without root
+
+This is only for advanced users.
+
+It is possible to run this container and
+[override the default user](https://docs.docker.com/engine/reference/run/#user) which is root in this image.
+
+Because you are specifiying the user and group `PUID` and `PGID` are ignored.
+
+If you want to find your UID: `id -u`,
+If you want to find your GID: `id -g`.
+
+You must set user to `NUMBERICAL_UID:NUMBERICAL_GID`.
+
+Below we assume your UID is 1000 and your GID is 1001.
+
+- In [Docker Run](#docker-run) add `--user 1000:1001 \` above the last line.
+- In [Docker Compose](#docker-compose) add `user: 1000:1001` above ports.
+
+If you wish to run it with a different UID/GID than your own you will need to change the ownership of the directory that
+is being bind: `chown UID:GID data/`
+or by changing the permissions for all other: `chmod o=rwx data/`
+
 ## Environment variables
-List of available environment variables:
+
+You can use the following values to change the settings of the server on boot.
+It is highly recommended you set the following environment values before starting the server:
 
 | Variable                                   | Info                                                                                                                                             | Default Value                                                                                      | Allowed Values                                                                                                    |
 |--------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
@@ -165,13 +214,13 @@ List of available environment variables:
 | QUERY_PORT                                 | Query port used to communicate with Steam servers.                                                                                               | 27016                                                                                              | 1024-65535                                                                                                        |
 | UPDATE_ON_BOOT\*\*                         | Update the server when the docker container starts.                                                                                              | true                                                                                               | true/false                                                                                                        |
 | BACKUP_ENABLED                             | Enables automatic backups.                                                                                                                       | true                                                                                               | true/false                                                                                                        |
-| BACKUP_CRON_EXPRESSION                     | Setting affects frequency of automatic backups.                                                                                                  | 0 0 * * *                                                                                          | Needs a Cron-Expression - See [Configuring Automatic Backups with Cron](#configuring-automatic-backups-with-cron) |
+| BACKUP_CRON_EXPRESSION                     | Setting affects frequency of automatic backups.                                                                                                  | 0 0 \* \* \*                                                                                       | Needs a Cron-Expression - See [Configuring Automatic Backups with Cron](#configuring-automatic-backups-with-cron) |
 | DELETE_OLD_BACKUPS                         | Delete backups after a certain number of days.                                                                                                   | false                                                                                              | true/false                                                                                                        |
 | OLD_BACKUP_DAYS                            | How many days to keep backups.                                                                                                                   | 30                                                                                                 | any positive integer                                                                                              |
 | AUTO_UPDATE_ENABLED                        | Enables automatic updates.                                                                                                                       | false                                                                                              | true/false                                                                                                        |
-| AUTO_UPDATE_CRON_EXPRESSION                | Setting affects frequency of automatic updates.                                                                                                  | 0 0 * * *                                                                                          | Needs a Cron-Expression - See [Configuring Automatic Updates with Cron](#configuring-automatic-updates-with-cron) |
+| AUTO_UPDATE_CRON_EXPRESSION                | Setting affects frequency of automatic updates.                                                                                                  | 0 0 \* \* \*                                                                                       | Needs a Cron-Expression - See [Configuring Automatic Updates with Cron](#configuring-automatic-updates-with-cron) |
 | AUTO_UPDATE_WARN_MINUTES                   | How long to wait to update the server, after the player were informed.                                                                           | 30                                                                                                 | !0                                                                                                                |
-| TARGET_COMMIT_ID                           | Install and run the game server at the specified version.                                                                                        | _(empty)_                                                                                          | See [Target Commit ID](#target-commit-id)(#target-commit-id)                                                                         |
+| TARGET_COMMIT_ID                           | Install and run the game server at the specified version.                                                                                        | _(empty)_                                                                                          | See [Locking Specific Game Version](#locking-specific-game-version)(#target-commit-id)                            |
 | DISCORD_WEBHOOK_URL                        | Discord webhook url found after creating a webhook on a discord server.                                                                          | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
 | DISCORD_SUPPRESS_NOTIFICATIONS             | Enables/Disables `@silent` messages for the server messages.                                                                                     | false                                                                                              | true/false                                                                                                        |
 | DISCORD_CONNECT_TIMEOUT                    | Discord command initial connection timeout.                                                                                                      | 30                                                                                                 | !0                                                                                                                |
@@ -219,42 +268,121 @@ List of available environment variables:
 
 \* highly recommended to set
 
-\*\* Make sure you know what you are doing when running this option enabled
+\*\* Make sure you know what you are doing when running this option enabled.
+
+### Game Ports
+
+| Port  | Info                 |
+|-------|----------------------|
+| 7777  | Game Port (TCP/UDP)  |
+| 27016 | Query Port (TCP/UDP) |
+
+## Creating a backup
+
+> [!WARNING]
+> Please confirm when your last save was.
+>
+> The server will backup the last saved.
+
+To create a backup of the game's last save, use the command:
+
+```bash
+docker exec longvinter-server backup
+```
+
+This will create a backup at `/data/Longvinter/backups/`
+
+## Restore from a backup
+
+> [!WARNING]
+> Please confirm when your last save was.
+>
+> If the recovery fails, it is rolled back to the last storage point.
+
+To restore from a backup, use the command:
+
+```bash
+docker exec -it longvinter-server restore
+```
+
+> [!IMPORTANT]
+> If docker restart is not set to policy `always` or `unless-stopped` then the server will shutdown and will need to be
+> manually restarted.
+>
+> The example docker run command and docker compose file in [How to Use](#how-to-use) already uses the needed policy.
+
+## Manually restore from a backup
+
+> [!WARNING]
+> Please confirm when your last save was.
+>
+> It is not automatically saved when you shut down the server.
+
+Locate the backup you want to restore in `/data/Longvinter/backups/` and decompress it.
+Need to stop the server before task.
+
+```bash
+docker compose down
+```
+
+Delete the old saved data folder located at `data/Longvinter/Saved/`.
+
+Copy the contents of the newly decompressed saved data folder `Saved/` to `data/Longvinter/Saved/`.
+
+Restart the game. (If you are using Docker Compose)
+
+```bash
+docker compose up -d
+```
 
 ## Configuring Automatic Backups with Cron
-The server is automatically backed up everynight at midnight according to the timezone set with TZ
 
 Set BACKUP_ENABLED enable or disable automatic backups (Default is enabled)
 
 BACKUP_CRON_EXPRESSION is a cron expression, in a Cron-Expression you define an interval for when to run jobs.
+This is affected by the environment variable TZ value.
 
 > [!TIP]
-> This image uses Supercronic for crons see [supercronic](https://github.com/aptible/supercronic#crontab-format) or [Crontab Generator](https://crontab-generator.org).
+> This image uses Supercronic for crons
+> see [supercronic](https://github.com/aptible/supercronic#crontab-format)
+> or
+> [Crontab Generator](https://crontab-generator.org).
 
-Set BACKUP_CRON_EXPRESSION to change the default schedule. Example Usage: If BACKUP_CRON_EXPRESSION to `0 2 * * *`, the backup script will run every day at 2:00 AM.
+Example Usage: If BACKUP_CRON_EXPRESSION to `0 2 * * *`, the backup script will run every day at 2:00 AM.
+The default is set to run at midnight every night.
 
 ## Configuring Automatic Updates with Cron
+
 To be able to use automatic Updates with this Server the following environment variables have to be set to `true`:
-- RCON_ENABLED
-- UPDATE_ON_BOOT
+
+- AUTO_UPDATE_ENABLED
+- UPDATE_ON_BOOT (default is enabled)
 
 > [!IMPORTANT]
 >
-> If docker restart is not set to policy `always` or `unless-stopped` then the server will shutdown and will need to be manually restarted.
+> If docker restart is not set to policy `always` or `unless-stopped` then the server will shutdown and will need to be
+> manually restarted.
 >
-> The example docker run command and docker compose file in [How to Use](#how-to-use) already use the needed policy.
-
-Set AUTO_UPDATE_ENABLED enable or disable automatic updates (Default is disabled)
+> The example docker run command and docker compose file in [How to Use](#how-to-use) already uses the needed policy.
 
 AUTO_UPDATE_CRON_EXPRESSION is a cron expression, in a Cron-Expression you define an interval for when to run jobs.
 
 > [!TIP]
-> This image uses Supercronic for crons see [supercronic](https://github.com/aptible/supercronic#crontab-format)
-> or [Crontab Generator](https://crontab-generator.org).
+> This image uses Supercronic for crons
+> see [supercronic](https://github.com/aptible/supercronic#crontab-format)
+> or
+> [Crontab Generator](https://crontab-generator.org).
 
 Set AUTO_UPDATE_CRON_EXPRESSION to change the default schedule.
 
-## Configuring the Server Settings
+## Editing Server Settings
+
+### With Environment Variables
+
+> [!IMPORTANT]
+>
+> These Environment Variables/Settings are subject to change since the game is still in beta.
+
 Used with [environment variables](#environment-variables).
 
 | Variable              | Info                                                                                                                                                                            | Default Value                 | Allowed Values                                                   |
@@ -263,7 +391,7 @@ Used with [environment variables](#environment-variables).
 | CFG_MAX_PLAYERS       | The maximum amount of players the server will allow at the same time.                                                                                                           | 32                            | 1-?                                                              |
 | CFG_SERVER_MOTD       | A Message Of The Day that will be displayed to the player.                                                                                                                      | Welcome to Longvinter Island! | "string"                                                         |
 | CFG_PASSWORD          | Use this setting to require a password to join the server.                                                                                                                      | _(empty)_                     | "string"                                                         |
-| CFG_COMMUNITY_WEBSITE | When the server or community has a website, enter it here to display it to the player.                                                                                          | www.longvinter.com            | `<example.com>`, `http://<example.com>`, `https://<example.com>` |
+| CFG_COMMUNITY_WEBSITE | When the server or community has a website, enter it here to display it to the player.                                                                                          | www\.longvinter\.com          | `<example.com>`, `http://<example.com>`, `https://<example.com>` |
 | CFG_COOP_PLAY         | When this setting is set to "true", Co-op Play will be enabled on the server. Set to "false" to disable PvP.                                                                    | false                         | true/false                                                       |
 | CFG_COOP_SPAWN        | All players will spawn here. (It only works when "CFG_COOP_PLAY" is "true".)                                                                                                    | 0                             | 0(West), 1(South), 2(East). (I haven't checked it out)           |
 | CFG_SERVER_TAG        | Server tag that can be used to search for the server.                                                                                                                           | None                          | "string"                                                         |
@@ -272,33 +400,44 @@ Used with [environment variables](#environment-variables).
 | CFG_TENT_DECAY        | When this setting is set to "true", tents will decay and be destroyed after 48 hours unless they are upgraded to a house.                                                       | true                          | true/false                                                       |
 | CFG_MAX_TENTS         | Maximum number of tents/houses each player can have placed in the world at a time.                                                                                              | 2                             | 1~?                                                              |
 
+### Manually
+
+When the server starts, a `Game.ini` file will be created in the following location: `<mount_folder>/Longvinter/Saved/Config/LinuxServer/Game.ini`
+
+s
+But if the DISABLE_GENERATE_SETTINGS value is set to 'true', the file can be modified and set directly.
+
+> [!IMPORTANT]
+> Changes can only be made to `Game.ini` while the server is off.
+>
+> Any changes made while the server is live will be overwritten when the server stops.
+
 ## Using discord webhooks
+
 1. Generate a webhook url for your discord server in your discord's server settings.
 2. Set the environment variable with the unique token at the end of the discord webhook url example: `https://discord.com/api/webhooks/1234567890/abcde`
 
 Send discord messages with docker run:
+
 ```bash
 -e DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/1234567890/abcde" \
 -e DISCORD_PRE_UPDATE_BOOT_MESSAGE="Server is updating..." \
 ```
 
 Send discord messages with docker compose:
+
 ```yml
 - DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/1234567890/abcde
 - DISCORD_PRE_UPDATE_BOOT_MESSAGE="Server is updating..."
 ```
 
-## Target Commit ID
+## Locking Specific Game Version
+
 > [!WARNING]
 > Downgrading to a lower game version is possible, but it is unknown what impact it will have on existing saves.
 >
 > **Please do so at your own risk!**
 
-If TARGET_COMMIT_ID environment variable is set, install and run the server to the specific version.
-
-The list of Commit ID can be found in https://github.com/Uuvana-Studios/longvinter-linux-server/commits/main/
-
-
-
-# To do List
-- Restore
+If **TARGET_COMMIT_ID** environment variable is set, will lock server version to specific commit.
+The Commit ID is a hexadecimal value found on page <https://github.com/Uuvana-Studios/longvinter-linux-server/commits/main/>
+and must be set to at least 4 digits.

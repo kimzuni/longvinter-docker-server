@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # shellcheck source=scripts/variables.sh
 source "/home/steam/server/variables.sh"
 
@@ -11,14 +11,18 @@ if ! dirExists "$DATA_DIR"; then
 	LogError "$DATA_DIR is not mounted."
 	exit 1
 fi
-mkdir -p "$SERVER_BACKUP_DIR"
+mkdir -p "$BACKUP_DIRECTORY_PATH"
+if [ ! -s "/home/steam/$GIT_REPO_NAME" ]; then
+	rm -rf "/home/steam/$GIT_REPO_NAME"
+	ln -s "$GIT_REPO_PATH" "/home/steam/$GIT_REPO_NAME"
+fi
 
 if [[ "$(id -u)" -eq 0 ]] && [[ "$(id -g)" -eq 0 ]]; then
 	if [[ "${PUID}" -ne 0 ]] && [[ "${PGID}" -ne 0 ]]; then
 		LogAction "EXECUTING USERMOD"
 		usermod -o -u "${PUID}" steam
 		groupmod -o -g "${PGID}" steam
-		chown -R steam:steam $DATA_DIR /home/steam
+		chown -R steam:steam "$DATA_DIR" /home/steam
 	else
 		LogError "Running as root is not supported, please fix your PUID and PGID!"
 		exit 1
@@ -61,6 +65,14 @@ mapfile -t backup_pids < <(pgrep backup)
 if [ "${#backup_pids[@]}" -ne 0 ]; then
 	LogInfo "Waiting for backup to finish"
 	for pid in "${backup_pids[@]}"; do
+		tail --pid="$pid" -f 2>/dev/null
+	done
+fi
+
+mapfile -t restore_pids < <(pgrep restore)
+if [ "${#restore_pids[@]}" -ne 0 ]; then
+	LogInfo "Waiting for restore to finish"
+	for pid in "${restore_pids[@]}"; do
 		tail --pid="$pid" -f 2>/dev/null
 	done
 fi

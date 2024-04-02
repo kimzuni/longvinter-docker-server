@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # shellcheck source=scripts/helper_functions.sh
 source "/home/steam/server/helper_functions.sh"
 
@@ -64,7 +64,7 @@ if [ "$ARCHITECTURE" == "arm64" ]; then
 			;;
 	esac
 
-	sed -i "s|^\(\"\$UE4_PROJECT_ROOT\/Longvinter\/Binaries\/Linux\/LongvinterServer-Linux-Shipping\" Longvinter \"\$@\"\)|LD_LIBRARY_PATH=/home/steam/steamcmd/linux64:\$LD_LIBRARY_PATH $box64_binary \1|" $GIT_REPO_PATH/LongvinterServer.sh
+	sed -i "s|^\(\"\$UE4_PROJECT_ROOT\/Longvinter\/Binaries\/Linux\/LongvinterServer-Linux-Shipping\" Longvinter \"\$@\"\)|LD_LIBRARY_PATH=/home/steam/steamcmd/linux64:\$LD_LIBRARY_PATH $box64_binary \1|" "$GIT_REPO_PATH/LongvinterServer.sh"
 fi
 STARTCOMMAND=("$GIT_REPO_PATH/LongvinterServer.sh")
 
@@ -93,7 +93,9 @@ container_version_check
 if [ "${DISABLE_GENERATE_SETTINGS,,}" = true ]; then
 	LogAction "GENERATING CONFIG"
 	LogWarn "Env vars will not be applied due to DISABLE_GENERATE_SETTINGS being set to TRUE!"
-	cp "$CONFIG_FILE_FULL_PATH".default "$CONFIG_FILE_FULL_PATH"
+	if [ ! -f "$CONFIG_FILE_FULL_PATH" ]; then
+		cp "$CONFIG_FILE_FULL_PATH".default "$CONFIG_FILE_FULL_PATH"
+	fi
 else
 	LogAction "GENERATING CONFIG"
 	LogInfo "Using Env vars to create Game.ini"

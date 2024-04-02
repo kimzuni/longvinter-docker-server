@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # shellcheck source=scripts/helper_functions.sh
 source "/home/steam/server/helper_functions.sh"
 
@@ -27,10 +27,9 @@ IsInstalled() {
 UpdateRequired() {
 	LogAction "Checking for new Longvinter Server updates"
 
-	cd "$GIT_REPO_PATH"
-
-	local CURRENT_COMMIT=$(git log HEAD -1 | head -1 | awk '{print $2}')
-	local LATEST_COMMIT=$(curl -sfSL "$GIT_REPO_API/commits/main" | jq .sha -r)
+	local CURRENT_COMMIT LATEST_COMMIT
+	CURRENT_COMMIT=$(git -C "$GIT_REPO_PATH" log HEAD -1 | head -1 | awk '{print $2}')
+	LATEST_COMMIT=$(curl -sfSL "$GIT_REPO_API/commits/main" | jq .sha -r)
 
 	LogInfo "Current Version: $CURRENT_COMMIT"
 
@@ -44,7 +43,6 @@ UpdateRequired() {
 		fi
 	else
 		if [ "$CURRENT_COMMIT" == "$LATEST_COMMIT" ]; then
-			return_val=1
 			LogSuccess "The server is up to date!"
 			return 1
 		else
@@ -63,13 +61,13 @@ BeforeInstall() {
 InstallServer() {
 	BeforeInstall
 
-	cd "$GIT_REPO_PATH"
+	cd "$GIT_REPO_PATH" || exit
 	DiscordMessage "Install" "${DISCORD_PRE_INSTALL_MESSAGE}" "in-progress" "${DISCORD_PRE_INSTALL_MESSAGE_ENABLED}" "${DISCORD_PRE_INSTALL_MESSAGE_URL}"
 
 	git init
-	git remote add origin $GIT_REPO_URL
-	git fetch origin $GIT_REPO_BRANCH
-	git checkout ${TARGET_COMMIT_ID:-$GIT_REPO_BRANCH}
+	git remote add origin "$GIT_REPO_URL"
+	git fetch origin "$GIT_REPO_BRANCH"
+	git checkout "${TARGET_COMMIT_ID:-$GIT_REPO_BRANCH}"
 	
 	DiscordMessage "Install" "${DISCORD_POST_INSTALL_MESSAGE}" "in-progress" "${DISCORD_POST_INSTALL_MESSAGE_ENABLED}" "${DISCORD_POST_INSTALL_MESSAGE_URL}"
 }
@@ -77,12 +75,12 @@ InstallServer() {
 UpdateServer() {
 	BeforeInstall
 
-	cd "$GIT_REPO_PATH"
+	cd "$GIT_REPO_PATH" || exit
 	DiscordMessage "Update" "${DISCORD_PRE_UPDATE_BOOT_MESSAGE}" "in-progress" "${DISCORD_PRE_UPDATE_BOOT_MESSAGE_ENABLED}" "${DISCORD_PRE_UPDATE_BOOT_MESSAGE_URL}"
 
 	git stash
 	if [ -z "$TARGET_COMMIT_ID" ] || ! git log -1 "${TARGET_COMMIT_ID}" > /dev/null 2>&1; then
-		git fetch origin $GIT_REPO_BRANCH
+		git fetch origin "$GIT_REPO_BRANCH"
 	fi
 	git checkout "${TARGET_COMMIT_ID:-origin/$GIT_REPO_BRANCH}"
 	git stash clear

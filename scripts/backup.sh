@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # shellcheck source=scripts/variables.sh
 source "/home/steam/server/variables.sh"
 
@@ -8,7 +8,7 @@ source "/home/steam/server/helper_functions.sh"
 DiscordMessage "Backup" "${DISCORD_PRE_BACKUP_MESSAGE}" "in-progress" "${DISCORD_PRE_BACKUP_MESSAGE_ENABLED}" "${DISCORD_PRE_BACKUP_MESSAGE_URL}"
 
 DATE=$(date +"%s")
-FILE_PATH="$SERVER_BACKUP_DIR/Saved-Backup-${DATE}.tar.gz"
+FILE_PATH="$BACKUP_DIRECTORY_PATH/Saved-Backup-${DATE}.tar.gz"
 cd "$GIT_REPO_PATH/Longvinter" || exit
 
 LogAction "Creating backup"
@@ -36,7 +36,7 @@ if [[ "${OLD_BACKUP_DAYS}" =~ ^[0-9]+$ ]]; then
 	LogAction "Removing Old Backups"
 	LogInfo "Removing backups older than ${OLD_BACKUP_DAYS} days"
 	DiscordMessage "Backup" "${DISCORD_PRE_BACKUP_DELETE_MESSAGE//old_backup_days/${OLD_BACKUP_DAYS}}" "in-progress" "${DISCORD_PRE_BACKUP_DELETE_MESSAGE_ENABLED}" "${DISCORD_PRE_BACKUP_DELETE_MESSAGE_URL}"
-	find "$SERVER_BACKUP_DIR" -mindepth 1 -maxdepth 1 -mtime "+${OLD_BACKUP_DAYS}" -type f -name 'Saved-Backup-*.tar.gz' -print -delete
+	find "$BACKUP_DIRECTORY_PATH" -mindepth 1 -maxdepth 1 -mtime "+${OLD_BACKUP_DAYS}" -type f -name 'Saved-Backup-*.tar.gz' -print -delete
 	DiscordMessage "Backup" "${DISCORD_POST_BACKUP_DELETE_MESSAGE//old_backup_days/${OLD_BACKUP_DAYS}}" "success" "${DISCORD_POST_BACKUP_DELETE_MESSAGE_ENABLED}" "${DISCORD_POST_BACKUP_DELETE_MESSAGE_URL}"
 	exit 0
 fi

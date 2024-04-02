@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # shellcheck source=scripts/helper_functions.sh
 source "/home/steam/server/helper_functions.sh"
 
@@ -64,8 +64,8 @@ else
 	COLOR=$DISCORD_BLUE
 fi
 
-if [ "${TITLE,,}" == "start" -a "$DISCORD_SERVER_INFO_MESSAGE_ENABLED" = true ]; then
-	MESSAGE=`echo -e "$MESSAGE\n"; Server_Info | sed -E "s/([^:]+):(.+)/**\1**:\2/g"`
+if [ "${TITLE,,}" == "start" ] && [ "$DISCORD_SERVER_INFO_MESSAGE_ENABLED" = true ]; then
+	MESSAGE=$(echo -e "$MESSAGE\n"; Server_Info | sed -E "s/([^:]+):(.+)/**\1**:\2/g")
 fi
 
 JSON=$(jo embeds[]="$(jo title="$TITLE" description="$MESSAGE" color=$COLOR)" flags="$DISCORD_FLAGS")

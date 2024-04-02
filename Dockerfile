@@ -116,8 +116,8 @@ ENV TZ="UTC" \
 ARG GIT_VERSION_TAG=unspecified
 
 COPY --chmod=755 ./scripts /home/steam/server
-RUN for file in backup.sh; do \
-        mv /home/steam/server/$file /usr/local/bin/${file%.sh}; \
+RUN for file in backup.sh update.sh restore.sh; do \
+        mv /home/steam/server/"$file" /usr/local/bin/"${file%.sh}"; \
     done
 
 WORKDIR /home/steam/server
@@ -131,7 +131,7 @@ RUN touch crontab \
  && chmod o+w crontab /home/steam/Steam/package \
  && chown -R steam:steam /home/steam/{server,Steam}
 
-HEALTHCHECK --start-period=3m \
+HEALTHCHECK --start-period=5m \
     CMD pidof "LongvinterServer-Linux-Shipping" > /dev/null || exit 1
 
 ENTRYPOINT ["/home/steam/server/init.sh"]
