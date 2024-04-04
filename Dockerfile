@@ -27,15 +27,15 @@ ARG SUPERCRONIC_VERSION="0.2.29"
 # hadolint ignore=DL3008
 RUN apt-get update && \
     apt-get install --no-install-recommends --no-install-suggests -y \
-      git \
-      git-lfs \
-      wget \
+      curl wget \
       ca-certificates \
       lib32gcc1-amd64-cross \
       procps=2:4.0.2-3 \
       xdg-user-dirs=0.18-1 \
       jo=1.9-1 \
       jq=1.6-2.1 \
+ && curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash \
+ && apt-get -y install git git-lfs \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 RUN su steam -c "/home/steam/steamcmd/steamcmd.sh +login anonymous +app_update 1007 +quit"
