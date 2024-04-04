@@ -23,6 +23,8 @@ ARG SUPERCRONIC_SHA1SUM_ARM64="512f6736450c56555e01b363144c3c9d23abed4c"
 ARG SUPERCRONIC_SHA1SUM_AMD64="cd48d45c4b10f3f0bfdd3a57d054cd05ac96812b"
 ARG SUPERCRONIC_VERSION="0.2.29"
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 # update and install dependencies
 # hadolint ignore=DL3008
 RUN apt-get update && \
@@ -35,14 +37,13 @@ RUN apt-get update && \
       jo=1.9-1 \
       jq=1.6-2.1 \
  && curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash \
- && apt-get -y install git git-lfs \
+ && apt-get --no-install-recommends  --no-install-suggests -y \
+      install git git-lfs \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 RUN su steam -c "/home/steam/steamcmd/steamcmd.sh +login anonymous +app_update 1007 +quit"
 
 # install supercronic
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
 ARG TARGETARCH
 RUN case ${TARGETARCH} in \
         "amd64") SUPERCRONIC_SHA1SUM=${SUPERCRONIC_SHA1SUM_AMD64} ;; \
