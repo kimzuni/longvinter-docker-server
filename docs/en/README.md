@@ -181,6 +181,23 @@ docker run -d \
     kimzuni/longvinter-docker-server:latest
 ```
 
+### Update the Container
+
+If you are running the server first, please stop:
+
+```bash
+docker stop longvinter-server
+docker rm longvinter-server
+```
+
+Next, remove the installed image:
+
+```bash
+docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-server" | awk '{print $3}')
+```
+
+Finally, run the [Docker Compose](#docker-compose) or [Docker Run](#docker-run) with the `latest` tag.
+
 ### Running without root
 
 This is only for advanced users.

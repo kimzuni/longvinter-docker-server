@@ -142,10 +142,11 @@ container_version_check() {
 
 	if [ "${current_version}" != "${latest_version}" ]; then
 		LogWarn "New version available: ${latest_version}"
-		LogWarn "Learn how to update the container: https://github.com/kimzuni/longvinter-docker-server#update-the-container"
+		LogWarn "Learn how to update the container:"
+		LogWarn " - English : https://github.com/kimzuni/longvinter-docker-server/tree/main/docs/en/#update-the-container"
+		LogWarn " - 한국어  : https://github.com/kimzuni/longvinter-docker-server/tree/main/docs/kr/#컨테이너-업데이트-방법"
 	else
 		LogSuccess "The container is up to date!"
-
 	fi
 }
 
@@ -161,13 +162,58 @@ get_latest_version() {
 
 # Use it when you have to wait for it to be saved automatically because it does not support RCON.
 wait_save() {
-	local path log
+	local path old_path new_path
+	local num old_num adminpanel
+
+	old_path=$(last_savefile)
+	old_num=$(wc -l 2> /dev/null < "$old_path")
 	while path=$(inotifywait -q -e modify -r "$SERVER_LOG_DIR" | sed "s/ MODIFY //g"); do
-		log=$(tail -1 "$path")
-		if [[ "$log" =~ ^\[[a-zA-Z]+\ [0-9\ ,:]+\ [AP]M\]\ Game\ saved!$ ]]; then
+		if [[ "${path##*/}" =~ ^AdminPanelServer-.*\.log$ ]]
+		then adminpanel=true
+		else adminpanel=false
+		fi
+
+		if [ -n "$old_path" ] && num=$(check_save "$old_path" "$old_num"); then
+			break
+		elif [ "$adminpanel" = false ]; then
+			path="$old_path"
+		elif [ "$old_path" != "$path" ] && num=$(check_save "$path" 0); then
 			break
 		fi
+
+		new_path=$(last_savefile)
+		if [ "$path" != "$new_path" ] && num=$(check_save "$new_path" 0); then
+			break
+		fi
+
+		old_path="$new_path"
+		old_num="${num:-$old_num}"
 	done
+}
+
+# Outputs the latest log file among log files where saves are recorded
+last_savefile() {
+	# shellcheck disable=SC2012
+	ls -t "$SERVER_LOG_DIR"/AdminPanelServer-*.log 2> /dev/null | head -1
+}
+
+# Check if there is any saved history in the log file
+# And Output the last line number of that file
+# Returns 0 if saved
+# Returns 1 if unsaved
+check_save() {
+	local path num old_num
+	path="$1"
+	old_num="$2"
+	num=$(wc -l < "$path")
+
+	echo "$num"
+
+	logs=$(tail -$((num - old_num)) "$path")
+	if echo "$logs" | grep -i ^"\[[a-z]\+ [0-9 ,:]\+ [AP]M\] Game saved!"$ > /dev/null 2>&1; then
+		return 0
+	fi
+	return 1
 }
 
 Server_Info() {

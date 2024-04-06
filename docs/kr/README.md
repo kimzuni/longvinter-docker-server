@@ -178,6 +178,23 @@ docker run -d \
     kimzuni/longvinter-docker-server:latest
 ```
 
+### 컨테이너 업데이트 방법
+
+먼저 서버를 실행 중이라면 아래 명령어로 서버를 중지해 주세요.
+
+```bash
+docker stop longvinter-server
+docker rm longvinter-server
+```
+
+그리고 아래 명령어를 실행햐여 설치된 이미지를 제거합니다.
+
+```bash
+docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-server" | awk '{print $3}')
+```
+
+마지막으로 `latest` 태그를 이용하여 [Docker Compose](#docker-compose) 또는 [Docker Run](#docker-run)을 실행하면 최신 버전의 컨테이너를 사용할 수 있습니다.
+
 ### root 없이 실행하기
 
 고급 유저를 위한 기능입니다.
