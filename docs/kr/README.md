@@ -214,7 +214,8 @@ docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-ser
 - [Docker Compose](#docker-compose)를 사용할 경우 restart 아래에 `user: 1000:1001`을 추가해야 합니다.
 
 만약 현재 사용자의 UID/GID와 다른 UID/GID 값을 사용하려면 바인딩되는 디렉토리의 소유권을 변경해야 합니다.
-`chown UID:GID data/`명령어를 실행하여 소유권을 변경하거나 `chmod o=rwx`를 실행하여 모든 사용자가 접근할 수 있도록 해주세요.
+`chown UID:GID data/`명령어를 실행하여 소유권을 변경하거나
+`chmod o=rwx data/`를 실행하여 모든 사용자가 접근할 수 있도록 해주세요.
 
 ## 환경 변수
 
