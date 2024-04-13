@@ -2,12 +2,11 @@
 # shellcheck source=scripts/helper_functions.sh
 source "/home/steam/server/helper_functions.sh"
 
-# Returns 0 if TARGET_COMMIT_ID has not been declare or is valid
+# Returns 0 if valid TARGET_COMMIT_ID or is empty
 # Returns 1 if Invalid TARGET_COMMIT_ID
-CheckCommitID() {
-	local COMMIT_ID="$1"
-	local URL="$GIT_REPO_API/commits/$COMMIT_ID"
-	if [ -n "$COMMIT_ID" ] && ! curl -sfSL "$URL" > /dev/null 2>&1; then
+IsValidCommitID() {
+	local URL="$GIT_REPO_API/commits/$TARGET_COMMIT_ID"
+	if [ -n "$TARGET_COMMIT_ID" ] && ! curl -sfSL "$URL" > /dev/null 2>&1; then
 		return 1
 	fi
 	return 0
@@ -27,7 +26,6 @@ IsInstalled() {
 UpdateRequired() {
 	LogAction "Checking for new Longvinter Server updates"
 
-	local CURRENT_COMMIT LATEST_COMMIT
 	CURRENT_COMMIT=$(git -C "$GIT_REPO_PATH" log HEAD -1 | head -1 | awk '{print $2}')
 	LATEST_COMMIT=$(curl -sfSL "$GIT_REPO_API/commits/main" | jq .sha -r)
 

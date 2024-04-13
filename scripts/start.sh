@@ -20,8 +20,10 @@ if [ "$ARCHITECTURE" == "arm64" ] && [ "${ARM_COMPATIBILITY_MODE,,}" = true ]; t
 	export CPU_MHZ=2000
 fi
 
-if ! CheckCommitID "$TARGET_COMMIT_ID"; then
+if ! IsValidCommitID; then
 	LogError "Invalid TARGET_COMMIT_ID($TARGET_COMMIT_ID)"
+	LogError "Please change the value and restart the server."
+	DiscordMessage "Error" "Invalid TARGET_COMMIT_ID($TARGET_COMMIT_ID). Please change the value and restart the server." "failure"
 	# This is written because GitHub API can only be used 60 times per hour
 	sleep infinity
 	exit 1

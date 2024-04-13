@@ -39,11 +39,20 @@ This container has also been tested and will work on both `x64` and `ARM64` base
 
 ## Official URL
 
-- [\[Uuvana\] FAQ(Frequently Asked Questions)](https://contact.uuvana.com/)
-- [\[Uuvana\] Contact](https://contact.uuvana.com/)
-- [\[Uuvana\] Youtube](https://www.youtube.com/@uuvana)
-- [\[Longvinter\] Server Docs](https://docs-server.longvinter.com/)
-- [\[Longvinter\] Discord](https://discord.gg/longvinter)
+- [Longvinter](https://www.longvinter.com/)
+  - [X(Twitter)](https://twitter.com/longvinter)
+  - [Reddit](https://www.reddit.com/r/Longvinter/)
+  - [TicTok](https://www.tiktok.com/@longvinter)
+  - [Instagram](https://www.instagram.com/longvintergame)
+  - [Server Docs](https://docs-server.longvinter.com/)
+  - [Discord](https://discord.gg/longvinter)
+- [Uuvana](https://www.uuvana.com/)
+  - [X(Twitter)](https://twitter.com/uuvanastudios)
+  - [Youtube](https://www.youtube.com/@uuvana)
+  - [Instagram](https://www.instagram.com/uuvanastudios/)
+  - [Media Kit](https://longvinter.com/press)
+  - [Forum](https://forum.uuvana.com/)
+  - ~~[FAQ(Frequently Asked Questions)](https://contact.uuvana.com/)~~
 
 ## Server Requirements
 
@@ -284,6 +293,9 @@ It is highly recommended you set the following environment values before startin
 | DISCORD_ERR_BACKUP_DELETE_MESSAGE          | Discord message when there has been an error removing older backups.                                                                             | Unable to delete old backups, OLD_BACKUP_DAYS is not an integer. OLD_BACKUP_DAYS=`old_backup_days` | "string"                                                                                                          |
 | DISCORD_ERR_BACKUP_DELETE_MESSAGE_ENABLED  | If the Discord message is enabled for this message.                                                                                              | true                                                                                               | true/false                                                                                                        |
 | DISCORD_ERR_BACKUP_DELETE_MESSAGE_URL      | Discord Webhook URL for this message. (if left empty will use DISCORD_WEBHOOK_URL)                                                               | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
+| DISCORD_BROADCAST_MESSAGE_ENABLE           | If the Discord message is enabled for broadcast content.                                                                                         | true                                                                                               | true/false                                                                                                        |
+| DISCORD_BROADCAST_MESSAGE_URL              | Discord Webhook URL for this message. (if left empty will use DISCORD_WEBHOOK_URL)                                                               | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
+| BROADCAST_COUNTDOWN_MTIMES                 | Broadcast when the remaining time during countdown is included, which is used for updates, etc.                                                  | 1 5 10 15                                                                                          | !0 and Word spacing                                                                                               |
 | DISABLE_GENERATE_SETTINGS                  | Whether to automatically generate the Game.ini                                                                                                   | false                                                                                              | true/false                                                                                                        |
 | ARM_COMPATIBILITY_MODE                     | Switches the compatibility layer from Box86 to QEMU when executing steamcmd for server updates. This setting is only applicable for ARM64 hosts. | false                                                                                              | true/false                                                                                                        |
 
@@ -370,7 +382,7 @@ This is affected by the environment variable TZ value.
 > [Crontab Generator](https://crontab-generator.org).
 
 Example Usage: If BACKUP_CRON_EXPRESSION to `0 2 * * *`, the backup script will run every day at 2:00 AM.
-The default is set to run at midnight every night.
+This is affected by the environment variable TZ value and the default is set to run at midnight every night.
 
 ## Configuring Automatic Updates with Cron
 
@@ -387,6 +399,7 @@ To be able to use automatic Updates with this Server the following environment v
 > The example docker run command and docker compose file in [How to Use](#how-to-use) already uses the needed policy.
 
 AUTO_UPDATE_CRON_EXPRESSION is a cron expression, in a Cron-Expression you define an interval for when to run jobs.
+This is affected by the environment variable TZ value and the default is set to run at midnight every night.
 
 > [!TIP]
 > This image uses Supercronic for crons
@@ -394,7 +407,8 @@ AUTO_UPDATE_CRON_EXPRESSION is a cron expression, in a Cron-Expression you defin
 > or
 > [Crontab Generator](https://crontab-generator.org).
 
-Set AUTO_UPDATE_CRON_EXPRESSION to change the default schedule.
+Example Usage: If AUTO_UPDATE_CRON_EXPRESSION to `0 2 * * *`, the update script will run every day at 2:00 AM.
+This is affected by the environment variable TZ value and the default is set to run at midnight every night.
 
 ## Editing Server Settings
 
@@ -423,10 +437,9 @@ Used with [environment variables](#environment-variables).
 
 ### Manually
 
-When the server starts, a `Game.ini` file will be created in the following location: `<mount_folder>/Longvinter/Saved/Config/LinuxServer/Game.ini`
-
-s
-But if the DISABLE_GENERATE_SETTINGS value is set to 'true', the file can be modified and set directly.
+When the server starts, a `Game.ini` file will be created in the following location: `<mount_folder>/Longvinter/Saved/Config/LinuxServer/Game.ini`.
+By default, the `Game.ini` file consists of the [this environment variables](#with-environment-variables),
+but if the DISABLE_GENERATE_SETTINGS value is set to 'true', the file can be modified and set directly.
 
 > [!IMPORTANT]
 > Changes can only be made to `Game.ini` while the server is off.

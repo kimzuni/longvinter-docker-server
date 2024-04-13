@@ -30,6 +30,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN apt-get update && \
     apt-get install --no-install-recommends --no-install-suggests -y \
       curl \
+      net-tools \
       ca-certificates \
       lib32gcc1-amd64-cross \
       procps=2:4.0.2-3 \
@@ -110,6 +111,9 @@ ENV TZ="UTC" \
     DISCORD_ERR_BACKUP_DELETE_MESSAGE="Unable to delete old backups, OLD_BACKUP_DAYS is not an integer. OLD_BACKUP_DAYS=old_backup_days" \
     DISCORD_ERR_BACKUP_DELETE_MESSAGE_ENABLED=true \
     DISCORD_ERR_BACKUP_DELETE_MESSAGE_URL= \
+    DISCORD_BROADCAST_MESSAGE_ENABLE=true \
+    DISCORD_BROADCAST_MESSAGE_URL= \
+    BROADCAST_COUNTDOWN_MTIMES="1 5 10 15" \
     DISABLE_GENERATE_SETTINGS=false \
     ARM_COMPATIBILITY_MODE=false
 

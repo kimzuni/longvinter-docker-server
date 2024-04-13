@@ -14,7 +14,8 @@
 
 [English](/docs/en/README.md) | [한국어](/docs/kr/README.md)
 
-[롱빈터](https://store.steampowered.com/app/1635450/Longvinter/) 전용 서버를 호스팅할 수 있는 도커 컨테이너입니다.
+[롱빈터](https://store.steampowered.com/app/1635450/Longvinter/)
+전용 서버를 호스팅할 수 있는 도커 컨테이너입니다.
 
 이 소스 코드는
 [thijsvanloef/palworld-server-docker](https://github.com/thijsvanloef/palworld-server-docker)
@@ -33,15 +34,25 @@
 > 현재 롱빈터에서 RCON을 지원하지 않기 때문에 관련된 모든 기능이 교체 및 제거되었습니다.
 >
 > 따라서 서버를 저장하지 않은 채로 서버 종료, 업데이트, 백업 복구 등의 작업을 진행할 경우
-> 최대 12분동안 플레이한 내역이 롤백될 수 있음을 알려드립니다. (12분마다 자동 저장됩니다.)
+> 최대 12분동안 플레이한 내역이 롤백될 수 있음을 알려드립니다.
+> (12분마다 자동 저장됩니다.)
 
 ## 공식 사이트 및 커뮤니티
 
-- [\[우바나\] FAQ(자주 묻는 질문)](https://contact.uuvana.com/)
-- [\[우바나\] 포럼](https://forum.uuvana.com/)
-- [\[우바나\] 유튜브](https://www.youtube.com/@uuvana)
-- [\[롱빈터\] 서버 가이드 문서](https://docs-server.longvinter.com/)
-- [\[롱빈터\] 디스코드](https://discord.gg/longvinter)
+- [롱빈터](https://www.longvinter.com/)
+  - [X(트위터)](https://twitter.com/longvinter)
+  - [레딧](https://www.reddit.com/r/Longvinter/)
+  - [틱톡](https://www.tiktok.com/@longvinter)
+  - [인스타그램](https://www.instagram.com/longvintergame)
+  - [서버 가이드 문서](https://docs-server.longvinter.com/)
+  - [디스코드](https://discord.gg/longvinter)
+- [우바나](https://www.uuvana.com/)
+  - [X(트위터)](https://twitter.com/uuvanastudios)
+  - [유튜브](https://www.youtube.com/@uuvana)
+  - [인스타그램](https://www.instagram.com/uuvanastudios/)
+  - [이미지 및 로고](https://longvinter.com/press)
+  - [포럼](https://forum.uuvana.com/)
+  - ~~[FAQ(자주 묻는 질문)](https://contact.uuvana.com/)~~
 
 ## 서버 요구사항
 
@@ -54,7 +65,8 @@
 
 [환경 변수](#환경-변수)를 설정할 수 있습니다.
 
-서버를 실행한 후 `docker log longvinter-server` 명령어로 서버 로그를 확인할 수 있습니다. 실시간으로 확인하려면 마지막에 `-f`를 추가해 주세요.
+서버를 실행한 후 `docker log longvinter-server` 명령어로 서버 로그를 확인할 수 있습니다.
+실시간으로 확인하려면 마지막에 `-f`를 추가해 주세요.
 
 ### Docker Compose
 
@@ -199,7 +211,8 @@ docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-ser
 
 고급 유저를 위한 기능입니다.
 
-컨테이너를 실행할 때 해당 이미지의 [기본 사용자를 재정의](https://docs.docker.com/engine/reference/run/#user)할 수 있습니다.
+컨테이너를 실행할 때 해당 이미지의
+[기본 사용자를 재정의](https://docs.docker.com/engine/reference/run/#user)할 수 있습니다.
 
 이때 설정한 환경 변수 `PUID` 및 `PGID`의 값은 무시됩니다.
 
@@ -237,7 +250,7 @@ docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-ser
 | AUTO_UPDATE_ENABLED                        | 일정 시간마다 자동으로 서버 업데이트 진행                                                                              | false                                                                                             |  true/false                                                                                                 |
 | AUTO_UPDATE_CRON_EXPRESSION                | 자동 업데이트 빈도 설정                                                                                            | 0 0 \* \* \*                                                                                      | 크론식 표현 - [Cron으로 자동 업데이트 설정하는 방법](#cron으로-자동-업데이트-설정하는-방법) 참고 바람                         |
 | AUTO_UPDATE_WARN_MINUTES                   | 지정한 시간(분)이 지난 후 서버 업데이트 진행                                                                           | 30                                                                                                | !0                                                                                                          |
-| TARGET_COMMIT_ID                           | 게임 서버를 지정한 Commit ID를 가진 버전으로 설치 및 실행                                                               | _(empty)_                                                                                         | [특정 게임 버전으로 실행하기](#특정-게임-버전으로-실행하기) 참고                                                        |
+| TARGET_COMMIT_ID                           | 게임 서버를 지정한 Commit ID를 가진 버전으로 설치 및 실행                                                               | _(empty)_                                                                                         | [특정 게임 버전으로 고정](#특정-게임-버전으로-고정) 참고                                                              |
 | DISCORD_WEBHOOK_URL                        | 디스코드 서버에서 생성한 웹훅 URL                                                                                    | _(empty)_                                                                                         | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
 | DISCORD_SUPPRESS_NOTIFICATIONS             | 디스코드 메시지 전송 시 멤버들에게 알림을 보내지 않음                                                                     | false                                                                                             | true/false                                                                                                  |
 | DISCORD_CONNECT_TIMEOUT                    | 지정한 시간동안 디스코드 웹훅에 연결할 수 없을 경우 연결 취소                                                               | 30                                                                                                | !0                                                                                                          |
@@ -280,6 +293,9 @@ docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-ser
 | DISCORD_ERR_BACKUP_DELETE_MESSAGE          | 오래된 백업 파일 삭제 실패 시 전송되는 메시지                                                                         | Unable to delete old backups, OLD_BACKUP_DAYS is not an integer. OLD_BACKUP_DAYS=`old_backup_days` | "string"                                                                                                    |
 | DISCORD_ERR_BACKUP_DELETE_MESSAGE_ENABLED  | 이 값이 `true`인 경우에만 해당 메시지 전송                                                                          | true                                                                                               | true/false                                                                                                  |
 | DISCORD_ERR_BACKUP_DELETE_MESSAGE_URL      | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                     | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
+| DISCORD_BROADCAST_MESSAGE_ENABLE           | 이 값이 `true`인 경우 브로드캐스트 내용를 디스코드 메시지로 전송                                                        | true                                                                                               | true/false                                                                                                  |
+| DISCORD_BROADCAST_MESSAGE_URL              | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                     | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
+| BROADCAST_COUNTDOWN_MTIMES                 | 업데이트 등에 사용되는 카운트다운 진행 중 남은 시간이 이 값에 포함되어 있을 경우 브로드캐스트로 알림                             | 1 5 10 15                                                                                          | !0 and " "(Space)                                                                                           |
 | DISABLE_GENERATE_SETTINGS                  | 서버 설정 파일 `Game.ini`에 적용되는 모든 환경변수 설정 무시 및 기본 값으로 설정                                          | false                                                                                              | true/false                                                                                                  |
 | ARM_COMPATIBILITY_MODE                     | 서버 업데이트를 위해 steamcmd를 실행할 때 Box86에서 QEMU로 호환성 계층을 전환합니다. 이 설정은 ARM64 호스트에만 적용 가능합니다. | false                                                                                              | true/false                                                                                                  |
 
@@ -294,7 +310,7 @@ docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-ser
 | 7777  | 게입 포트 (TCP/UDP) |
 | 27016 | 쿼리 포트 (TCP/UDP) |
 
-## 백업 하기
+## 백업하기
 
 > [!WARNING]
 > 마지막 저장이 언제였는지 확인해 주세요.
@@ -309,7 +325,7 @@ docker exec longvinter-server backup
 
 백업 완료 시 `/data/Longvinter/backups/`에 압축 파일이 생성됩니다.
 
-## 백업 파일로 복구 하기
+## 백업 파일로 복구하기
 
 > [!WARNING]
 > 마지막 저장이 언제였는지 확인해 주세요.
@@ -323,7 +339,8 @@ docker exec -it longvinter-server restore
 ```
 
 > [!IMPORTANT]
-> 도커 재시작 옵션이 `always` 또는 `unless-stopped`로 설정되어 있어야 합니다. 그렇지 않으면 서버가 종료된 후 수동으로 서버를 다시 올려야 합니다.
+> 도커 재시작 옵션이 `always` 또는 `unless-stopped`로 설정되어 있어야 합니다.
+> 그렇지 않으면 서버가 종료된 후 수동으로 서버를 다시 올려야 합니다.
 >
 > 참고로 [사용법](#사용법)에 기재된 `docker compose` 및 `docker run` 명령어의 예시에는 해당 설정이 적용되어 있습니다.
 
@@ -359,11 +376,13 @@ BACKUP_CRON_EXPRESSION는 크론식으로, 작업을 실행할 시간 또는 주
 이는 환경 변수 TZ(타임존) 값의 영향을 받습니다.
 
 > [!TIP]
-> 이 이미지는 Supercronic으로 Cron을 사용합니다. 자세한 설정 방법은 [supercronic](https://github.com/aptible/supercronic#crontab-format)
-> 또는 [Crontab Generator](https://crontab-generator.org)를 참고해 주세요.
+> 이 이미지는 Supercronic으로 Cron을 사용합니다.
+> 자세한 설정 방법은 [supercronic](https://github.com/aptible/supercronic#crontab-format)
+> 또는
+> [Crontab Generator](https://crontab-generator.org)를 참고해 주세요.
 
 BACKUP_CRON_EXPRESSION 값의 예시로 `0 2 * * *`로 설정할 경우 매일 오전 2시에 백업이 진행됩니다.
-기본값은 매일 밤 자정에 실행되도록 설정되어 있습니다
+이는 환경 변수 TZ 값의 영향을 받으며, 기본값은 매일 밤 자정에 실행되도록 설정되어 있습니다.
 
 ## Cron으로 자동 업데이트 설정하는 방법
 
@@ -373,23 +392,33 @@ BACKUP_CRON_EXPRESSION 값의 예시로 `0 2 * * *`로 설정할 경우 매일 �
 - UPDATE_ON_BOOT (기본값)
 
 > [!IMPORTANT]
-> 도커 재시작 옵션이 `always` 또는 `unless-stopped`로 설정되어 있어야 합니다. 그렇지 않으면 서버가 종료된 후 수동으로 서버를 다시 올려야 합니다.
+>
+> 도커 재시작 옵션이 `always` 또는 `unless-stopped`로 설정되어 있어야 합니다.
+> 그렇지 않으면 서버가 종료된 후 수동으로 서버를 다시 올려야 합니다.
 >
 > 참고로 [사용법](#사용법)에 기재된 `docker compose` 및 `docker run` 명령어의 예시에는 해당 설정이 적용되어 있습니다.
 
 AUTO_UPDATE_CRON_EXPRESSION는 크론식으로, 작업을 실행할 시간 또는 주기를 설정할 수 있습니다.
-기본값은 매일 밤 자정에 실행되도록 설정되어 있습니다.
+이는 환경 변수 TZ 값의 영향을 받으며, 기본값은 매일 밤 자정에 실행되도록 설정되어 있습니다.
 
 > [!TIP]
-> 이 이미지는 Supercronic으로 Cron을 사용합니다. 자세한 설정 방법은 [supercronic](https://github.com/aptible/supercronic#crontab-format)
-> 또는 [Crontab Generator](https://crontab-generator.org)를 참고해 주세요.
+> 이 이미지는 Supercronic으로 Cron을 사용합니다.
+> 자세한 설정 방법은 [supercronic](https://github.com/aptible/supercronic#crontab-format)
+> 또는
+> [Crontab Generator](https://crontab-generator.org)를 참고해 주세요.
 
 AUTO_UPDATE_CRON_EXPRESSION 값의 예시로 `0 2 * * *`로 설정할 경우 매일 오전 2시에 업데이트가 진행됩니다.
-기본값은 매일 밤 자정으로 설정되어 있습니다.
+이는 환경 변수 TZ 값의 영향을 받으며, 기본값은 매일 밤 자정에 실행되도록 설정되어 있습니다.
 
 ## 서버 설정 변경
 
 ### 서버 관련 환경 변수
+
+> [!IMPORTANT]
+>
+> 게임이 아직 베타 버전이기 때문에 해당 환경 변수 및 설정은 변경될 수 있습니다.
+
+[환경 변수](#환경-변수)와 함께 사용되는 설정입니다.
 
 | 변수                   | 정보                                                                            | 기본값                         | 설정 가능한 값                                                     |
 |-----------------------|--------------------------------------------------------------------------------|-------------------------------|-----------------------------------------------------------------|
@@ -408,13 +437,14 @@ AUTO_UPDATE_CRON_EXPRESSION 값의 예시로 `0 2 * * *`로 설정할 경우 매
 
 ### 수동 설정
 
-서버가 시작된 후 `<mount_folder>/Longvinter/Saved/Config/LinuxServer/`에 `Game.ini` 파일이 생성됩니다.
-기본적으로 `Game.ini` 파일은 위 환경 변수들로 구성되지만 DISABLE_GENERATE_SETTINGS 값을 `true`로 설정할 경우에는 직접 파일을 수정하여 설정할 수 있습니다.
+서버가 시작된 후 `<mount_folder>/Longvinter/Saved/Config/LinuxServer/` 폴더 내 `Game.ini` 파일이 생성됩니다.
+기본적으로 `Game.ini` 파일은 [위 환경 변수](#서버-관련-환경-변수)들로 구성되지만
+DISABLE_GENERATE_SETTINGS 값을 `true`로 설정할 경우에는 직접 파일을 수정하여 설정할 수 있습니다.
 
 > [!IMPORTANT]
 > 서버가 중지되어 있을 때만 `Game.ini` 파일을 변경할 수 있습니다.
 >
-> 서버가 실행되고 있다면 서버가 중지될 때 해당 파일을 덮어씁니다.
+> 서버가 실행 중이라면 중지할 때 해당 파일을 덮어쓰기 때문에 서버를 중지한 후 수정해야 합니다.
 
 ## 디스코드 웹훅 사용법
 
@@ -435,7 +465,7 @@ Docker Compose로 사용하는 방법
 - DISCORD_PRE_UPDATE_BOOT_MESSAGE="Server is updating..."
 ```
 
-## 특정 게임 버전으로 실행하기
+## 특정 게임 버전으로 고정
 
 > [!WARNING]
 > 해당 설정 사용 시 서버를 구버전으로 설치 및 다운그레이드를 진행합니다. 이 설정으로 인해 어떠한 문제가 발생할 지 알 수 없음을 알려드립니다.

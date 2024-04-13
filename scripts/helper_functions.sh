@@ -76,6 +76,16 @@ isExecutable() {
 	return "$return_val"
 }
 
+# Checks if users in the game
+# Returns 0 if players exists
+# Returns 1 if players not exists
+player_check() {
+	if [ "$(timeout 1s bash -c "while :; do netstat -an | grep :'$PORT' | awk '{print \$2}'; done" | grep -cv ^0)" -eq 0 ]; then
+		return 1
+	fi
+	return 0
+}
+
 #
 # Log Definitions
 #
@@ -125,12 +135,65 @@ DiscordMessage() {
 	fi
 }
 
+# Given a message this will broadcast in discord
+# Returns 0 on success
+# Returns 1 if not able to broadcast
+broadcast_command() {
+	local message="$1"
+	local level="$2"
+
+	if [[ $TEXT = *[![:ascii:]]* ]]; then
+		LogWarn "Unable to broadcast since the message contains non-ascii characters: \"${message}\""
+		return 1
+	fi
+	DiscordMessage "Broadcast" "$message" "$level" "$DISCORD_BROADCAST_MESSAGE_ENABLE" "$DISCORD_BROADCAST_MESSAGE_URL"
+}
+
 # Saves then shutdowns the server
 # Returns 0 if it is shutdown
 # Returns not 0 if it is not able to be shutdown
 shutdown_server() {
 	kill -15 "$(pidof LongvinterServer-Linux-Shipping)"
 	return $?
+}
+
+# Given an amount of time in minutes and a message prefix
+# Will skip countdown if no players are in the server, Will only check the mtime if there are players in the server
+# Returns 0 on success
+# Returns 1 if mtime is empty
+# Returns 2 if mtime is not an integer
+countdown_message() {
+	local mtime="$1"
+	local message_prefix="$2"
+	local return_val=0
+	local minute="minutes"
+
+	if [[ "${mtime}" =~ ^[0-9]+$ ]]; then
+		for ((i = "${mtime}" ; i > 0 ; i--)); do
+			# Only do countdown if there are players
+			# Checking for players every minute
+			if ! player_check; then
+				break
+			fi
+
+			if [[ " $BROADCAST_COUNTDOWN_MTIMES " == *" $i "* ]]; then
+				if [ "$i" -eq 1 ]; then
+					minute="minute"
+				fi
+				broadcast_command "${message_prefix} in ${i} ${minute}" "warn"
+			fi
+
+			sleep 59s
+		done
+		test "$i" eq 0 && sleep 1s
+	# If there are players but mtime is empty
+	elif [ -z "${mtime}" ]; then
+		return_val=1
+	# If there are players but mtime is not an integer
+	else
+		return_val=2
+	fi
+	return "$return_val"
 }
 
 container_version_check() {
@@ -162,58 +225,49 @@ get_latest_version() {
 
 # Use it when you have to wait for it to be saved automatically because it does not support RCON.
 wait_save() {
-	local path old_path new_path
-	local num old_num adminpanel
+	local old_file new_file
+	local old_line new_line
 
-	old_path=$(last_savefile)
-	old_num=$(wc -l 2> /dev/null < "$old_path")
-	while path=$(inotifywait -q -e modify -r "$SERVER_LOG_DIR" | sed "s/ MODIFY //g"); do
-		if [[ "${path##*/}" =~ ^AdminPanelServer-.*\.log$ ]]
-		then adminpanel=true
-		else adminpanel=false
-		fi
+	while :; do
+		sleep 1s
 
-		if [ -n "$old_path" ] && num=$(check_save "$old_path" "$old_num"); then
+		# shellcheck disable=SC2012
+		new_file="$(ls -t "$SERVER_LOG_DIR"/AdminPanelServer-* 2> /dev/null | head -1)"
+		if [ -n "$old_file" ] && new_line="$(save_check "$old_file" "$old_line")"; then
 			break
-		elif [ "$adminpanel" = false ]; then
-			path="$old_path"
-		elif [ "$old_path" != "$path" ] && num=$(check_save "$path" 0); then
+		elif [ "$old_file" != "$new_file" ] && new_line="$(save_check "$new_file")"; then
 			break
 		fi
-
-		new_path=$(last_savefile)
-		if [ "$path" != "$new_path" ] && num=$(check_save "$new_path" 0); then
-			break
-		fi
-
-		old_path="$new_path"
-		old_num="${num:-$old_num}"
+		old_file="$new_file"
+		old_line="$new_line"
 	done
 }
 
-# Outputs the latest log file among log files where saves are recorded
-last_savefile() {
-	# shellcheck disable=SC2012
-	ls -t "$SERVER_LOG_DIR"/AdminPanelServer-*.log 2> /dev/null | head -1
-}
+# Given a log file this will check save log and display file number of line
+# Returns 0 if find save log
+# Returns 1 if not find save log
+# Returns 2 if the file is not found
+save_check() {
+	local file="$1"
+	local lastline="$2"
+	local livetime savetime
 
-# Check if there is any saved history in the log file
-# And Output the last line number of that file
-# Returns 0 if saved
-# Returns 1 if unsaved
-check_save() {
-	local path num old_num
-	path="$1"
-	old_num="$2"
-	num=$(wc -l < "$path")
-
-	echo "$num"
-
-	logs=$(tail -$((num - old_num)) "$path")
-	if echo "$logs" | grep -i ^"\[[a-z]\+ [0-9 ,:]\+ [AP]M\] Game saved!"$ > /dev/null 2>&1; then
-		return 0
+	if [ ! -f "$file" ]; then
+		return 2
 	fi
-	return 1
+
+	wc -l < "$file"
+	savetime="$(tail -n +"$((lastline+1))" "$file" | grep -E ^"\[[a-zA-Z]{3} [0-9, :]+ [AP]M\] Game saved!" | tail -1 | awk -F ']' '{print $1}' | cut -b 2-)"
+	if [ -z "$savetime" ]; then
+		return 1
+	fi
+
+	livetime="$(date "+%s")"
+	savetime="$(date -d "$savetime" "+%s")"
+	if [ "$((livetime - savetime))" -ge 65 ]; then
+		return 1
+	fi
+	return 0
 }
 
 Server_Info() {

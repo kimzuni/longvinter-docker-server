@@ -22,13 +22,20 @@ if [ "${UPDATE_ON_BOOT,,}" != true ]; then
 	exit 1
 fi
 
-if [[ "${AUTO_UPDATE_WARN_MINUTES}" =~ ^[0-9]+$ ]]; then
-	DiscordMessage "Update" "Server will update in ${AUTO_UPDATE_WARN_MINUTES} minutes" "warn"
-fi
-
-sleep "${AUTO_UPDATE_WARN_MINUTES}m"
-
-LogAction "Updating the server from $CURRENT_MANIFEST to $TARGET_MANIFEST."
-
-backup
-shutdown_server
+countdown_message "${AUTO_UPDATE_WARN_MINUTES}" "Server will update"
+countdown_exit_code=$?
+case "${countdown_exit_code}" in
+	0 )
+		LogAction "Updating the server from $CURRENT_COMMIT to ${TARGET_COMMIT_ID:-$LATEST_COMMIT}."
+		backup
+		shutdown_server
+		;;
+	1 )
+		LogWarn "Unable to auto update, the server is not empty and AUTO_UPDATE_WARN_MINUTES is empty."
+		exit 1
+		;;
+	2 )
+		LogWarn "Unable to auto update, the server is not empty and AUTO_UPDATE_WARN_MINUTES is not an integer: ${AUTO_UPDATE_WARN_MINUTES}"
+		exit 1
+		;;
+esac
