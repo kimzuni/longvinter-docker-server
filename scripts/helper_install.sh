@@ -44,7 +44,7 @@ UpdateRequired() {
 			LogSuccess "The server is up to date!"
 			return 1
 		else
-			LogInfo "An Update Is Available. Latest Version: $LATEST_MANIFEST."
+			LogInfo "An Update Is Available. Latest Version: $LATEST_COMMIT."
 			return 0
 		fi
 	fi

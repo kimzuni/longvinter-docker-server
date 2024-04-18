@@ -35,7 +35,7 @@
 >
 > 따라서 서버를 저장하지 않은 채로 서버 종료, 업데이트, 백업 복구 등의 작업을 진행할 경우
 > 최대 12분동안 플레이한 내역이 롤백될 수 있음을 알려드립니다.
-> (12분마다 자동 저장됩니다.)
+> (10_12분마다 자동 저장됩니다.)
 
 ## 공식 사이트 및 커뮤니티
 
@@ -243,13 +243,17 @@ docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-ser
 | PORT\*                                     | 서버 게임 포트 번호                                                                                                | 7777                                                                                               | 1024-65535                                                                                                 |
 | QUERY_PORT                                 | 스팀 서버와 통신하기 위한 쿼리 포트 번호                                                                               | 27016                                                                                              | 1024-65535                                                                                                 |
 | UPDATE_ON_BOOT\*\*                         | 서버 시작 시 자동으로 서버 업데이트 진행                                                                               | true                                                                                               | true/false                                                                                                 |
-| BACKUP_ENABLED                             | 일정 시간마다 자동으로 서버 백업 진행                                                                                  | true                                                                                               | true/false                                                                                                |
-| BACKUP_CRON_EXPRESSION                     | 자동 백업 빈도 설정                                                                                                | 0 0 \* \* \*                                                                                       | 크론식 표현 - [Cron으로 자동 백업 설정하는 방법](#cron으로-자동-백업-설정하는-방법) 참고 바람                             |
-| DELETE_OLD_BACKUPS                         | 자동 백업 설정 시 오래된 백업 파일 자동 삭제                                                                            | false                                                                                             | true/false                                                                                                 |
+| BACKUP_ENABLED                             | 자동 백업 할성화                                                                                                  | true                                                                                               | true/false                                                                                                 |
+| BACKUP_CRON_EXPRESSION                     | 자동 백업 빈도 설정                                                                                                | 0 0 \* \* \*                                                                                      | 크론식 표현 - [Cron으로 자동 백업 설정하는 방법](#cron으로-자동-백업-설정하는-방법) 참고 바람                              |
+| DELETE_OLD_BACKUPS                         | 자동 백업 시 오래된 백업 파일 자동 삭제                                                                               | false                                                                                             | true/false                                                                                                  |
 | OLD_BACKUP_DAYS                            | 지정한 일수가 지난 백업 파일만 삭제                                                                                   | 30                                                                                                | !0                                                                                                          |
-| AUTO_UPDATE_ENABLED                        | 일정 시간마다 자동으로 서버 업데이트 진행                                                                              | false                                                                                             |  true/false                                                                                                 |
-| AUTO_UPDATE_CRON_EXPRESSION                | 자동 업데이트 빈도 설정                                                                                            | 0 0 \* \* \*                                                                                      | 크론식 표현 - [Cron으로 자동 업데이트 설정하는 방법](#cron으로-자동-업데이트-설정하는-방법) 참고 바람                         |
-| AUTO_UPDATE_WARN_MINUTES                   | 지정한 시간(분)이 지난 후 서버 업데이트 진행                                                                           | 30                                                                                                | !0                                                                                                          |
+| AUTO_UPDATE_ENABLED                        | 자동 업데이트 활성화                                                                                               | false                                                                                             |  true/false                                                                                                 |
+| AUTO_UPDATE_CRON_EXPRESSION                | 자동 업데이트 빈도 설정                                                                                            | 0 \* \* \* \*                                                                                     | 크론식 표현 - [Cron으로 자동 업데이트 설정하는 방법](#cron으로-자동-업데이트-설정하는-방법) 참고 바람                         |
+| AUTO_UPDATE_WARN_MINUTES                   | 플레이어에게 알림 전송 후 지정된 시간이 지나고 서버가 저장되면 업데이트 진행                                                  | 15                                                                                                | !0                                                                                                          |
+| AUTO_REBOOT_ENABLED                        | 자동 재부팅 활성화                                                                                                | false                                                                                             | true/false                                                                                                  |
+| AUTO_REBOOT_CRON_EXPRESSION                | 자동 재부팅 빈도 설정                                                                                             | 0 0 \* \* \*                                                                                       | 크론식 표현 - [Cron으로 자동 재부팅 설정하는 방법](#cron으로-자동-재부팅-설정하는-방법) 참고 바람                           |
+| AUTO_REBOOT_WARN_MINUTES                   | 플레이어에게 알림 전송 후 지정된 시간이 지나고 서버가 저장되면 재부팅 진행                                                   | 15                                                                                                 | !0                                                                                                         |
+| AUTO_REBOOT_EVEN_IF_PLAYERS_ONLINE         | 플레이 중인 유저가 있을 경우에도 재부팅 진행                                                                           | false                                                                                              | true/false                                                                                                 |
 | TARGET_COMMIT_ID                           | 게임 서버를 지정한 Commit ID를 가진 버전으로 설치 및 실행                                                               | _(empty)_                                                                                         | [특정 게임 버전으로 고정](#특정-게임-버전으로-고정) 참고                                                              |
 | DISCORD_WEBHOOK_URL                        | 디스코드 서버에서 생성한 웹훅 URL                                                                                    | _(empty)_                                                                                         | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
 | DISCORD_SUPPRESS_NOTIFICATIONS             | 디스코드 메시지 전송 시 멤버들에게 알림을 보내지 않음                                                                     | false                                                                                             | true/false                                                                                                  |
@@ -295,7 +299,7 @@ docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-ser
 | DISCORD_ERR_BACKUP_DELETE_MESSAGE_URL      | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                     | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
 | DISCORD_BROADCAST_MESSAGE_ENABLE           | 이 값이 `true`인 경우 브로드캐스트 내용를 디스코드 메시지로 전송                                                        | true                                                                                               | true/false                                                                                                  |
 | DISCORD_BROADCAST_MESSAGE_URL              | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                     | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
-| BROADCAST_COUNTDOWN_MTIMES                 | 업데이트 등에 사용되는 카운트다운 진행 중 남은 시간이 이 값에 포함되어 있을 경우 브로드캐스트로 알림                             | 1 5 10 15                                                                                          | !0 and " "(Space)                                                                                           |
+| BROADCAST_COUNTDOWN_MTIMES                 | 카운트다운 진행 중 남은 시간이 이 값에 포함되어 있을 경우 브로드캐스트로 알림                                               | 1 5 10 15 30 60                                                                                    | !0 and " "(Space)                                                                                           |
 | DISABLE_GENERATE_SETTINGS                  | 서버 설정 파일 `Game.ini`에 적용되는 모든 환경변수 설정 무시 및 기본 값으로 설정                                          | false                                                                                              | true/false                                                                                                  |
 | ARM_COMPATIBILITY_MODE                     | 서버 업데이트를 위해 steamcmd를 실행할 때 Box86에서 QEMU로 호환성 계층을 전환합니다. 이 설정은 ARM64 호스트에만 적용 가능합니다. | false                                                                                              | true/false                                                                                                  |
 
@@ -370,10 +374,9 @@ docker compose up -d
 
 ## Cron으로 자동 백업 설정하는 방법
 
-자동 백업을 사용하려면 환경 변수 BACKUP_ENABLED 값이 `true`로 설정되어 있어야 합니다. (기본값)
+자동 백업을 사용하려면 환경 변수 BACKUP_ENABLED 값이 `true`로 설정되어 있어야 합니다. (기본값: `true`)
 
 BACKUP_CRON_EXPRESSION는 크론식으로, 작업을 실행할 시간 또는 주기를 설정할 수 있습니다.
-이는 환경 변수 TZ(타임존) 값의 영향을 받습니다.
 
 > [!TIP]
 > 이 이미지는 Supercronic으로 Cron을 사용합니다.
@@ -381,15 +384,15 @@ BACKUP_CRON_EXPRESSION는 크론식으로, 작업을 실행할 시간 또는 주
 > 또는
 > [Crontab Generator](https://crontab-generator.org)를 참고해 주세요.
 
-BACKUP_CRON_EXPRESSION 값의 예시로 `0 2 * * *`로 설정할 경우 매일 오전 2시에 백업이 진행됩니다.
+만약 BACKUP_CRON_EXPRESSION 값을 `0 2 * * *`로 설정할 경우 매일 오전 2시에 백업이 진행됩니다.
 이는 환경 변수 TZ 값의 영향을 받으며, 기본값은 매일 밤 자정에 실행되도록 설정되어 있습니다.
 
 ## Cron으로 자동 업데이트 설정하는 방법
 
 자동 업데이트를 사용하려면 아래 환경 변수 모두 true로 설정해야 합니다.
 
-- AUTO_UPDATE_ENABLED
-- UPDATE_ON_BOOT (기본값)
+- AUTO_UPDATE_ENABLED (기본값: `false`)
+- UPDATE_ON_BOOT (기본값: `true`)
 
 > [!IMPORTANT]
 >
@@ -399,7 +402,6 @@ BACKUP_CRON_EXPRESSION 값의 예시로 `0 2 * * *`로 설정할 경우 매일 �
 > 참고로 [사용법](#사용법)에 기재된 `docker compose` 및 `docker run` 명령어의 예시에는 해당 설정이 적용되어 있습니다.
 
 AUTO_UPDATE_CRON_EXPRESSION는 크론식으로, 작업을 실행할 시간 또는 주기를 설정할 수 있습니다.
-이는 환경 변수 TZ 값의 영향을 받으며, 기본값은 매일 밤 자정에 실행되도록 설정되어 있습니다.
 
 > [!TIP]
 > 이 이미지는 Supercronic으로 Cron을 사용합니다.
@@ -407,7 +409,29 @@ AUTO_UPDATE_CRON_EXPRESSION는 크론식으로, 작업을 실행할 시간 또�
 > 또는
 > [Crontab Generator](https://crontab-generator.org)를 참고해 주세요.
 
-AUTO_UPDATE_CRON_EXPRESSION 값의 예시로 `0 2 * * *`로 설정할 경우 매일 오전 2시에 업데이트가 진행됩니다.
+만약 AUTO_UPDATE_CRON_EXPRESSION 값을 `0 2 * * *`로 설정할 경우 매일 오전 2시에 업데이트가 진행됩니다.
+이는 환경 변수 TZ 값의 영향을 받으며, 기본값은 매 시간 정시에 실행되도록 설정되어 있습니다.
+
+## Cron으로 자동 재부팅 설정하는 방법
+
+자동 백업을 사용하려면 환경 변수 AUTO_REBOOT_ENABLED 값이 `true`로 설정되어 있어야 합니다. (기본값: `false`)
+
+> [!IMPORTANT]
+>
+> 도커 재시작 옵션이 `always` 또는 `unless-stopped`로 설정되어 있어야 합니다.
+> 그렇지 않으면 서버가 종료된 후 수동으로 서버를 다시 올려야 합니다.
+>
+> 참고로 [사용법](#사용법)에 기재된 `docker compose` 및 `docker run` 명령어의 예시에는 해당 설정이 적용되어 있습니다.
+
+AUTO_REBOOT_CRON_EXPRESSION는 크론식으로, 작업을 실행할 시간 또는 주기를 설정할 수 있습니다.
+
+> [!TIP]
+> 이 이미지는 Supercronic으로 Cron을 사용합니다.
+> 자세한 설정 방법은 [supercronic](https://github.com/aptible/supercronic#crontab-format)
+> 또는
+> [Crontab Generator](https://crontab-generator.org)를 참고해 주세요.
+
+만약 AUTO_REBOOT_CRON_EXPRESSION 값을 `0 2 * * *`로 설정할 경우 매일 오전 2시에 재부팅이 진행됩니다.
 이는 환경 변수 TZ 값의 영향을 받으며, 기본값은 매일 밤 자정에 실행되도록 설정되어 있습니다.
 
 ## 서버 설정 변경

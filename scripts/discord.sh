@@ -39,20 +39,20 @@ else
 fi
 
 if [ -n "${LEVEL}" ]; then
-	case $LEVEL in
-		info )
+	case "${LEVEL,,}" in
+		info|blue )
 			COLOR=$DISCORD_BLUE
 			;;
-		in-progress )
+		in-progress|yellow )
 			COLOR=$DISCORD_YELLOW
 			;;
-		warn )
+		warn|orange )
 			COLOR=$DISCORD_ORANGE
 			;;
-		failure )
+		failure|red )
 			COLOR=$DISCORD_RED
 			;;
-		success )
+		success|green )
 			COLOR=$DISCORD_GREEN
 			;;
 		* )

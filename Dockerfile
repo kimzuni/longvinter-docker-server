@@ -34,6 +34,7 @@ RUN apt-get update && \
       ca-certificates \
       lib32gcc1-amd64-cross \
       procps=2:4.0.2-3 \
+      gettext-base=0.21-12 \
       xdg-user-dirs=0.18-1 \
       jo=1.9-1 \
       jq=1.6-2.1 \
@@ -50,7 +51,7 @@ RUN case ${TARGETARCH} in \
         "amd64") SUPERCRONIC_SHA1SUM=${SUPERCRONIC_SHA1SUM_AMD64} ;; \
         "arm64") SUPERCRONIC_SHA1SUM=${SUPERCRONIC_SHA1SUM_ARM64} ;; \
     esac \
-    && curl -L https://github.com/aptible/supercronic/releases/download/v${SUPERCRONIC_VERSION}/supercronic-linux-${TARGETARCH} -o supercronic \
+    && curl -sfSL https://github.com/aptible/supercronic/releases/download/v${SUPERCRONIC_VERSION}/supercronic-linux-${TARGETARCH} -o supercronic \
     && echo "${SUPERCRONIC_SHA1SUM}" supercronic | sha1sum -c - \
     && chmod +x supercronic \
     && mv supercronic /usr/local/bin/supercronic
@@ -67,8 +68,13 @@ ENV TZ="UTC" \
     DELETE_OLD_BACKUPS=false \
     OLD_BACKUP_DAYS=30 \
     AUTO_UPDATE_ENABLED=false \
-    AUTO_UPDATE_CRON_EXPRESSION="0 0 * * *" \
-    AUTO_UPDATE_WARN_MINUTES=30 \
+    AUTO_UPDATE_CRON_EXPRESSION="0 * * * *" \
+    AUTO_UPDATE_WARN_MINUTES=15 \
+    AUTO_REBOOT_ENABLED=false \
+    AUTO_REBOOT_CRON_EXPRESSION="0 0 * * *" \
+    AUTO_REBOOT_WARN_MINUTES=15 \
+    AUTO_REBOOT_EVEN_IF_PLAYERS_ONLINE=false \
+    TARGET_COMMIT_ID= \
     DISCORD_WEBHOOK_URL="" \
     DISCORD_SUPPRESS_NOTIFICATIONS=false \
     DISCORD_CONNECT_TIMEOUT=30 \
@@ -113,7 +119,7 @@ ENV TZ="UTC" \
     DISCORD_ERR_BACKUP_DELETE_MESSAGE_URL= \
     DISCORD_BROADCAST_MESSAGE_ENABLE=true \
     DISCORD_BROADCAST_MESSAGE_URL= \
-    BROADCAST_COUNTDOWN_MTIMES="1 5 10 15" \
+    BROADCAST_COUNTDOWN_MTIMES="1 5 10 15 30 60" \
     DISABLE_GENERATE_SETTINGS=false \
     ARM_COMPATIBILITY_MODE=false
 
@@ -121,7 +127,7 @@ ENV TZ="UTC" \
 ARG GIT_VERSION_TAG=unspecified
 
 COPY --chmod=755 ./scripts /home/steam/server
-RUN for file in backup.sh update.sh restore.sh; do \
+RUN for file in backup.sh update.sh restore.sh broadcast.sh; do \
         mv /home/steam/server/"$file" /usr/local/bin/"${file%.sh}"; \
     done
 

@@ -35,7 +35,7 @@ This container has also been tested and will work on both `x64` and `ARM64` base
 >
 > Therefore, we would like to inform you that if you do not save the server and proceed
 > with server shutdown, update, and backup recovery, the history of your play for up to 12 minutes may be rolled back.
-> (Server is Automatically saved every 12 minutes.)
+> (Server is Automatically saved every 10~12 minutes.)
 
 ## Official URL
 
@@ -248,8 +248,12 @@ It is highly recommended you set the following environment values before startin
 | DELETE_OLD_BACKUPS                         | Delete backups after a certain number of days.                                                                                                   | false                                                                                              | true/false                                                                                                        |
 | OLD_BACKUP_DAYS                            | How many days to keep backups.                                                                                                                   | 30                                                                                                 | any positive integer                                                                                              |
 | AUTO_UPDATE_ENABLED                        | Enables automatic updates.                                                                                                                       | false                                                                                              | true/false                                                                                                        |
-| AUTO_UPDATE_CRON_EXPRESSION                | Setting affects frequency of automatic updates.                                                                                                  | 0 0 \* \* \*                                                                                       | Needs a Cron-Expression - See [Configuring Automatic Updates with Cron](#configuring-automatic-updates-with-cron) |
-| AUTO_UPDATE_WARN_MINUTES                   | How long to wait to update the server, after the player were informed.                                                                           | 30                                                                                                 | !0                                                                                                                |
+| AUTO_UPDATE_CRON_EXPRESSION                | Setting affects frequency of automatic updates.                                                                                                  | 0 \* \* \* \*                                                                                      | Needs a Cron-Expression - See [Configuring Automatic Updates with Cron](#configuring-automatic-updates-with-cron) |
+| AUTO_UPDATE_WARN_MINUTES                   | How long to wait to saved and update the server, after the player were informed.                                                                 | 15                                                                                                 | !0                                                                                                                |
+| AUTO_REBOOT_ENABLED                        | Enables automatic reboots.                                                                                                                       | false                                                                                              | true/false                                                                                                        |
+| AUTO_REBOOT_CRON_EXPRESSION                | Setting affects frequency of automatic reboots.                                                                                                  | 0 0 \* \* \*                                                                                       | Needs a Cron-Expression - See [Configuring Automatic Reboots with Cron](#configuring-automatic-reboots-with-cron) |
+| AUTO_REBOOT_WARN_MINUTES                   | How long to wait to saved and reboot the server, after the player were informed.                                                                 | 15                                                                                                 | !0                                                                                                                |
+| AUTO_REBOOT_EVEN_IF_PLAYERS_ONLINE         | Reboot the Server even if there are players online.                                                                                              | false                                                                                              | true/false                                                                                                        |
 | TARGET_COMMIT_ID                           | Install and run the game server at the specified version.                                                                                        | _(empty)_                                                                                          | See [Locking Specific Game Version](#locking-specific-game-version)(#target-commit-id)                            |
 | DISCORD_WEBHOOK_URL                        | Discord webhook url found after creating a webhook on a discord server.                                                                          | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
 | DISCORD_SUPPRESS_NOTIFICATIONS             | Enables/Disables `@silent` messages for the server messages.                                                                                     | false                                                                                              | true/false                                                                                                        |
@@ -295,7 +299,7 @@ It is highly recommended you set the following environment values before startin
 | DISCORD_ERR_BACKUP_DELETE_MESSAGE_URL      | Discord Webhook URL for this message. (if left empty will use DISCORD_WEBHOOK_URL)                                                               | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
 | DISCORD_BROADCAST_MESSAGE_ENABLE           | If the Discord message is enabled for broadcast content.                                                                                         | true                                                                                               | true/false                                                                                                        |
 | DISCORD_BROADCAST_MESSAGE_URL              | Discord Webhook URL for this message. (if left empty will use DISCORD_WEBHOOK_URL)                                                               | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
-| BROADCAST_COUNTDOWN_MTIMES                 | Broadcast when the remaining time during countdown is included, which is used for updates, etc.                                                  | 1 5 10 15                                                                                          | !0 and Word spacing                                                                                               |
+| BROADCAST_COUNTDOWN_MTIMES                 | Broadcast when the remaining time during countdown is included.                                                                                  | 1 5 10 15 30 60                                                                                    | !0 and Word spacing                                                                                               |
 | DISABLE_GENERATE_SETTINGS                  | Whether to automatically generate the Game.ini                                                                                                   | false                                                                                              | true/false                                                                                                        |
 | ARM_COMPATIBILITY_MODE                     | Switches the compatibility layer from Box86 to QEMU when executing steamcmd for server updates. This setting is only applicable for ARM64 hosts. | false                                                                                              | true/false                                                                                                        |
 
@@ -373,7 +377,6 @@ docker compose up -d
 Set BACKUP_ENABLED enable or disable automatic backups (Default is enabled)
 
 BACKUP_CRON_EXPRESSION is a cron expression, in a Cron-Expression you define an interval for when to run jobs.
-This is affected by the environment variable TZ value.
 
 > [!TIP]
 > This image uses Supercronic for crons
@@ -399,7 +402,6 @@ To be able to use automatic Updates with this Server the following environment v
 > The example docker run command and docker compose file in [How to Use](#how-to-use) already uses the needed policy.
 
 AUTO_UPDATE_CRON_EXPRESSION is a cron expression, in a Cron-Expression you define an interval for when to run jobs.
-This is affected by the environment variable TZ value and the default is set to run at midnight every night.
 
 > [!TIP]
 > This image uses Supercronic for crons
@@ -408,6 +410,28 @@ This is affected by the environment variable TZ value and the default is set to 
 > [Crontab Generator](https://crontab-generator.org).
 
 Example Usage: If AUTO_UPDATE_CRON_EXPRESSION to `0 2 * * *`, the update script will run every day at 2:00 AM.
+This is affected by the environment variable TZ value and the default is set to run at every hour.
+
+## Configuring Automatic Reboots with Cron
+
+Set AUTO_REBOOT_ENABLED enable or disable automatic reboots (Default is disabled)
+
+> [!IMPORTANT]
+>
+> If docker restart is not set to policy `always` or `unless-stopped` then the server will shutdown and will need to be
+> manually restarted.
+>
+> The example docker run command and docker compose file in [How to Use](#how-to-use) already uses the needed policy.
+
+AUTO_REBOOT_CRON_EXPRESSION is a cron expression, in a Cron-Expression you define an interval for when to run jobs.
+
+> [!TIP]
+> This image uses Supercronic for crons
+> see [supercronic](https://github.com/aptible/supercronic#crontab-format)
+> or
+> [Crontab Generator](https://crontab-generator.org).
+
+Example Usage: If AUTO_REBOOT_CRON_EXPRESSION to `0 2 * * *`, the reboot script will run every day at 2:00 AM.
 This is affected by the environment variable TZ value and the default is set to run at midnight every night.
 
 ## Editing Server Settings

@@ -80,7 +80,7 @@ isExecutable() {
 # Returns 0 if players exists
 # Returns 1 if players not exists
 player_check() {
-	if [ "$(timeout 1s bash -c "while :; do netstat -an | grep :'$PORT' | awk '{print \$2}'; done" | grep -cv ^0)" -eq 0 ]; then
+	if ! timeout 1s bash -c "while :; do netstat -an | grep ^udp.*:'$PORT' | awk '{print \$2}'; done" | grep -qv ^0; then
 		return 1
 	fi
 	return 0
@@ -139,14 +139,8 @@ DiscordMessage() {
 # Returns 0 on success
 # Returns 1 if not able to broadcast
 broadcast_command() {
-	local message="$1"
-	local level="$2"
-
-	if [[ $TEXT = *[![:ascii:]]* ]]; then
-		LogWarn "Unable to broadcast since the message contains non-ascii characters: \"${message}\""
-		return 1
-	fi
-	DiscordMessage "Broadcast" "$message" "$level" "$DISCORD_BROADCAST_MESSAGE_ENABLE" "$DISCORD_BROADCAST_MESSAGE_URL"
+	broadcast "$@"
+	return $?
 }
 
 # Saves then shutdowns the server
@@ -170,22 +164,20 @@ countdown_message() {
 
 	if [[ "${mtime}" =~ ^[0-9]+$ ]]; then
 		for ((i = "${mtime}" ; i > 0 ; i--)); do
-			# Only do countdown if there are players
-			# Checking for players every minute
-			if ! player_check; then
-				break
-			fi
-
-			if [[ " $BROADCAST_COUNTDOWN_MTIMES " == *" $i "* ]]; then
+			if [ "$mtime" -eq "$i" ] || [[ " $BROADCAST_COUNTDOWN_MTIMES " == *" $i "* ]]; then
 				if [ "$i" -eq 1 ]; then
 					minute="minute"
 				fi
 				broadcast_command "${message_prefix} in ${i} ${minute}" "warn"
 			fi
 
+			# Only do countdown if there are players
+			# Checking for players every minute
+			if ! player_check; then
+				break
+			fi
 			sleep 59s
 		done
-		test "$i" eq 0 && sleep 1s
 	# If there are players but mtime is empty
 	elif [ -z "${mtime}" ]; then
 		return_val=1
@@ -193,6 +185,7 @@ countdown_message() {
 	else
 		return_val=2
 	fi
+
 	return "$return_val"
 }
 
@@ -225,46 +218,33 @@ get_latest_version() {
 
 # Use it when you have to wait for it to be saved automatically because it does not support RCON.
 wait_save() {
-	local old_file new_file
-	local old_line new_line
+	local spare="$1"
 
-	while :; do
+	LogAction "Waiting for the server to be saved..."
+	broadcast_command "Waiting for the server to be saved..." "in-progress"
+
+	while ! save_check "$spare"; do
 		sleep 1s
-
-		# shellcheck disable=SC2012
-		new_file="$(ls -t "$SERVER_LOG_DIR"/AdminPanelServer-* 2> /dev/null | head -1)"
-		if [ -n "$old_file" ] && new_line="$(save_check "$old_file" "$old_line")"; then
-			break
-		elif [ "$old_file" != "$new_file" ] && new_line="$(save_check "$new_file")"; then
-			break
-		fi
-		old_file="$new_file"
-		old_line="$new_line"
 	done
 }
 
-# Given a log file this will check save log and display file number of line
+# Given a number verify that there is a saved log within that second
 # Returns 0 if find save log
 # Returns 1 if not find save log
-# Returns 2 if the file is not found
 save_check() {
-	local file="$1"
-	local lastline="$2"
+	local spare="${1:-10}"
 	local livetime savetime
 
-	if [ ! -f "$file" ]; then
-		return 2
-	fi
-
-	wc -l < "$file"
-	savetime="$(tail -n +"$((lastline+1))" "$file" | grep -E ^"\[[a-zA-Z]{3} [0-9, :]+ [AP]M\] Game saved!" | tail -1 | awk -F ']' '{print $1}' | cut -b 2-)"
-	if [ -z "$savetime" ]; then
-		return 1
-	fi
-
 	livetime="$(date "+%s")"
-	savetime="$(date -d "$savetime" "+%s")"
-	if [ "$((livetime - savetime))" -ge 65 ]; then
+	savetime=$(
+		grep -rE ^"\[[a-zA-Z]{3} [0-9, :]+ [AP]M\] Game saved!" "$SERVER_LOG_DIR" \
+		| awk -F "\\\[|\\\]" '{print $2}' \
+		| sed "s/Jan/1/g; s/Feb/2/g; s/Mar/3/g; s/Apr/4/g; s/May/5/g; s/Jun/6/g; s/Jul/7/g; s/Aug/8/g; s/Sep/9/g; s/Oct/10/g; s/Nov/11/g; s/Dec/12/g" \
+		| awk -F ":| |," '{if (($NF == "PM" && $5 != 12) || ($NF == "AM" && $5 == 12)) $5 = ($5+12)%24; printf("%s/%s/%s %s:%s:%s\n", $4, $1, $2, $5, $6, $7)}' \
+		| sort --version-sort | tail -1 | (read -r time; test -n "$time" && date -d "$time" "+%s")
+	)
+
+	if [ $((livetime - savetime)) -ge $((spare)) ]; then
 		return 1
 	fi
 	return 0
