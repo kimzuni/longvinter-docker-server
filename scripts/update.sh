@@ -26,6 +26,7 @@ countdown_message "${AUTO_UPDATE_WARN_MINUTES}" "Server will update"
 countdown_exit_code=$?
 case "${countdown_exit_code}" in
 	0 )
+		# shellcheck disable=SC2119
 		wait_save
 		LogAction "Updating the server from $CURRENT_COMMIT to ${TARGET_COMMIT_ID:-$LATEST_COMMIT}."
 		backup
