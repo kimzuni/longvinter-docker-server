@@ -34,7 +34,7 @@ This container has also been tested and will work on both `x64` and `ARM64` base
 > At the moment, All related features have been replaced and removed because Longvinter does not support RCON.
 >
 > Therefore, we would like to inform you that if you do not save the server and proceed
-> with server shutdown, update, and backup recovery, the history of your play for up to 12 minutes may be rolled back.
+> with server shutdown, and recovery, the history of your play for up to 12 minutes may be rolled back.
 > (Server is Automatically saved every 10~12 minutes.)
 
 ## Official URL
@@ -297,8 +297,8 @@ It is highly recommended you set the following environment values before startin
 | DISCORD_ERR_BACKUP_DELETE_MESSAGE          | Discord message when there has been an error removing older backups.                                                                             | Unable to delete old backups, OLD_BACKUP_DAYS is not an integer. OLD_BACKUP_DAYS=`old_backup_days` | "string"                                                                                                          |
 | DISCORD_ERR_BACKUP_DELETE_MESSAGE_ENABLED  | If the Discord message is enabled for this message.                                                                                              | true                                                                                               | true/false                                                                                                        |
 | DISCORD_ERR_BACKUP_DELETE_MESSAGE_URL      | Discord Webhook URL for this message. (if left empty will use DISCORD_WEBHOOK_URL)                                                               | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
-| DISCORD_BROADCAST_MESSAGE_ENABLE           | If the Discord message is enabled for broadcast content.                                                                                         | true                                                                                               | true/false                                                                                                        |
-| DISCORD_BROADCAST_MESSAGE_URL              | Discord Webhook URL for this message. (if left empty will use DISCORD_WEBHOOK_URL)                                                               | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
+| DISCORD_BROADCAST_MESSAGE_ENABLE\*\*       | If the Discord message is enabled for broadcast content.                                                                                         | true                                                                                               | true/false                                                                                                        |
+| DISCORD_BROADCAST_MESSAGE_URL\*            | Discord Webhook URL for this message. (if left empty will use DISCORD_WEBHOOK_URL)                                                               | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                                   |
 | BROADCAST_COUNTDOWN_MTIMES                 | Broadcast when the remaining time during countdown is included.                                                                                  | 1 5 10 15 30 60                                                                                    | !0 and Word spacing                                                                                               |
 | DISABLE_GENERATE_SETTINGS                  | Whether to automatically generate the Game.ini                                                                                                   | false                                                                                              | true/false                                                                                                        |
 | ARM_COMPATIBILITY_MODE                     | Switches the compatibility layer from Box86 to QEMU when executing steamcmd for server updates. This setting is only applicable for ARM64 hosts. | false                                                                                              | true/false                                                                                                        |
@@ -313,6 +313,34 @@ It is highly recommended you set the following environment values before startin
 |-------|----------------------|
 | 7777  | Game Port (TCP/UDP)  |
 | 27016 | Query Port (TCP/UDP) |
+
+## Broadcast
+
+Used for countdown before automatic updating/Rebooting a server.
+
+> [!IMPORTANT]
+> Since the game server does not support RCON, in-game broadcasting is not possible,
+> so this send it to Discord.
+>
+> See [Broadcast on Discord](#broadcast-on-discord)
+
+## Manually Broadcast
+
+You can broadcast manually using the command:
+
+```bash
+docker exec longvinter-server broadcast "Message" [COLOR]
+```
+
+List of color:
+$\color{#1132D8}Blue$(Default),
+$\color{#E8D44F}Yellow$,
+$\color{#D85311}Orange$,
+$\color{#DF0000}Red$,
+$\color{#00CC00}Green$
+(Case-insensitive)
+
+Color is used when sending to Discord. See [Broadcast on Discord](#broadcast-on-discord)
 
 ## Creating a backup
 
@@ -488,6 +516,18 @@ Send discord messages with docker compose:
 - DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/1234567890/abcde
 - DISCORD_PRE_UPDATE_BOOT_MESSAGE="Server is updating..."
 ```
+
+## Broadcast on Discord
+
+> [!IMPORTANT]
+>
+> Since the game server does not support RCON, in-game broadcasting is not possible,
+> recommend using this feature.
+
+Set DISCORD_BROADCAST_MESSAGE_ENABLE enable or disable broadcast on Discord (Default is enabled) (Recommended for use)
+
+If you use broadcast-only Discord Channel, set the DISCORD_BROADCAST_MESSAGE_URL.
+If not set, DISCORD_WEBHOOK_URL will be used.
 
 ## Locking Specific Game Version
 

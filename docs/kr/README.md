@@ -33,9 +33,9 @@
 > [!WARNING]
 > 현재 롱빈터에서 RCON을 지원하지 않기 때문에 관련된 모든 기능이 교체 및 제거되었습니다.
 >
-> 따라서 서버를 저장하지 않은 채로 서버 종료, 업데이트, 백업 복구 등의 작업을 진행할 경우
+> 따라서 서버를 저장하지 않은 채로 서버 종료, 복구 등의 작업을 진행할 경우
 > 최대 12분동안 플레이한 내역이 롤백될 수 있음을 알려드립니다.
-> (10_12분마다 자동 저장됩니다.)
+> (10~12분마다 자동 저장됩니다.)
 
 ## 공식 사이트 및 커뮤니티
 
@@ -297,8 +297,8 @@ docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-ser
 | DISCORD_ERR_BACKUP_DELETE_MESSAGE          | 오래된 백업 파일 삭제 실패 시 전송되는 메시지                                                                         | Unable to delete old backups, OLD_BACKUP_DAYS is not an integer. OLD_BACKUP_DAYS=`old_backup_days` | "string"                                                                                                    |
 | DISCORD_ERR_BACKUP_DELETE_MESSAGE_ENABLED  | 이 값이 `true`인 경우에만 해당 메시지 전송                                                                          | true                                                                                               | true/false                                                                                                  |
 | DISCORD_ERR_BACKUP_DELETE_MESSAGE_URL      | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                     | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
-| DISCORD_BROADCAST_MESSAGE_ENABLE           | 이 값이 `true`인 경우 브로드캐스트 내용를 디스코드 메시지로 전송                                                        | true                                                                                               | true/false                                                                                                  |
-| DISCORD_BROADCAST_MESSAGE_URL              | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                     | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
+| DISCORD_BROADCAST_MESSAGE_ENABLE\*\*       | 이 값이 `true`인 경우 브로드캐스트 메시지를 디스코드로 전송                                                             | true                                                                                               | true/false                                                                                                  |
+| DISCORD_BROADCAST_MESSAGE_URL\*            | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                     | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                             |
 | BROADCAST_COUNTDOWN_MTIMES                 | 카운트다운 진행 중 남은 시간이 이 값에 포함되어 있을 경우 브로드캐스트로 알림                                               | 1 5 10 15 30 60                                                                                    | !0 and " "(Space)                                                                                           |
 | DISABLE_GENERATE_SETTINGS                  | 서버 설정 파일 `Game.ini`에 적용되는 모든 환경변수 설정 무시 및 기본 값으로 설정                                          | false                                                                                              | true/false                                                                                                  |
 | ARM_COMPATIBILITY_MODE                     | 서버 업데이트를 위해 steamcmd를 실행할 때 Box86에서 QEMU로 호환성 계층을 전환합니다. 이 설정은 ARM64 호스트에만 적용 가능합니다. | false                                                                                              | true/false                                                                                                  |
@@ -314,7 +314,35 @@ docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-ser
 | 7777  | 게입 포트 (TCP/UDP) |
 | 27016 | 쿼리 포트 (TCP/UDP) |
 
-## 백업하기
+## 브로드캐스트
+
+서버 자동 업데이트/재부팅 전 카운트다운에 사용됩니다.
+
+> [!IMPORTANT]
+> 게임 서버에서 RCON을 지원하지 않아 게임 내 메시지를 띄울 수 없기 때문에
+> 해당 메시지를 디스코드로 전송합니다.
+>
+> [브로드캐스트 메시지를 디스코드로 전송](#브로드캐스트-메시지를-디스코드로-전송) 참고 바람
+
+## 수동 브로드캐스트
+
+아래 명령어를 사용하여 수동으로 브로드캐스트가 가능합니다.
+
+```bash
+docker exec longvinter-server broadcast "Message" [COLOR]
+```
+
+색상은
+$\color{#1132D8}Blue$(기본값),
+$\color{#E8D44F}Yellow$,
+$\color{#D85311}Orange$,
+$\color{#DF0000}Red$,
+$\color{#00CC00}Green$
+중 선택할 수 있으며, 대/소문자를 구분하지 않습니다.
+
+색상은 메시지를 디스코드로 전송할 때 사용됩니다. [브로드캐스트 메시지를 디스코드로 전송](#브로드캐스트-메시지를-디스코드로-전송) 참고 바람
+
+## 백업 생성
 
 > [!WARNING]
 > 마지막 저장이 언제였는지 확인해 주세요.
@@ -329,7 +357,7 @@ docker exec longvinter-server backup
 
 백업 완료 시 `/data/Longvinter/backups/`에 압축 파일이 생성됩니다.
 
-## 백업 파일로 복구하기
+## 백업 파일을 이용한 복원
 
 > [!WARNING]
 > 마지막 저장이 언제였는지 확인해 주세요.
@@ -348,7 +376,7 @@ docker exec -it longvinter-server restore
 >
 > 참고로 [사용법](#사용법)에 기재된 `docker compose` 및 `docker run` 명령어의 예시에는 해당 설정이 적용되어 있습니다.
 
-## 백업 파일을 수동으로 복원하기
+## 수동 복원
 
 > [!WARNING]
 > 마지막 저장이 언제였는지 확인해 주세요.
@@ -488,6 +516,18 @@ Docker Compose로 사용하는 방법
 - DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/1234567890/abcde
 - DISCORD_PRE_UPDATE_BOOT_MESSAGE="Server is updating..."
 ```
+
+## 브로드캐스트 메시지를 디스코드로 전송
+
+> [!IMPORTANT]
+>
+> 게임 서버에서 RCON을 지원하지 않아 게임 내 메시지를 띄울 수 없기 때문에
+> 해당 기능 사용을 권장합니다.
+
+브로드캐스트 메시지를 디스코드로 전송하려면 환경 변수 DISCORD_BROADCAST_MESSAGE_ENABLE 값이 `true`로 설정되어 있어야 합니다. (기본값: `true`)
+
+환경 변수 DISCORD_BROADCAST_MESSAGE_URL 값을 설정하여 브로드캐스트 전용 채널을 사용할 수 있으며,
+설정하지 않으면 DISCORD_WEBHOOK_URL 값이 사용됩니다.
 
 ## 특정 게임 버전으로 고정
 
