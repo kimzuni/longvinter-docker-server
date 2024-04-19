@@ -9,9 +9,4 @@ source "/home/steam/server/helper_functions.sh"
 message="$1"
 level="$2"
 
-if [[ $message = *[![:ascii:]]* ]]; then
-    LogWarn "Unable to broadcast since the message contains non-ascii characters: \"${message}\""
-    exit 1
-fi
-
 DiscordMessage "Broadcast" "$message" "$level" "$DISCORD_BROADCAST_MESSAGE_ENABLE" "$DISCORD_BROADCAST_MESSAGE_URL"
