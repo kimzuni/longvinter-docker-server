@@ -18,7 +18,7 @@ get_playername() {
 
 LogInfo "Waiting for server start for show player logging..."
 
-joins=()
+# joins=()
 last_line=0
 while true; do
 	server_pid=$(pidof LongvinterServer-Linux-Shipping)
@@ -33,8 +33,8 @@ while true; do
 				*"Join succeeded"* )
 					# Notify Discord and log all players who have joined
 					player_name="$(awk -F "Join succeeded: " '{print $NF}' <<< "$log")"
-					eosid="$(get_eosid "$(grep -m 1 "?Name=$player_name userId:" "$SERVER_LOG_PATH")")"
-					joins+=("$eosid")
+					# eosid="$(get_eosid "$(grep -m 1 "?Name=$player_name userId:" "$SERVER_LOG_PATH")")"
+					# joins+=("$eosid")
 
 					LogInfo "${player_name} has joined"
 
@@ -45,8 +45,7 @@ while true; do
 					# Notify Discord and log all players who have left
 					eosid="$(get_eosid "$log")"
 					player_name="$(get_playername "$eosid")"
-					# shellcheck disable=SC2068
-					mapfile -t joins < <(tr ' ' '\n' <<< "${joins[@]/$eosid}" | grep -v ^$)
+					# mapfile -t joins < <(tr ' ' '\n' <<< "${joins[@]/$eosid}" | grep -v ^$)
 
 					LogInfo "${player_name} has left"
 

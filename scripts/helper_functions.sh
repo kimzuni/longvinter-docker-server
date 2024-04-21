@@ -196,14 +196,19 @@ container_version_check() {
 	current_version=$(cat /home/steam/server/GIT_VERSION_TAG)
 	latest_version=$(get_latest_version)
 
-	if [ "${current_version}" != "${latest_version}" ]; then
+	if [ "${current_version}" == "dev" ]; then
+		LogWarn "Currently using the dev version."
+		LogWarn "Recommended to use the latest version: ${latest_version}"
+	elif [ "${current_version}" != "${latest_version}" ]; then
 		LogWarn "New version available: ${latest_version}"
-		LogWarn "Learn how to update the container:"
-		LogWarn " - English : https://github.com/kimzuni/longvinter-docker-server/tree/main/docs/en/#update-the-container"
-		LogWarn " - 한국어  : https://github.com/kimzuni/longvinter-docker-server/tree/main/docs/kr/#컨테이너-업데이트-방법"
 	else
 		LogSuccess "The container is up to date!"
+		return
 	fi
+
+	LogWarn "Learn how to update the container:"
+	LogWarn " - English : https://github.com/kimzuni/longvinter-docker-server/tree/main/docs/en/#update-the-container"
+	LogWarn " - 한국어  : https://github.com/kimzuni/longvinter-docker-server/tree/main/docs/kr/#컨테이너-업데이트-방법"
 }
 
 # Get latest release version from kimzuni/longvinter-docker-server repository
@@ -218,7 +223,7 @@ get_latest_version() {
 
 # Use it when you have to wait for it to be saved automatically because it does not support RCON.
 wait_save() {
-	local spare="$1"
+	local spare="${1:-}"
 
 	LogAction "Waiting for the server to be saved..."
 	broadcast_command "Waiting for the server to be saved..." "in-progress"
