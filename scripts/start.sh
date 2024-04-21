@@ -128,6 +128,10 @@ else
 	LogInfo "No Cronjobs found"
 fi
 
+if [ "${ENABLE_PLAYER_LOGGING,,}" = true ] && [[ "${PLAYER_LOGGING_POLL_PERIOD}" =~ ^[0-9]+$ ]]; then
+	/home/steam/server/player_logging.sh &
+fi
+
 
 
 LogAction "Starting Server"
