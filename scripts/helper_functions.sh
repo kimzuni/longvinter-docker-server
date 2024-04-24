@@ -223,16 +223,15 @@ get_latest_version() {
 
 # Use it when you have to wait for it to be saved automatically because it does not support RCON.
 wait_save() {
-	local spare="${1:-10}"
-
 	LogAction "Waiting for the server to be saved..."
 	broadcast_command "Waiting for the server to be saved..." "in-progress"
 
-	while ! save_check "$spare"; do
+	while ! save_check; do
 		sleep 1s
 	done
 }
 
+# shellcheck disable=SC2120
 # Given a number verify that there is a saved log within that second
 # Returns 0 if find save log
 # Returns 1 if not find save log
