@@ -13,7 +13,7 @@ get_eosid() {
 
 get_playername() {
 	local eosid="$1"
-	grep -m 1 "Login request.*$eosid" "$SERVER_LOG_PATH" | awk -F "Name=| userId:" '{print $2}'
+	grep -m 1 "Login request.*$eosid" "$SERVER_LOG_PATH" | awk -F "Name=| userId:" '{print $2}' | tr -d "\r"
 }
 
 LogInfo "Waiting for server start for show player logging..."
@@ -25,13 +25,13 @@ while true; do
 	if [ -n "${server_pid}" ]; then
 		# Get list of players who have joined and left from the server log
 		line_number="$(wc -l < "$SERVER_LOG_PATH")"
-		logs="$(head -"$line_number" "$SERVER_LOG_PATH" | tail -n +"$((last_line+1))" | grep -E "Join succeeded|RemovePlayer" | tr -d '\r')"
+		logs="$(head -"$line_number" "$SERVER_LOG_PATH" | tail -n +"$((last_line+1))" | grep -E "Join succeeded|RemovePlayer" | tr -d "\r")"
 		last_line="$line_number"
 
 		echo "$logs" | while read -r log; do
 			case "$log" in
+				# Notify Discord and log all players who have joined
 				*"Join succeeded"* )
-					# Notify Discord and log all players who have joined
 					player_name="$(awk -F "Join succeeded: " '{print $NF}' <<< "$log")"
 					# eosid="$(get_eosid "$(grep -m 1 "?Name=$player_name userId:" "$SERVER_LOG_PATH")")"
 					# joins+=("$eosid")
@@ -41,8 +41,8 @@ while true; do
 					# Replace ${player_name} with actual player's name
 					DiscordMessage "Player Joined" "${DISCORD_PLAYER_JOIN_MESSAGE//player_name/${player_name}}" "success" "${DISCORD_PLAYER_JOIN_MESSAGE_ENABLED}" "${DISCORD_PLAYER_JOIN_MESSAGE_URL}"
 					;;
+				# Notify Discord and log all players who have left
 				*"RemovePlayer"* )
-					# Notify Discord and log all players who have left
 					eosid="$(get_eosid "$log")"
 					player_name="$(get_playername "$eosid")"
 					# mapfile -t joins < <(tr ' ' '\n' <<< "${joins[@]/$eosid}" | grep -v ^$)

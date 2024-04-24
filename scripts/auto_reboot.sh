@@ -16,7 +16,6 @@ countdown_message "${AUTO_REBOOT_WARN_MINUTES}" "Server will reboot"
 countdown_exit_code=$?
 case "${countdown_exit_code}" in
 	0 )
-		# shellcheck disable=SC2119
 		wait_save
 		shutdown_server
 		;;

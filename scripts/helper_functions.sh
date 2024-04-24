@@ -223,7 +223,7 @@ get_latest_version() {
 
 # Use it when you have to wait for it to be saved automatically because it does not support RCON.
 wait_save() {
-	local spare="${1:-}"
+	local spare="${1:-10}"
 
 	LogAction "Waiting for the server to be saved..."
 	broadcast_command "Waiting for the server to be saved..." "in-progress"
