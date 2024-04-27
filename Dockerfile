@@ -32,7 +32,7 @@ RUN apt-get update && \
       curl \
       net-tools \
       ca-certificates \
-      lib32gcc1-amd64-cross \
+      lib32gcc-s1-amd64-cross=12.2.0-14cross1 \
       procps=2:4.0.2-3 \
       gettext-base=0.21-12 \
       xdg-user-dirs=0.18-1 \
@@ -70,10 +70,14 @@ ENV TZ="UTC" \
     AUTO_UPDATE_ENABLED=false \
     AUTO_UPDATE_CRON_EXPRESSION="0 * * * *" \
     AUTO_UPDATE_WARN_MINUTES=15 \
+    AUTO_UPDATE_WARN_MESSAGE="Server will update in remaining_time minutes." \
     AUTO_REBOOT_ENABLED=false \
     AUTO_REBOOT_CRON_EXPRESSION="0 0 * * *" \
     AUTO_REBOOT_WARN_MINUTES=15 \
+    AUTO_REBOOT_WARN_MESSAGE="Server will reboot in remaining_time minutes." \
     AUTO_REBOOT_EVEN_IF_PLAYERS_ONLINE=false \
+    BROADCAST_COUNTDOWN_MTIMES="1 5 10 15 30 60" \
+    BROADCAST_COUNTDOWN_SUSPEND_MESSAGE="Suspends countdown because there are no players." \
     TARGET_COMMIT_ID= \
     DISCORD_WEBHOOK_URL="" \
     DISCORD_SUPPRESS_NOTIFICATIONS=false \
@@ -125,7 +129,6 @@ ENV TZ="UTC" \
     DISCORD_ERR_BACKUP_DELETE_MESSAGE_URL= \
     DISCORD_BROADCAST_MESSAGE_ENABLE=true \
     DISCORD_BROADCAST_MESSAGE_URL= \
-    BROADCAST_COUNTDOWN_MTIMES="1 5 10 15 30 60" \
     DISABLE_GENERATE_SETTINGS=false \
     ENABLE_PLAYER_LOGGING=true \
     PLAYER_LOGGING_POLL_PERIOD=5 \
@@ -135,7 +138,7 @@ ENV TZ="UTC" \
 ARG GIT_VERSION_TAG=unspecified
 
 COPY --chmod=755 ./scripts /home/steam/server
-RUN for file in backup.sh update.sh restore.sh broadcast.sh; do \
+RUN for file in backup.sh update.sh restore.sh reboot.sh broadcast.sh; do \
         mv /home/steam/server/"$file" /usr/local/bin/"${file%.sh}"; \
     done
 

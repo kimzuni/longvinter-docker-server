@@ -2,9 +2,7 @@
 # shellcheck source=scripts/helper_functions.sh
 source "/home/steam/server/helper_functions.sh"
 
-# Given a message this will broadcast in discord
-# Returns 0 on success
-# Returns 1 if not able to broadcast
+# Given a message and level this will broadcast in discord
 
 message="$1"
 level="$2"

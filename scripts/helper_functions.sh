@@ -135,12 +135,9 @@ DiscordMessage() {
 	fi
 }
 
-# Given a message this will broadcast in discord
-# Returns 0 on success
-# Returns 1 if not able to broadcast
+# Given a message and level this will broadcast in discord
 broadcast_command() {
 	broadcast "$@"
-	return $?
 }
 
 # Saves then shutdowns the server
@@ -158,26 +155,30 @@ shutdown_server() {
 # Returns 2 if mtime is not an integer
 countdown_message() {
 	local mtime="$1"
-	local message_prefix="$2"
+	local message="$2"
 	local return_val=0
-	local minute="minutes"
 
 	if [[ "${mtime}" =~ ^[0-9]+$ ]]; then
 		for ((i = "${mtime}" ; i > 0 ; i--)); do
-			if [ "$mtime" -eq "$i" ] || [[ " $BROADCAST_COUNTDOWN_MTIMES " == *" $i "* ]]; then
-				if [ "$i" -eq 1 ]; then
-					minute="minute"
-				fi
-				broadcast_command "${message_prefix} in ${i} ${minute}" "warn"
-			fi
-
 			# Only do countdown if there are players
 			# Checking for players every minute
-			if ! player_check; then
-				break
+			player_check || break
+
+			if [ "$mtime" -eq "$i" ] || [[ " $BROADCAST_COUNTDOWN_MTIMES " == *" $i "* ]]; then
+				if [ "$i" -eq 1 ]; then
+					message="${message//minutes/minute}"
+				fi
+				broadcast_command "${message//remaining_time/$i}" "warn"
 			fi
+
 			sleep 59s
 		done
+
+		if [ "$i" -eq 0 ]; then
+			sleep 1s
+		elif [ "$1" -ne "$mtime" ]; then
+			broadcast_command "${BROADCAST_COUNTDOWN_SUSPEND_MESSAGE}" "warn"
+		fi
 	# If there are players but mtime is empty
 	elif [ -z "${mtime}" ]; then
 		return_val=1
@@ -223,8 +224,23 @@ get_latest_version() {
 
 # Use it when you have to wait for it to be saved automatically because it does not support RCON.
 wait_save() {
-	LogAction "Waiting for the server to be saved..."
-	broadcast_command "Waiting for the server to be saved..." "in-progress"
+	local title="$1"
+	local message="$2"
+	local level="$3"
+	local enabled="$4"
+	local webhook_url="$5"
+	local timestamp livetime
+
+	if ! player_check; then
+		livetime="$(date "+%s")"
+		timestamp="$(grep "RemovePlayer" "$SERVER_LOG_PATH" | tail -1 | awk -F "\\\[|\\\]" '{printf("%s/%s/%s %s:%s:%s\n", $2, $3, $4, $5, $6, $7)}' | date_to_timestamp)"
+		if [ -z "$timestamp" ] || save_check "$((livetime - timestamp))"; then
+			return
+		fi
+	fi
+
+	LogWarn "$message"
+	DiscordMessage "$title" "$message" "$level" "$enabled" "$webhook_url"
 
 	while ! save_check; do
 		sleep 1s
@@ -245,13 +261,20 @@ save_check() {
 		| awk -F "\\\[|\\\]" '{print $2}' \
 		| sed "s/Jan/1/g; s/Feb/2/g; s/Mar/3/g; s/Apr/4/g; s/May/5/g; s/Jun/6/g; s/Jul/7/g; s/Aug/8/g; s/Sep/9/g; s/Oct/10/g; s/Nov/11/g; s/Dec/12/g" \
 		| awk -F ":| |," '{if (($NF == "PM" && $5 != 12) || ($NF == "AM" && $5 == 12)) $5 = ($5+12)%24; printf("%s/%s/%s %s:%s:%s\n", $4, $1, $2, $5, $6, $7)}' \
-		| sort --version-sort | tail -1 | (read -r time; test -n "$time" && date -d "$time" "+%s")
+		| sort --version-sort | tail -1 | date_to_timestamp
 	)
 
-	if [ $((livetime - savetime)) -ge $((spare)) ]; then
+	if [ $((livetime - savetime)) -ge $((spare - 5)) ]; then
 		return 1
 	fi
 	return 0
+}
+
+date_to_timestamp() {
+	read -r time
+	if [ -n "$time" ]; then
+		date -d "$time" "+%s" 2> /dev/null
+	fi
 }
 
 Server_Info() {

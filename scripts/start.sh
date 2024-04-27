@@ -121,6 +121,13 @@ if [ "${AUTO_UPDATE_ENABLED,,}" = true ] && [ "${UPDATE_ON_BOOT}" = true ]; then
 	supercronic -quiet -test "/home/steam/server/crontab" || exit
 fi
 
+if [ "${AUTO_REBOOT_ENABLED,,}" = true ]; then
+	LogInfo "AUTO_REBOOT_ENABLED=${AUTO_REBOOT_ENABLED,,}"
+	LogInfo "Adding cronjob for auto rebooting"
+	echo "$AUTO_REBOOT_CRON_EXPRESSION bash /usr/local/bin/reboot" >> "/home/steam/server/crontab"
+	supercronic -quiet -test "/home/steam/server/crontab" || exit
+fi
+
 if [ -s "/home/steam/server/crontab" ]; then
 	supercronic -passthrough-logs "/home/steam/server/crontab" &
 	LogInfo "Cronjobs started"
