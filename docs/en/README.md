@@ -318,6 +318,7 @@ It is highly recommended you set the following environment values before startin
 
 \*\* Make sure you know what you are doing when running this option enabled.
 
+<!-- markdownlint-disable-next-line -->
 <details><summary>List of deleted or changed environment variables</summary>
 
 | Variable                           | Available Versions | Changed to                          |

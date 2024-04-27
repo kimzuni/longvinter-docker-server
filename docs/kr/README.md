@@ -319,6 +319,7 @@ docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-ser
 
 \*\* 기본 값 사용 권장
 
+<!-- markdownlint-disable-next-line -->
 <details><summary>삭제 또는 변경된 환경 변수 목록</summary>
 
 | Variable                           | Available Versions | Changed to                          |
