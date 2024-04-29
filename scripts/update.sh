@@ -27,7 +27,7 @@ countdown_exit_code=$?
 case "${countdown_exit_code}" in
 	0 )
 		wait_save "Update" "Waiting for the server to be saved before update..." "warn" "$DISCORD_PRE_UPDATE_BOOT_MESSAGE_ENABLED" "$DISCORD_PRE_UPDATE_BOOT_MESSAGE_URL"
-		LogAction "Updating the server from $CURRENT_COMMIT to ${TARGET_COMMIT_ID:-$LATEST_COMMIT}."
+		LogAction "Updating the server from ${CURRENT_COMMIT:0:7} to ${TARGET_COMMIT:0:7}"
 		backup
 		shutdown_server
 		;;

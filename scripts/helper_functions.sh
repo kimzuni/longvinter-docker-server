@@ -233,7 +233,7 @@ wait_save() {
 
 	if ! player_check; then
 		livetime="$(date "+%s")"
-		timestamp="$(grep "RemovePlayer" "$SERVER_LOG_PATH" | tail -1 | awk -F "\\\[|\\\]" '{printf("%s/%s/%s %s:%s:%s\n", $2, $3, $4, $5, $6, $7)}' | date_to_timestamp)"
+		timestamp="$(grep "RemovePlayer" "$SERVER_LOG_PATH" | tail -1 | awk -F "\\\[|\\\]|\.|-|:" '{printf("%s/%s/%s %s:%s:%s\n", $2, $3, $4, $5, $6, $7)}' | date_to_timestamp UTC)"
 		if [ -z "$timestamp" ] || save_check "$((livetime - timestamp))"; then
 			return
 		fi
@@ -247,7 +247,6 @@ wait_save() {
 	done
 }
 
-# shellcheck disable=SC2120
 # Given a number verify that there is a saved log within that second
 # Returns 0 if find save log
 # Returns 1 if not find save log
@@ -271,9 +270,14 @@ save_check() {
 }
 
 date_to_timestamp() {
-	read -r time
-	if [ -n "$time" ]; then
-		date -d "$time" "+%s" 2> /dev/null
+	local UTC="$1"
+	local DATETIME
+
+	test "${UTC,,}" != "utc" && UTC=""
+
+	read -r DATETIME
+	if [ -n "$DATETIME" ]; then
+		date -d "$DATETIME $UTC" "+%s" 2> /dev/null
 	fi
 }
 

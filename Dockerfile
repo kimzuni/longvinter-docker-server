@@ -38,6 +38,7 @@ RUN apt-get update && \
       xdg-user-dirs=0.18-1 \
       jo=1.9-1 \
       jq=1.6-2.1 \
+      netcat-traditional=1.10-47 \
  && curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash \
  && apt-get --no-install-recommends  --no-install-suggests -y \
       install git git-lfs \

@@ -20,7 +20,7 @@ if [ "$ARCHITECTURE" == "arm64" ] && [ "${ARM_COMPATIBILITY_MODE,,}" = true ]; t
 	export CPU_MHZ=2000
 fi
 
-if ! IsValidCommitID; then
+if [ -n "$TARGET_COMMIT_ID" ] && ! IsValidCommitID "$TARGET_COMMIT_ID"; then
 	LogError "Invalid TARGET_COMMIT_ID($TARGET_COMMIT_ID)"
 	LogError "Please change the value and restart the server."
 	DiscordMessage "Error" "Invalid TARGET_COMMIT_ID($TARGET_COMMIT_ID). Please change the value and restart the server." "failure"

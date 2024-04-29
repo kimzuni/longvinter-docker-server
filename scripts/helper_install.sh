@@ -5,11 +5,12 @@ source "/home/steam/server/helper_functions.sh"
 # Returns 0 if valid TARGET_COMMIT_ID or is empty
 # Returns 1 if Invalid TARGET_COMMIT_ID
 IsValidCommitID() {
-	local URL="$GIT_REPO_API/commits/$TARGET_COMMIT_ID"
-	if [ -n "$TARGET_COMMIT_ID" ] && ! curl -sfSL "$URL" > /dev/null 2>&1; then
+	local COMMIT_ID="$1"
+	local URL="$GIT_REPO_API/commits/$COMMIT_ID"
+
+	if ! curl -sfSL "$URL" > /dev/null 2>&1; then
 		return 1
 	fi
-	return 0
 }
 
 # Returns 0 if game is installed
@@ -28,6 +29,7 @@ UpdateRequired() {
 
 	CURRENT_COMMIT=$(git -C "$GIT_REPO_PATH" log HEAD -1 | head -1 | awk '{print $2}')
 	LATEST_COMMIT=$(curl -sfSL "$GIT_REPO_API/commits/main" | jq .sha -r)
+	TARGET_COMMIT="${TARGET_COMMIT_ID:-$LATEST_COMMIT}"
 
 	LogInfo "Current Version: $CURRENT_COMMIT"
 

@@ -13,10 +13,14 @@ get_eosid() {
 
 get_playername() {
 	local eosid="$1"
-	grep -m 1 "Login request.*$eosid" "$SERVER_LOG_PATH" | awk -F "Name=| userId:" '{print $2}' | tr -d "\r"
+	grep "Login request.*$eosid" "$SERVER_LOG_PATH" | tail -1 | awk -F "Name=| userId:" '{print $2}' | tr -d "\r"
 }
 
-LogInfo "Waiting for server start for show player logging..."
+# Wait until game port is open
+while ! nc -uz 127.0.0.1 "${PORT}"; do
+	sleep 5s
+	LogInfo "Waiting for server start for show player logging..."
+done
 
 # joins=()
 last_line=0
