@@ -22,6 +22,8 @@ if [ "${UPDATE_ON_BOOT,,}" != true ]; then
 	exit 1
 fi
 
+TARGET_COMMIT="${TARGET_COMMIT_ID:-$LATEST_COMMIT}"
+
 countdown_message "${AUTO_UPDATE_WARN_MINUTES}" "${AUTO_UPDATE_WARN_MESSAGE}"
 countdown_exit_code=$?
 case "${countdown_exit_code}" in

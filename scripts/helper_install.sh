@@ -29,7 +29,6 @@ UpdateRequired() {
 
 	CURRENT_COMMIT=$(git -C "$GIT_REPO_PATH" log HEAD -1 | head -1 | awk '{print $2}')
 	LATEST_COMMIT=$(curl -sfSL "$GIT_REPO_API/commits/main" | jq .sha -r)
-	TARGET_COMMIT="${TARGET_COMMIT_ID:-$LATEST_COMMIT}"
 
 	LogInfo "Current Version: $CURRENT_COMMIT"
 
