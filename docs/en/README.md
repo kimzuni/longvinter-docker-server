@@ -349,7 +349,7 @@ Used for countdown before automatic updating/Rebooting a server.
 >
 > See [Broadcast on Discord](#broadcast-on-discord)
 
-## Manually Broadcast
+### Manually Broadcast
 
 You can broadcast manually using the command:
 
@@ -542,7 +542,7 @@ Send discord messages with docker compose:
 - DISCORD_PRE_UPDATE_BOOT_MESSAGE="Server is updating..."
 ```
 
-## Broadcast on Discord
+### Broadcast on Discord
 
 > [!IMPORTANT]
 >
