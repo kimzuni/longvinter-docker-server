@@ -12,7 +12,7 @@ if [ "${AUTO_REBOOT_EVEN_IF_PLAYERS_ONLINE,,}" != true ]; then
 	fi
 fi
 
-countdown_message "${AUTO_REBOOT_WARN_MINUTES}" "${AUTO_REBOOT_WARN_MESSAGE}"
+countdown_message "${AUTO_REBOOT_WARN_MINUTES}" "${AUTO_REBOOT_WARN_MESSAGE}" "${AUTO_UPDATE_WARN_REMAINING_TIMES}"
 countdown_exit_code=$?
 case "${countdown_exit_code}" in
 	0 )

@@ -24,7 +24,7 @@ fi
 
 TARGET_COMMIT="${TARGET_COMMIT_ID:-$LATEST_COMMIT}"
 
-countdown_message "${AUTO_UPDATE_WARN_MINUTES}" "${AUTO_UPDATE_WARN_MESSAGE}"
+countdown_message "${AUTO_UPDATE_WARN_MINUTES}" "${AUTO_UPDATE_WARN_MESSAGE}" "${AUTO_UPDATE_WARN_REMAINING_TIMES}"
 countdown_exit_code=$?
 case "${countdown_exit_code}" in
 	0 )

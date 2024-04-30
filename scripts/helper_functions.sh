@@ -156,6 +156,7 @@ shutdown_server() {
 countdown_message() {
 	local mtime="$1"
 	local message="$2"
+	local remaining_times="$3"
 	local return_val=0
 
 	if [[ "${mtime}" =~ ^[0-9]+$ ]]; then
@@ -164,7 +165,7 @@ countdown_message() {
 			# Checking for players every minute
 			player_check || break
 
-			if [ "$mtime" -eq "$i" ] || [[ " $BROADCAST_COUNTDOWN_MTIMES " == *" $i "* ]]; then
+			if [ "$mtime" -eq "$i" ] || [[ " $remaining_times " == *" $i "* ]]; then
 				if [ "$i" -eq 1 ]; then
 					message="${message//minutes/minute}"
 				fi
@@ -177,7 +178,9 @@ countdown_message() {
 		if [ "$i" -eq 0 ]; then
 			sleep 1s
 		elif [ "$1" -ne "$mtime" ]; then
-			broadcast_command "${BROADCAST_COUNTDOWN_SUSPEND_MESSAGE}" "warn"
+			if [ "$BROADCAST_COUNTDOWN_SUSPEND_MESSAGE_ENABLE" = true ]; then
+				broadcast_command "${BROADCAST_COUNTDOWN_SUSPEND_MESSAGE}" "warn"
+			fi
 		fi
 	# If there are players but mtime is empty
 	elif [ -z "${mtime}" ]; then

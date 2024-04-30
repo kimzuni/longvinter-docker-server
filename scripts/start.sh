@@ -92,14 +92,13 @@ fi
 LogAction "Checking for available container updates"
 container_version_check
 
+LogAction "GENERATING CONFIG"
 if [ "${DISABLE_GENERATE_SETTINGS,,}" = true ]; then
-	LogAction "GENERATING CONFIG"
 	LogWarn "Env vars will not be applied due to DISABLE_GENERATE_SETTINGS being set to TRUE!"
 	if [ ! -f "$CONFIG_FILE_FULL_PATH" ]; then
 		cp "$CONFIG_FILE_FULL_PATH".default "$CONFIG_FILE_FULL_PATH"
 	fi
 else
-	LogAction "GENERATING CONFIG"
 	LogInfo "Using Env vars to create Game.ini"
 	/home/steam/server/compile-settings.sh || exit
 fi

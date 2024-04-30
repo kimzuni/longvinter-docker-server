@@ -235,7 +235,7 @@ docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-ser
 아래 값들을 사용하여 서버의 설정을 변경할 수 있습니다.
 서버를 실행하기 전에 값을 설정해야 적용됩니다.
 
-| 변수명                                       | 정보                                                                                                            | 기본값                                                                                              | 설정 가능한 값                                                                                                | 추가된 버전 |
+| 변수명                                      | 설명                                                                                                            | 기본값                                                                                               | 설정 가능한 값                                                                                                | 추가된 버전 |
 |--------------------------------------------|----------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|-----------|
 | TZ                                         | Cron 및 게임 서버에 사용되는 시간대 설정 (로그 파일에는 적용되지 않음)                                                      | UTC                                                                                                | [TZ Identifiers](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#Time_Zone_abbreviations) 참고 | 0.1.0     |
 | PUID\*                                     | 지정한 값을 가진 UID로 서버 실행                                                                                     | 1000                                                                                               | !0                                                                                                         | 0.1.0     |
@@ -249,16 +249,17 @@ docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-ser
 | OLD_BACKUP_DAYS                            | 백업 파일 보관 일수                                                                                               | 30                                                                                                | !0                                                                                                          | 0.1.1     |
 | AUTO_UPDATE_ENABLED                        | 자동 업데이트 활성화                                                                                              | false                                                                                             |  true/false                                                                                                 | 0.1.4     |
 | AUTO_UPDATE_CRON_EXPRESSION                | 자동 업데이트 빈도 설정                                                                                            | 0 \* \* \* \*                                                                                     | 크론식 표현 - [Cron으로 자동 업데이트 설정하는 방법](#cron으로-자동-업데이트-설정하는-방법) 참고 바람                        | 0.1.4     |
-| AUTO_UPDATE_WARN_MINUTES                   | 플레이어가 있을 경우 서버를 저장 및 업데이트할 때까지 기다리는 시간(분)                                                     | 15                                                                                                | !0                                                                                                          | 0.1.4     |
-| AUTO_UPDATE_WARN_MESSAGE                   | 자동 업데이트 카운트다운 시 남은 시간을 브로드캐스트 할 떄 전송되는 메시지                                                   | Server will update in `remaining_time` minutes.                                                   | "string"                                                                                                    | dev       |
-| AUTO_REBOOT_ENABLED                        | 자동 재부팅 활성화                                                                                                | false                                                                                             | true/false                                                                                                 | dev       |
-| AUTO_REBOOT_CRON_EXPRESSION                | 자동 재부팅 빈도 설정                                                                                             | 0 0 \* \* \*                                                                                       | 크론식 표현 - [Cron으로 자동 재부팅 설정하는 방법](#cron으로-자동-재부팅-설정하는-방법) 참고 바람                          | dev       |
-| AUTO_REBOOT_WARN_MINUTES                   | 플레이어가 있을 경우 서버를 저장 및 재부팅할 때까지 기다리는 시간(분)                                                      | 15                                                                                                 | !0                                                                                                         | dev       |
-| AUTO_REBOOT_WARN_MESSAGE                   | 자동 재부팅 카운트다운 시 남은 시간을 브로드캐스트 할 떄 전송되는 메시지                                                    | Server will update in `remaining_time` minutes.                                                    | "string"                                                                                                   | dev       |
-| AUTO_REBOOT_EVEN_IF_PLAYERS_ONLINE         | 플레이어가 있을 경우에도 자동 재부팅 진행                                                                             | false                                                                                              | true/false                                                                                                 | dev       |
-| BROADCAST_COUNTDOWN_MTIMES                 | 카운트다운 중 남은 시간이 이 값에 포함되어 있을 경우에만 브로드캐스트                                                       | 1 5 10 15 30 60                                                                                    | !0 and " "(Space)                                                                                          | 0.1.6     |
-| BROADCAST_COUNTDOWN_SUSPEND_MESSAGE        | 플레이어가 없어 카운트다운이 중단된 경우 브로드캐스트 메시지                                                              | Suspends countdown because there are no players.                                                   | "string"                                                                                                    | dev       |
-| BROADCAST_COUNTDOWN_SUSPEND_MESSAGE_ENABLE | 이 값이 `true`인 경우에만 해당 메시지 전송                                                                          | true                                                                                               | true/false                                                                                                  | dev       |
+| AUTO_UPDATE_WARN_MINUTES                   | 플레이어에게 알림 전송 후 서버를 업데이트할 때까지 기다리는 시간(분)                                                        | 15                                                                                                | !0                                                                                                          | 0.1.4     |
+| AUTO_UPDATE_WARN_MESSAGE                   | 플레이어에게 남은 시간을 알리기 위해 전송되는 메시지                                                                     | Server will update in `remaining_time` minutes.                                                   | "string"                                                                                                    | 0.1.10    |
+| AUTO_UPDATE_WARN_REMAINING_TIMES           | 카운트다운 중 남은 시간이 이 값에 포함되어 있을 경우에만 플레이어에게 알림                                                   | 1 5 10                                                                                             | !0 and " "(Space)                                                                                          | 0.1.6     |
+| AUTO_REBOOT_ENABLED                        | 자동 재부팅 활성화                                                                                                | false                                                                                             | true/false                                                                                                 | 0.1.10    |
+| AUTO_REBOOT_CRON_EXPRESSION                | 자동 재부팅 빈도 설정                                                                                             | 0 0 \* \* \*                                                                                       | 크론식 표현 - [Cron으로 자동 재부팅 설정하는 방법](#cron으로-자동-재부팅-설정하는-방법) 참고 바람                          | 0.1.10    |
+| AUTO_REBOOT_WARN_MINUTES                   | 플레이어에게 알림 전송 후 서버를 재부팅할 때까지 기다리는 시간(분)                                                         | 15                                                                                                | !0                                                                                                          | 0.1.4     |
+| AUTO_REBOOT_WARN_MESSAGE                   | 플레이어에게 남은 시간을 알리기 위해 전송되는 메시지                                                                     | Server will update in `remaining_time` minutes.                                                   | "string"                                                                                                    | 0.1.10    |
+| AUTO_REBOOT_WARN_REMAINING_TIMES           | 카운트다운 중 남은 시간이 이 값에 포함되어 있을 경우에만 플레이어에게 알림                                                   | 1 5 10                                                                                             | !0 and " "(Space)                                                                                          | 0.1.6     |
+| AUTO_REBOOT_EVEN_IF_PLAYERS_ONLINE         | 플레이어가 있을 경우에도 자동 재부팅 진행                                                                             | false                                                                                              | true/false                                                                                                 | 0.1.10    |
+| BROADCAST_COUNTDOWN_SUSPEND_MESSAGE        | 플레이어가 없어 카운트다운이 중단된 경우 브로드캐스트할 메시지                                                            | Suspends countdown because there are no players.                                                   | "string"                                                                                                    | 0.1.10    |
+| BROADCAST_COUNTDOWN_SUSPEND_MESSAGE_ENABLE | 이 값이 `true`인 경우에만 해당 메시지 전송                                                                          | true                                                                                               | true/false                                                                                                  | 0.1.10    |
 | TARGET_COMMIT_ID                           | 게임 서버를 지정한 Commit ID를 가진 버전으로 설치 및 실행                                                             | _(empty)_                                                                                          | [특정 게임 버전으로 고정](#특정-게임-버전으로-고정) 참고                                                               | 0.1.3     |
 | DISCORD_WEBHOOK_URL                        | 디스코드 서버에서 생성한 웹훅 URL                                                                                  | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                             | 0.1.0     |
 | DISCORD_SUPPRESS_NOTIFICATIONS             | 디스코드 메시지 전송 시 멤버들에게 알림을 보내지 않음                                                                   | false                                                                                              | true/false                                                                                                  | 0.1.0     |
@@ -319,18 +320,21 @@ docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-ser
 
 \*\* 기본 값 사용 권장
 
-<!-- markdownlint-disable-next-line -->
-<details><summary>삭제 또는 변경된 환경 변수 목록</summary>
+### 제거된 환경 변수
 
-| Variable                           | Available Versions | Changed to                          |
-|------------------------------------|--------------------|-------------------------------------|
-| DISCORD_SERVER_INFO_MESSAGE_ENABLE | 0.1.0              | DISCORD_SERVER_INFO_MESSAGE_ENABLED |
+<!-- markdownlint-disable-next-line -->
+<details><summary>목록 보기</summary>
+
+| 변수명                              | 사용 가능한 버전  | 사유  | 대체된 변수명                          |
+|------------------------------------|---------------|------|-------------------------------------|
+| DISCORD_SERVER_INFO_MESSAGE_ENABLE | 0.1.0         | 오타  | DISCORD_SERVER_INFO_MESSAGE_ENABLED |
+| BROADCAST_COUNTDOWN_MTIMES         | 0.1.6 ~ 0.1.9 | 수정  | BROADCAST_COUNTDOWN_REMAINING_TIMES |
 
 </details>
 
 ### 게임 포트
 
-| 포트   | 용도               |
+| 포트   | 설명               |
 |-------|-------------------|
 | 7777  | 게입 포트 (TCP/UDP) |
 | 27016 | 쿼리 포트 (TCP/UDP) |
@@ -345,7 +349,7 @@ docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-ser
 >
 > [브로드캐스트 메시지를 디스코드로 전송](#브로드캐스트-메시지를-디스코드로-전송) 참고 바람
 
-## 수동 브로드캐스트
+### 수동 브로드캐스트
 
 아래 명령어를 사용하여 수동으로 브로드캐스트가 가능합니다.
 
@@ -493,7 +497,7 @@ AUTO_REBOOT_CRON_EXPRESSION는 크론식으로, 작업을 실행할 시간 또�
 
 [환경 변수](#환경-변수)와 함께 사용되는 설정입니다.
 
-| 변수                   | 정보                                                                            | 기본값                         | 설정 가능한 값                                                     |
+| 변수                   | 설명                                                                            | 기본값                         | 설정 가능한 값                                                     |
 |-----------------------|--------------------------------------------------------------------------------|-------------------------------|-----------------------------------------------------------------|
 | CFG_SERVER_NAME       | 비공식 서버 목록에 표시되는 서버명                                                    | Unnamed Island                | "string"                                                         |
 | CFG_MAX_PLAYERS       | 동시 접속 최대 인원                                                                | 32                            | 1-?                                                              |
@@ -538,7 +542,7 @@ Docker Compose로 사용하는 방법
 - DISCORD_PRE_UPDATE_BOOT_MESSAGE="Server is updating..."
 ```
 
-## 브로드캐스트 메시지를 디스코드로 전송
+### 브로드캐스트 메시지를 디스코드로 전송
 
 > [!IMPORTANT]
 >
@@ -559,4 +563,4 @@ Docker Compose로 사용하는 방법
 
 환경 변수 **TARGET_COMMIT_ID** 값이 설정된 경우 서버 버전이 해당 커밋의 버전으로 실행됩니다.
 Commit ID는 <https://github.com/Uuvana-Studios/longvinter-linux-server/commits/main/> 페이지에서 확인할 수 있는 16진수 값이며,
-4자리 이상으로 설정해야 합니다.
+4자리 이상이 필요합니다.
