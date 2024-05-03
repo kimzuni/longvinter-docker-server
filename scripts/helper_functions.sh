@@ -291,7 +291,10 @@ Server_Info() {
 	fi
 
 	echo "Server Name: $CFG_SERVER_NAME"
-	if [ "$DISCORD_SERVER_INFO_MESSAGE_WITH_IP" = true ]; then
+	if [ -z "$DISCORD_SERVER_INFO_MESSAGE_WITH_DOMAIN" ]; then
+		echo "Server Domain: ${DISCORD_SERVER_INFO_MESSAGE_WITH_DOMAIN#http*://}"
+		echo "Server Port: $PORT"
+	elif [ "$DISCORD_SERVER_INFO_MESSAGE_WITH_IP" = true ]; then
 		echo "Server IP: $(curl -sfSL icanhazip.com)"
 		echo "Server Port: $PORT"
 	fi
