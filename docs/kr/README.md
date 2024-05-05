@@ -280,8 +280,9 @@ docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-ser
 | DISCORD_PRE_START_MESSAGE                  | 서버 시작 시 전송되는 디스코드 메시지                                                                                | Server has been started!                                                                           | "string"                                                                                                    | 0.1.0     |
 | DISCORD_PRE_START_MESSAGE_ENABLED          | 이 값이 `true`인 경우에만 해당 메시지 전송                                                                          | true                                                                                               | true/false                                                                                                  | 0.1.0     |
 | DISCORD_PRE_START_MESSAGE_URL              | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                     | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                             | 0.1.0     |
-| DISCORD_SERVER_INFO_MESSAGE_ENABLED        | 서버 시작 메시지 전송 시 서버 설정 내용을 같이 전송                                                                    | true                                                                                               | true/false                                                                                                  | 0.1.1     |
-| DISCORD_SERVER_INFO_MESSAGE_WITH_IP        | 서버 설정 내용 전송 시 서버 IP 및 포트 번호를 같이 전송 ("IP로 접속하기"로 연결할 때 필요)                                   | false                                                                                              | true/false                                                                                                  | 0.1.0     |
+| DISCORD_PRE_START_MESSAGE_WITH_SERVER_INFO | 서버 시작 메시지 전송 시 서버 설정 내용을 같이 전송                                                                    | true                                                                                               | true/false                                                                                                  | 0.1.1     |
+| DISCORD_PRE_START_MESSAGE_WITH_SERVER_IP   | 서버 시작 메시지 전송 시 서버 IP 및 포트 번호를 같이 전송                                                              | false                                                                                              | true/false                                                                                                  | 0.1.0     |
+| DISCORD_PRE_START_MESSAGE_WITH_DOMAIN      | 서버 시작 메시지 전송 시 도메인 및 포트 번호를 같이 전송 (DISCORD_PRE_START_MESSAGE_WITH_IP 값이 무시됨)                  | _(empty)_                                                                                          | `example.com`, `http://example.com`, `https://example.com`                                                  | 0.1.11    |
 | DISCORD_PRE_SHUTDOWN_MESSAGE               | 서버 종료 전 전송되는 디스코드 메시지                                                                                | Server is shutting down...                                                                         | "string"                                                                                                    | 0.1.0     |
 | DISCORD_PRE_SHUTDOWN_MESSAGE_ENABLED       | 이 값이 `true`인 경우에만 해당 메시지 전송                                                                          | true                                                                                               | true/false                                                                                                  | 0.1.0     |
 | DISCORD_PRE_SHUTDOWN_MESSAGE_URL           | 해당 메시지를 보낼 디스코드 웹훅 URL (이 값을 비워둘 경우 DISCORD_WEBHOOK_URL 사용)                                     | _(empty)_                                                                                          | `https://discord.com/api/webhooks/<webhook_id>`                                                             | 0.1.0     |
@@ -325,10 +326,12 @@ docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-ser
 <!-- markdownlint-disable-next-line -->
 <details><summary>목록 보기</summary>
 
-| 변수명                              | 사용 가능한 버전  | 사유  | 대체된 변수명                          |
-|------------------------------------|---------------|------|-------------------------------------|
-| DISCORD_SERVER_INFO_MESSAGE_ENABLE | 0.1.0         | 오타  | DISCORD_SERVER_INFO_MESSAGE_ENABLED |
-| BROADCAST_COUNTDOWN_MTIMES         | 0.1.6 ~ 0.1.9 | 수정  | BROADCAST_COUNTDOWN_REMAINING_TIMES |
+| 변수명                               | 사용 가능한 버전   | 사유 | 대체된 변수명                                  |
+|-------------------------------------|----------------|-----|----------------------------------------------|
+| DISCORD_SERVER_INFO_MESSAGE_ENABLE  | 0.1.0          | 오타 | DISCORD_PRE_START_MESSAGE_WITH_GAME_SETTINGS |
+| DISCORD_SERVER_INFO_MESSAGE_ENABLED | 0.1.1 ~ 0.1.10 | 수정 | DISCORD_PRE_START_MESSAGE_WITH_GAME_SETTINGS |
+| DISCORD_SERVER_INFO_MESSAGE_WITH_IP | 0.1.0 ~ 0.1.10 | 수정 | DISCORD_PRE_START_MESSAGE_WITH_SERVER_IP     |
+| BROADCAST_COUNTDOWN_MTIMES          | 0.1.6 ~ 0.1.9  | 수정 | BROADCAST_COUNTDOWN_REMAINING_TIMES          |
 
 </details>
 

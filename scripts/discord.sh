@@ -64,7 +64,7 @@ else
 	COLOR=$DISCORD_BLUE
 fi
 
-if [ "${TITLE,,}" == "start" ] && [ "$DISCORD_SERVER_INFO_MESSAGE_ENABLED" = true ]; then
+if [ "${TITLE,,}" == "start" ]; then
 	MESSAGE=$(echo -e "$MESSAGE\n"; Server_Info | sed -E "s/([^:]+):(.+)/**\1**:\2/g")
 fi
 

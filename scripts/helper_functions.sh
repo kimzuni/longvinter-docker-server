@@ -285,27 +285,39 @@ date_to_timestamp() {
 }
 
 Server_Info() {
+	local IP INFO
 	local HTTP URL="$CFG_COMMUNITY_WEBSITE"
+
 	if ! [[ "$URL" =~ ^https?:// ]] && [ -n "$URL" ]; then
 		HTTP="http://"
 	fi
 
-	echo "Server Name: $CFG_SERVER_NAME"
-	if [ -z "$DISCORD_SERVER_INFO_MESSAGE_WITH_DOMAIN" ]; then
-		echo "Server Domain: ${DISCORD_SERVER_INFO_MESSAGE_WITH_DOMAIN#http*://}"
-		echo "Server Port: $PORT"
-	elif [ "$DISCORD_SERVER_INFO_MESSAGE_WITH_IP" = true ]; then
-		echo "Server IP: $(curl -sfSL icanhazip.com)"
-		echo "Server Port: $PORT"
+	if [ -n "$DISCORD_PRE_START_MESSAGE_WITH_DOMAIN" ]; then
+		IP="${DISCORD_PRE_START_MESSAGE_WITH_DOMAIN#http*://}"
+	elif [ "$DISCORD_PRE_START_MESSAGE_WITH_SERVER_IP" = true ]; then
+		IP="$(curl -sfSL ipv4.icanhazip.com)"
 	fi
-	echo "Server Password: $CFG_PASSWORD"
-	echo
-	echo "Message of the Day: $CFG_SERVER_MOTD"
-	echo "Community URL: $HTTP${URL:-None}"
-	echo "Max Player: $CFG_MAX_PLAYERS"
-	echo "PVP: $CFG_ENABLE_PVP"
-	echo "Tent Decay: $CFG_TENT_DECAY"
-	echo "Max Tent: $CFG_MAX_TENTS"
-	echo "Coop Play: $CFG_COOP_PLAY"
-	echo "Coop Spawn: $CFG_COOP_SPAWN"
+	if [ -n "$IP" ]; then
+		INFO="Server IP: $IP"$'\n'"Server Port: $PORT"$'\n'
+	fi
+
+	if [ "$DISCORD_PRE_START_MESSAGE_WITH_GAME_SETTINGS" = true ]; then
+		INFO=$(
+cat << END
+Server Name: $CFG_SERVER_NAME
+${INFO}Server Password: $CFG_PASSWORD
+
+Message of the Day: $CFG_SERVER_MOTD
+Community URL: $HTTP${URL:-None}
+Max Player: $CFG_MAX_PLAYERS
+PVP: $CFG_ENABLE_PVP
+Tent Decay: $CFG_TENT_DECAY
+Max Tent: $CFG_MAX_TENTS
+Coop Play: $CFG_COOP_PLAY
+Coop Spawn: $CFG_COOP_SPAWN
+END
+		)
+	fi
+
+	echo "$INFO"
 }
