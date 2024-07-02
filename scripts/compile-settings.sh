@@ -4,6 +4,8 @@ source "/home/steam/server/helper_functions.sh"
 
 LogAction "Compiling Game.ini"
 
+CFG_SERVER_REGION_FULL=${CFG_SERVER_REGION:+"ServerRegion=$CFG_SERVER_REGION"}
+
 cat << EOF > "$CONFIG_FILE_FULL_PATH"
 [/Game/Blueprints/Server/GI_AdvancedSessions.GI_AdvancedSessions_C]
 ServerName="$CFG_SERVER_NAME"
@@ -14,6 +16,7 @@ CommunityWebsite="${CFG_COMMUNITY_WEBSITE#http*://}"
 CoopPlay=$CFG_COOP_PLAY
 CoopSpawn=$CFG_COOP_SPAWN
 Tag="$CFG_SERVER_TAG"
+$CFG_SERVER_REGION_FULL
 
 [/Game/Blueprints/Server/GM_Longvinter.GM_Longvinter_C]
 AdminSteamID="$CFG_ADMIN_STEAM_ID"

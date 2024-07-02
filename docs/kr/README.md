@@ -510,6 +510,7 @@ AUTO_REBOOT_CRON_EXPRESSION는 크론식으로, 작업을 실행할 시간 또�
 | CFG_COOP_PLAY         | 협동 플레이 여부 (PvP를 활성화한 경우 이 설정은 무시)                                   | false                         | true/false                                                       |
 | CFG_COOP_SPAWN        | 협동 플레이 활성화 시 스폰 장소 지정 (모두 같은 곳에서 스폰)                              | 0                             | 0(West), 1(South), 2(East). (확인 필요)                            |
 | CFG_SERVER_TAG        | 서버 검색에 사용되는 태그                                                           | none                          | "string"                                                         |
+| CFG_SERVER_REGION     | 비공식 서버 목록 내 지정한 국가 목록에 서버 표시                                        | _(empty)_                     | AS, NA, SA, EU, OC, AF, AN or nothing                            |
 | CFG_ADMIN_STEAM_ID    | 해당 EOSID(SteamID64) 값을 가진 플레이어를 관리자로 설정 (공백으로 구분하여 여러명 설정 가능) | _(empty)_                     | 0-9, a-f, " "(Space)                                             |
 | CFG_ENABLE_PVP        | PvP 활성화 여부                                                                  | true                          | true/false                                                       |
 | CFG_TENT_DECAY        | 텐트 자동 철거 활성화 여부                                                          | true                          | true/false                                                       |
