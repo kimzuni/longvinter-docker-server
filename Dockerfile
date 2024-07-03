@@ -44,7 +44,7 @@ RUN apt-get update && \
       install git git-lfs \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
-RUN su steam -c "/home/steam/steamcmd/steamcmd.sh +login anonymous +app_update 1007 +quit"
+RUN su steam -c "/home/steam/steamcmd/steamcmd.sh +@sSteamCmdForcePlatformType linux +@sSteamCmdForcePlatformBitness 64 +login anonymous +app_update 1007 validate +quit"
 
 # install supercronic
 ARG TARGETARCH
