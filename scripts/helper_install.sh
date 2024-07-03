@@ -22,6 +22,10 @@ IsInstalled() {
 	return 1
 }
 
+InstallSteamapp() {
+	/home/steam/steamcmd/steamcmd.sh +@sSteamCmdForcePlatformType linux +@sSteamCmdForcePlatformBitness 64 +force_install_dir "$DATA_DIR/Steam" +login anonymous +app_update 1007 validate +quit
+}
+
 # Returns 0 if Update Required
 # Returns 1 if Update NOT Required
 UpdateRequired() {

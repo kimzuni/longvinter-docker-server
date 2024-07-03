@@ -29,6 +29,9 @@ if [ -n "$TARGET_COMMIT_ID" ] && ! IsValidCommitID "$TARGET_COMMIT_ID"; then
 	exit 1
 fi
 
+LogAction "Check & Update steamapp"
+InstallSteamapp
+
 IsInstalled
 ServerInstalled=$?
 if [ "$ServerInstalled" == 1 ]; then
