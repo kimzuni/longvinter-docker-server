@@ -1,7 +1,7 @@
 FROM cm2network/steamcmd:root AS base-amd64
 # Ignoring --platform=arm64 as this is required for the multi-arch build to continue to work on amd64 hosts
 # hadolint ignore=DL3029
-FROM --platform=arm64 sonroyaalmerol/steamcmd-arm64:root-2024-03-10 AS base-arm64
+FROM --platform=arm64 sonroyaalmerol/steamcmd-arm64:root-2024-07-02 AS base-arm64
 
 ARG TARGETARCH
 # Ignoring the lack of a tag here because the tag is defined in the above FROM lines
@@ -19,9 +19,9 @@ LABEL maintainer="me@kimzuni.com" \
 # set envs
 # SUPERCRONIC: Latest releases available at https://github.com/aptible/supercronic/releases
 # NOTICE: edit SUPERCRONIC_SHA1SUM when using binaries of another version or arch.
-ARG SUPERCRONIC_SHA1SUM_ARM64="512f6736450c56555e01b363144c3c9d23abed4c"
-ARG SUPERCRONIC_SHA1SUM_AMD64="cd48d45c4b10f3f0bfdd3a57d054cd05ac96812b"
-ARG SUPERCRONIC_VERSION="0.2.29"
+ARG SUPERCRONIC_SHA1SUM_ARM64="d5e02aa760b3d434bc7b991777aa89ef4a503e49"
+ARG SUPERCRONIC_SHA1SUM_AMD64="9f27ad28c5c57cd133325b2a66bba69ba2235799"
+ARG SUPERCRONIC_VERSION="0.2.30"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
