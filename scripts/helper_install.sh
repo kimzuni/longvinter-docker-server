@@ -22,8 +22,46 @@ IsInstalled() {
 	return 1
 }
 
+# Returns 0 if Update successful
+# Returns 1 if Update Failed
 InstallSteamapp() {
-	/home/steam/steamcmd/steamcmd.sh +@sSteamCmdForcePlatformType linux +@sSteamCmdForcePlatformBitness 64 +force_install_dir "$DATA_DIR/Steam" +login anonymous +app_update 1007 validate +quit
+	LogAction "Checking for new Steamworks SDK Redist updates"
+
+	local CURRENT_MANIFEST LATEST_MANIFEST temp_file http_code
+
+	#check steam for latest version
+	temp_file=$(mktemp)
+	http_code=$(curl https://api.steamcmd.net/v1/info/1007 --output "$temp_file" --silent --location --write-out "%{http_code}")
+	if [ "$http_code" -ne 200 ]; then
+		LogError "There was a problem reaching the Steam api. Unable to check for updates!"
+		DiscordMessage "Install" "There was a problem reaching the Steam api. Unable to check for updates!" "failure"
+		rm "$temp_file"
+		return 1
+	fi
+
+	# Parse temp file for manifest id
+	LATEST_MANIFEST=$(grep -Po '"1006".*"gid": "\d+"' <"$temp_file" | sed -r 's/.*("[0-9]+")$/\1/' | tr -d '"')
+	rm "$temp_file"
+
+	if [ -z "$LATEST_MANIFEST" ]; then
+		LogError "The server response does not contain the expected BuildID. Unable to check for updates!"
+		DiscordMessage "Install" "Steam servers response does not contain the expected BuildID. Unable to check for updates!" "failure"
+		return 1
+	fi
+
+	# Parse current manifest from steam files
+	CURRENT_MANIFEST=$(awk '/manifest/{count++} count==1 {print $2; exit}' "$DATA_DIR/steamapps/appmanifest_1007.acf" | tr -d '"')
+	LogInfo "Current Version: $CURRENT_MANIFEST"
+
+	# Checking current version is latest version
+	if [ "$CURRENT_MANIFEST" == "$LATEST_MANIFEST" ]; then
+		LogSuccess "The server is up to date!"
+		return 0
+	fi
+	LogInfo "An Update Is Available. Latest Version: $LATEST_MANIFEST."
+
+	# Update
+	/home/steam/steamcmd/steamcmd.sh +@sSteamCmdForcePlatformType linux +@sSteamCmdForcePlatformBitness 64 +force_install_dir "$DATA_DIR" +login anonymous +app_update 1007 validate +quit
 }
 
 # Returns 0 if Update Required
