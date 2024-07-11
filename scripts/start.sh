@@ -12,14 +12,6 @@ isExecutable "$DATA_DIR" || exit
 
 cd "$GIT_REPO_PATH" || exit 1
 
-if [ "$ARCHITECTURE" == "arm64" ] && [ "${ARM_COMPATIBILITY_MODE,,}" = true ]; then
-	LogInfo "ARM compatibility mode enabled"
-	export DEBUGGER="/usr/bin/qemu-i386-static"
-
-	# Arbitrary number to avoid CPU_MHZ warning due to qemu and steamcmd
-	export CPU_MHZ=2000
-fi
-
 if [ -n "$TARGET_COMMIT_ID" ] && ! IsValidCommitID "$TARGET_COMMIT_ID"; then
 	LogError "Invalid TARGET_COMMIT_ID($TARGET_COMMIT_ID)"
 	LogError "Please change the value and restart the server."
@@ -52,26 +44,9 @@ fi
 
 # Check if the architecture is arm64
 if [ "$ARCHITECTURE" == "arm64" ]; then
-	box64_binary="box64"
-
-	case $PAGESIZE in
-		8192)
-			LogInfo "Using Box64 for 8k pagesize"
-			box64_binary="box64-8k"
-			;;
-		16384)
-			LogInfo "Using Box64 for 16k pagesize"
-			box64_binary="box64-16k"
-			;;
-		65536)
-			LogInfo "Using Box64 for 64k pagesize"
-			box64_binary="box64-64k"
-			;;
-	esac
-
-	sed -i "s|^\(\"\$UE4_PROJECT_ROOT\/Longvinter\/Binaries\/Linux\/LongvinterServer-Linux-Shipping\" Longvinter \"\$@\"\)|LD_LIBRARY_PATH=/home/steam/steamcmd/linux64:\$LD_LIBRARY_PATH $box64_binary \1|" "$GIT_REPO_PATH/LongvinterServer.sh"
+	sed -i "s|^\(\"\$UE4_PROJECT_ROOT\/Longvinter\/Binaries\/Linux\/LongvinterServer-Linux-Shipping\" Longvinter \"\$@\"\)|LD_LIBRARY_PATH=/home/steam/steamcmd/linux64:\$LD_LIBRARY_PATH /usr/local/bin/box64 \1|" "./LongvinterServer.sh"
 fi
-STARTCOMMAND=("$GIT_REPO_PATH/LongvinterServer.sh")
+STARTCOMMAND=("./LongvinterServer.sh")
 
 #Validate Installation
 if ! fileExists "${STARTCOMMAND[0]}"; then

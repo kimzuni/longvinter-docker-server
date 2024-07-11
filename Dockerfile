@@ -1,7 +1,7 @@
 FROM cm2network/steamcmd:root AS base-amd64
 # Ignoring --platform=arm64 as this is required for the multi-arch build to continue to work on amd64 hosts
 # hadolint ignore=DL3029
-FROM --platform=arm64 sonroyaalmerol/steamcmd-arm64:root-2024-07-02 AS base-arm64
+FROM --platform=arm64 sonroyaalmerol/steamcmd-arm64:root-2024-07-08 AS base-arm64
 
 ARG TARGETARCH
 # Ignoring the lack of a tag here because the tag is defined in the above FROM lines
@@ -51,7 +51,7 @@ RUN case ${TARGETARCH} in \
         "amd64") SUPERCRONIC_SHA1SUM=${SUPERCRONIC_SHA1SUM_AMD64} ;; \
         "arm64") SUPERCRONIC_SHA1SUM=${SUPERCRONIC_SHA1SUM_ARM64} ;; \
     esac \
-    && curl -sfSL https://github.com/aptible/supercronic/releases/download/v${SUPERCRONIC_VERSION}/supercronic-linux-${TARGETARCH} -o supercronic \
+    && curl -sfSL "https://github.com/aptible/supercronic/releases/download/v${SUPERCRONIC_VERSION}/supercronic-linux-${TARGETARCH}" -o supercronic \
     && echo "${SUPERCRONIC_SHA1SUM}" supercronic | sha1sum -c - \
     && chmod +x supercronic \
     && mv supercronic /usr/local/bin/supercronic
@@ -135,7 +135,16 @@ ENV TZ="UTC" \
     DISABLE_GENERATE_SETTINGS=false \
     ENABLE_PLAYER_LOGGING=true \
     PLAYER_LOGGING_POLL_PERIOD=5 \
-    ARM_COMPATIBILITY_MODE=false
+    ARM64_DEVICE=generic
+
+# Sane Box64 config defaults
+# hadolint ignore=DL3044
+ENV BOX64_DYNAREC_STRONGMEM=1 \
+    BOX64_DYNAREC_BIGBLOCK=1 \
+    BOX64_DYNAREC_SAFEFLAGS=1 \
+    BOX64_DYNAREC_FASTROUND=1 \
+    BOX64_DYNAREC_FASTNAN=1 \
+    BOX64_DYNAREC_X87DOUBLE=0
 
 # Passed from Github Actions
 ARG GIT_VERSION_TAG=unspecified
