@@ -69,7 +69,7 @@ InstallSteamapp() {
 UpdateRequired() {
 	LogAction "Checking for new Longvinter Server updates"
 
-	CURRENT_COMMIT=$(git -C "$GIT_REPO_PATH" log HEAD -1 | head -1 | awk '{print $2}')
+	CURRENT_COMMIT=$(git -C "$GIT_REPO_PATH" log HEAD -1 --format=format:%H)
 	LATEST_COMMIT=$(curl -sfSL "$GIT_REPO_API/commits/main" | jq .sha -r)
 
 	LogInfo "Current Version: $CURRENT_COMMIT"
