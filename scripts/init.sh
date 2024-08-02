@@ -11,12 +11,8 @@ if ! dirExists "$DATA_DIR"; then
 	LogError "$DATA_DIR is not mounted."
 	exit 1
 fi
-mkdir -p "$BACKUP_DIRECTORY_PATH"
-if [ ! -s "/home/steam/$GIT_REPO_NAME" ]; then
-	rm -rf "/home/steam/$GIT_REPO_NAME"
-	ln -s "$GIT_REPO_PATH" "/home/steam/$GIT_REPO_NAME"
-fi
 
+mkdir -p "$BACKUP_DIRECTORY_PATH"
 if [[ "$(id -u)" -eq 0 ]] && [[ "$(id -g)" -eq 0 ]]; then
 	if [[ "${PUID}" -ne 0 ]] && [[ "${PGID}" -ne 0 ]]; then
 		LogAction "EXECUTING USERMOD"
