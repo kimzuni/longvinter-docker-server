@@ -49,5 +49,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+          provenance: false
           build-args: |
             GIT_VERSION_TAG=dev
