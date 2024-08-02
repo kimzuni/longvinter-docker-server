@@ -34,12 +34,13 @@
 > 현재 롱빈터에서 RCON을 지원하지 않기 때문에 관련된 모든 기능이 교체 및 제거되었습니다.
 >
 > 따라서 서버를 저장하지 않은 채로 서버 종료, 복구 등의 작업을 진행할 경우
-> 최대 12분동안 플레이한 내역이 롤백될 수 있음을 알려드립니다.
-> (10~12분마다 자동 저장됩니다.)
+> 약 5분동안 플레이한 내역이 롤백될 수 있음을 알려드립니다.
+> (약 5분마다 자동 저장됩니다.)
 
 ## 공식 사이트 및 커뮤니티
 
 - [롱빈터](https://www.longvinter.com/)
+  - [위키](https://wiki.longvinter.com)
   - [X(트위터)](https://twitter.com/longvinter)
   - [레딧](https://www.reddit.com/r/Longvinter/)
   - [틱톡](https://www.tiktok.com/@longvinter)
@@ -59,7 +60,7 @@
 > - OS(운영체제): 최소 64비트
 > - RAM(램): 최소 2GB
 
-출처: <https://docs-server.longvinter.com>
+출처: <https://wiki.longvinter.com/server/docker>
 
 ## 사용법
 
@@ -87,14 +88,11 @@ services:
         max-file: "3"
     ports:
       - "7777:7777/udp"
-      - "27016:27016/tcp"
-      - "27016:27016/udp"
     environment:
       TZ: "Asia/Seoul"
       PUID: 1000
       PGID: 1000
       PORT: 7777 # Optional but recommended
-      QUERY_PORT: 27016 # Optional but recommended
       CFG_SERVER_NAME: "Unnamed Island"
       CFG_MAX_PLAYERS: 32
       CFG_SERVER_MOTD: "Welcome to Longvinter Island!"
@@ -129,8 +127,6 @@ services:
         max-file: "3"
     ports:
       - "7777:7777/udp"
-      - "27016:27016/tcp"
-      - "27016:27016/udp"
     env_file:
       - .env
     volumes:
@@ -145,14 +141,11 @@ services:
 docker run -d \
     --name longvinter-server \
     -p 7777:7777/udp \
-    -p 27016:27016/tcp \
-    -p 27016:27016/udp \
     -v ./data:/data/ \
     -e TZ="Asia/Seoul" \
     -e PUID=1000 \
     -e PGID=1000 \
     -e PORT=7777 \
-    -e QUERY_PORT=27016 \
     -e CFG_SERVER_NAME="Unnamed Island" \
     -e CFG_MAX_PLAYERS=32 \
     -e CFG_SERVER_MOTD="Welcome to Longvinter Island!" \
@@ -178,8 +171,6 @@ docker run -d \
 docker run -d \
     --name longvinter-server \
     -p 7777:7777/udp \
-    -p 27016:27016/tcp \
-    -p 27016:27016/udp \
     -v ./data:/data/ \
     --env-file .env \
     --restart unless-stopped \
@@ -238,7 +229,6 @@ docker rmi $(docker images | grep -E ^"(ghcr.io\/)?kimzuni/longvinter-docker-ser
 | PUID\*                                     | 지정한 값을 가진 UID로 서버 실행                                                                  | 1000                                                                                               | !0                                                                                                         | 0.1.0     |
 | PGID\*                                     | 지정한 값을 가진 GID로 서버 실행                                                                  | 1000                                                                                               | !0                                                                                                         | 0.1.0     |
 | PORT\*                                     | 서버 게임 포트 번호                                                                             | 7777                                                                                               | 1024-65535                                                                                                 | 0.1.0     |
-| QUERY_PORT                                 | 스팀 서버와 통신하기 위한 쿼리 포트 번호                                                            | 27016                                                                                              | 1024-65535                                                                                                 | 0.1.0     |
 | UPDATE_ON_BOOT\*\*                         | 서버 시작 시 자동으로 서버 업데이트 진행                                                            | true                                                                                               | true/false                                                                                                 | 0.1.0     |
 | BACKUP_ENABLED                             | 자동 백업 할성화                                                                               | true                                                                                               | true/false                                                                                                 | 0.1.1     |
 | BACKUP_CRON_EXPRESSION                     | 자동 백업 빈도 설정                                                                             | 0 0 \* \* \*                                                                                       | 크론식 표현 - [Cron으로 자동 백업 설정하는 방법](#cron으로-자동-백업-설정하는-방법) 참고 바람                              | 0.1.1     |
@@ -357,10 +347,9 @@ Box64 구성에 대한 자세한 내용은 해당 공식 문서를 참조해 주
 
 ### 게임 포트
 
-| 포트   | 설명               |
-|-------|-------------------|
-| 7777  | 게입 포트 (TCP/UDP) |
-| 27016 | 쿼리 포트 (TCP/UDP) |
+| 포트  | 설명           |
+|------|---------------|
+| 7777 | 게입 포트 (UDP) |
 
 ## 브로드캐스트
 
@@ -520,21 +509,31 @@ AUTO_REBOOT_CRON_EXPRESSION는 크론식으로, 작업을 실행할 시간 또�
 
 [환경 변수](#환경-변수)와 함께 사용되는 설정입니다.
 
-| 변수                   | 설명                                                                            | 기본값                         | 설정 가능한 값                                                     |
-|-----------------------|--------------------------------------------------------------------------------|-------------------------------|-----------------------------------------------------------------|
-| CFG_SERVER_NAME       | 비공식 서버 목록에 표시되는 서버명                                                    | Unnamed Island                | "string"                                                         |
-| CFG_MAX_PLAYERS       | 동시 접속 최대 인원                                                                | 32                            | 1-?                                                              |
-| CFG_SERVER_MOTD       | 플레이어가 스폰되는 항구 앞 표지판에 표시되는 오늘의 메시지(Message of the Day)            | Welcome to Longvinter Island! | "string"                                                         |
-| CFG_PASSWORD          | 서버 접속을 위한 비밀번호                                                           | _(empty)_                     | "string"                                                         |
-| CFG_COMMUNITY_WEBSITE | 게임 내 서버 정보에 표시되는 커뮤니티 및 웹사이트 URL                                    | www\.longvinter\.com          | `example.com`, `http://example.com`, `https://example.com/path`  |
-| CFG_COOP_PLAY         | 협동 플레이 여부 (PvP를 활성화한 경우 이 설정은 무시)                                   | false                         | true/false                                                       |
-| CFG_COOP_SPAWN        | 협동 플레이 활성화 시 스폰 장소 지정 (모두 같은 곳에서 스폰)                              | 0                             | 0(West), 1(South), 2(East). (확인 필요)                            |
-| CFG_SERVER_TAG        | 서버 검색에 사용되는 태그                                                           | none                          | "string"                                                         |
-| CFG_SERVER_REGION     | 비공식 서버 목록 내 지정한 국가 목록에 서버 표시                                        | _(empty)_                     | AS, NA, SA, EU, OC, AF, AN or nothing                            |
-| CFG_ADMIN_STEAM_ID    | 해당 EOSID(SteamID64) 값을 가진 플레이어를 관리자로 설정 (공백으로 구분하여 여러명 설정 가능) | _(empty)_                     | 0-9, a-f, " "(Space)                                             |
-| CFG_ENABLE_PVP        | PvP 활성화 여부                                                                  | true                          | true/false                                                       |
-| CFG_TENT_DECAY        | 텐트 자동 철거 활성화 여부                                                          | true                          | true/false                                                       |
-| CFG_MAX_TENTS         | 플레이어당 최대로 설치할 수 있는 텐트 및 집의 개수 설정                                   | 2                             | 1~?                                                              |
+| 변수                                | 설명                                                       | 기본값                         | 설정 가능한 값                                                     |
+|------------------------------------|-----------------------------------------------------------|-------------------------------|-----------------------------------------------------------------|
+| CFG_SERVER_NAME                    | 비공식 서버 목록에 표시할 이름 설정                              | Unnamed Island                | "string"                                                         |
+| CFG_SERVER_MOTD                    | 섬 곳곳의 표지판에 표시되는 오늘의 메시지 설정                     | Welcome to Longvinter Island! | "string"                                                         |
+| CFG_MAX_PLAYERS                    | 동시에 접속할 수 있는 최대 플레이어 수 설정                       | 32                            | 1~                                                               |
+| CFG_PASSWORD                       | 서버 비밀번호 설정                                           | _(empty)_                     | "string"                                                         |
+| CFG_COMMUNITY_WEBSITE              | 서버 목록 및 게임 내에서 표시되는 URL                           | www\.longvinter\.com          | `example.com`, `http://example.com`, `https://example.com/path`  |
+| CFG_SERVER_TAG                     | 서버 검색을 위한 태그 추가                                    | none                          | "string"                                                         |
+| CFG_COOP_PLAY                      | 협동 플레이 활성화 (CFG_ENABLE_PVP가 false로 설정되어 있어야 함) | false                         | true/false                                                       |
+| CFG_COOP_SPAWN                     | 협동 플레이 스폰 지점 설정                                    | 0                             | 0(West), 1(South), 2(East). (확인 필요)                            |
+| CFG_CHECK_VPN                      | VPN 연결 차단                                              | true                          | true/false                                                       |
+| CFG_CHEST_RESPAWN_TIME             | 전리품 상자의 최대 리스폰 시간(초) 설정                         | 600                           | ?~                                                                |
+| CFG_DISABLE_WANDERING_TRADERS      | 떠돌이 상인 스폰 비활성화                                     | false                         | true/false                                                       |
+| CFG_SERVER_REGION                  | 서버 브라우저 내 지정한 국가 목록에 서버 표시                     | _(empty)_                     | AS, NA, SA, EU, OC, AF, AN or nothing                            |
+| CFG_ADMIN_STEAM_ID                 | 해당 EOSID 값을 가진 플레이어를 관리자로 설정 (인게임에서 확인 가능) | _(empty)_                     | 0-9, a-f, " "(Space)                                             |
+| CFG_ENABLE_PVP                     | PvP 활성화                                                | true                          | true/false                                                       |
+| CFG_TENT_DECAY                     | 텐트 자동 철거 활성화                                        | true                          | true/false                                                       |
+| CFG_MAX_TENTS                      | 플레이어가 서버에 설치할 수 있는 최대 텐트 수 설정                 | 2                             | 1~                                                               |
+| CFG_HARDCORE                       | 하드코어 모드 활성화                                         | false                         | true/false                                                       |
+| CFG_MONEY_DROP_MULTIPLIER\*        | 사망 시 MK 드랍률                                          | 0.0                           | 0.0~1.0                                                          |
+| CFG_WEAPON_DAMAGE_MULTIPLIER\*     | 무기 데미지 비율                                           | 1.0                           | 0.0~                                                             |
+| CFG_ENERGY_DRAIN_MULTIPLIER\*      | 에너지 소비율                                             | 1.0                           | 0.0~                                                             |
+| CFG_PRICE_FLUCTUATION_MULTIPLIER\* | 아이템 가격 변동률                                         | 1.0                           | 0.0~                                                             |
+
+\* 하드코어 모드에서만 적용됨
 
 ### 수동 설정
 

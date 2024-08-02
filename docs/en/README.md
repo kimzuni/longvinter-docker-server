@@ -40,6 +40,7 @@ This container has also been tested and will work on both `x64` and `ARM64` base
 ## Official URL
 
 - [Longvinter](https://www.longvinter.com/)
+  - [Wiki](https://wiki.longvinter.com)
   - [X(Twitter)](https://twitter.com/longvinter)
   - [Reddit](https://www.reddit.com/r/Longvinter/)
   - [TicTok](https://www.tiktok.com/@longvinter)
@@ -87,14 +88,11 @@ services:
         max-file: "3"
     ports:
       - "7777:7777/udp"
-      - "27016:27016/tcp"
-      - "27016:27016/udp"
     environment:
       TZ: "UTC"
       PUID: 1000
       PGID: 1000
       PORT: 7777 # Optional but recommended
-      QUERY_PORT: 27016 # Optional but recommended
       CFG_SERVER_NAME: "Unnamed Island"
       CFG_MAX_PLAYERS: 32
       CFG_SERVER_MOTD: "Welcome to Longvinter Island!"
@@ -129,8 +127,6 @@ services:
         max-file: "3"
     ports:
       - "7777:7777/udp"
-      - "27016:27016/tcp"
-      - "27016:27016/udp"
     env_file:
       - .env
     volumes:
@@ -145,14 +141,11 @@ You can also use the command `docker run` instead of `docker compose`. the serve
 docker run -d \
     --name longvinter-server \
     -p 7777:7777/udp \
-    -p 27016:27016/tcp \
-    -p 27016:27016/udp \
     -v ./data:/data/ \
     -e TZ="UTC" \
     -e PUID=1000 \
     -e PGID=1000 \
     -e PORT=7777 \
-    -e QUERY_PORT=27016 \
     -e CFG_SERVER_NAME="Unnamed Island" \
     -e CFG_MAX_PLAYERS=32 \
     -e CFG_SERVER_MOTD="Welcome to Longvinter Island!" \
@@ -178,8 +171,6 @@ Change your docker run command to this:
 docker run -d \
     --name longvinter-server \
     -p 7777:7777/udp \
-    -p 27016:27016/tcp \
-    -p 27016:27016/udp \
     -v ./data:/data/ \
     --env-file .env \
     --restart unless-stopped \
@@ -238,12 +229,11 @@ It is highly recommended you set the following environment values before startin
 | PUID\*                                       | The uid of the user the server should run as.                                                                                        | 1000                                                                                               | !0                                                                                                                | 0.1.0            |
 | PGID\*                                       | The gid of the user the server should run as.                                                                                        | 1000                                                                                               | !0                                                                                                                | 0.1.0            |
 | PORT\*                                       | Game port that the server will expose.                                                                                               | 7777                                                                                               | 1024-65535                                                                                                        | 0.1.0            |
-| QUERY_PORT                                   | Query port used to communicate with Steam servers.                                                                                   | 27016                                                                                              | 1024-65535                                                                                                        | 0.1.0            |
 | UPDATE_ON_BOOT\*\*                           | Update the server when the docker container starts.                                                                                  | true                                                                                               | true/false                                                                                                        | 0.1.0            |
 | BACKUP_ENABLED                               | Enables automatic backups.                                                                                                           | true                                                                                               | true/false                                                                                                        | 0.1.1            |
 | BACKUP_CRON_EXPRESSION                       | Setting affects frequency of automatic backups.                                                                                      | 0 0 \* \* \*                                                                                       | Needs a Cron-Expression - See [Configuring Automatic Backups with Cron](#configuring-automatic-backups-with-cron) | 0.1.1            |
 | DELETE_OLD_BACKUPS                           | Delete backups after a certain number of days.                                                                                       | false                                                                                              | true/false                                                                                                        | 0.1.1            |
-| OLD_BACKUP_DAYS                              | How many days to keep backups.                                                                                                       | 30                                                                                                 | any positive integer                                                                                              | 0.1.1            |
+| OLD_BACKUP_DAYS                              | How many days to keep backups.                                                                                                       | 30                                                                                                 | !0                                                                                                                | 0.1.1            |
 | AUTO_UPDATE_ENABLED                          | Enables automatic updates.                                                                                                           | false                                                                                              | true/false                                                                                                        | 0.1.4            |
 | AUTO_UPDATE_CRON_EXPRESSION                  | Setting affects frequency of automatic updates.                                                                                      | 0 \* \* \* \*                                                                                      | Needs a Cron-Expression - See [Configuring Automatic Updates with Cron](#configuring-automatic-updates-with-cron) | 0.1.4            |
 | AUTO_UPDATE_WARN_MINUTES                     | How long to wait to saved and update the server, after the player were informed. (This will be ignored, if no Players are connected) | 15                                                                                                 | !0                                                                                                                | 0.1.4            |
@@ -357,10 +347,9 @@ For the Box64 configurations, please see the their official documentation for mo
 
 ### Game Ports
 
-| Port  | Info                 |
-|-------|----------------------|
-| 7777  | Game Port (TCP/UDP)  |
-| 27016 | Query Port (TCP/UDP) |
+| Port | Info            |
+|------|-----------------|
+| 7777 | Game Port (UDP) |
 
 ## Broadcast
 
@@ -520,27 +509,39 @@ This is affected by the environment variable TZ value and the default is set to 
 
 Used with [environment variables](#environment-variables).
 
-| Variable              | Info                                                                                                                                                                            | Default Value                 | Allowed Values                                                   |
-|-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------|------------------------------------------------------------------|
-| CFG_SERVER_NAME       | Setting the server name that is displayed in the server list.                                                                                                                   | Unnamed Island                | "string"                                                         |
-| CFG_MAX_PLAYERS       | The maximum amount of players the server will allow at the same time.                                                                                                           | 32                            | 1-?                                                              |
-| CFG_SERVER_MOTD       | A Message Of The Day that will be displayed to the player.                                                                                                                      | Welcome to Longvinter Island! | "string"                                                         |
-| CFG_PASSWORD          | Use this setting to require a password to join the server.                                                                                                                      | _(empty)_                     | "string"                                                         |
-| CFG_COMMUNITY_WEBSITE | When the server or community has a website, enter it here to display it to the player.                                                                                          | www\.longvinter\.com          | `example.com`, `http://example.com`, `https://example.com/path`  |
-| CFG_COOP_PLAY         | When this setting is set to "true", Co-op Play will be enabled on the server. Set to "false" to disable PvP.                                                                    | false                         | true/false                                                       |
-| CFG_COOP_SPAWN        | All players will spawn here. (It only works when "CFG_COOP_PLAY" is "true".)                                                                                                    | 0                             | 0(West), 1(South), 2(East). (I haven't checked it out)           |
-| CFG_SERVER_TAG        | Server tag that can be used to search for the server.                                                                                                                           | None                          | "string"                                                         |
-| CFG_SERVER_REGION     | Display server in a list of specified country in the Unofficial Server List                                                                                                     | _(empty)_                     | AS, NA, SA, EU, OC, AF, AN or nothing                            |
-| CFG_ADMIN_STEAM_ID    | Add the SteamID64 values for the players that have admin rights to this setting. When there are multiple admins, add the SteamID64 values to this setting separated by a space. | _(empty)_                     | 0-9, a-f, " "(Space)                                             |
-| CFG_ENABLE_PVP        | When this setting is set to "true", PvP will be enabled on the server. Set to "false" to disable PvP.                                                                           | true                          | true/false                                                       |
-| CFG_TENT_DECAY        | When this setting is set to "true", tents will decay and be destroyed after 48 hours unless they are upgraded to a house.                                                       | true                          | true/false                                                       |
-| CFG_MAX_TENTS         | Maximum number of tents/houses each player can have placed in the world at a time.                                                                                              | 2                             | 1~?                                                              |
+| Variable                           | Info                                                                                  | Default Value                 | Allowed Values                                                   |
+|------------------------------------|---------------------------------------------------------------------------------------|-------------------------------|------------------------------------------------------------------|
+| CFG_SERVER_NAME                    | Sets the name that appears in the server browser.                                     | Unnamed Island                | "string"                                                         |
+| CFG_SERVER_MOTD                    | Sets the Message of the Day displayed on signs around the island.                     | Welcome to Longvinter Island! | "string"                                                         |
+| CFG_MAX_PLAYERS                    | Sets the maximum number of players that can connect simultaneously.                   | 32                            | 1~                                                               |
+| CFG_PASSWORD                       | Sets a password for the server.                                                       | _(empty)_                     | "string"                                                         |
+| CFG_COMMUNITY_WEBSITE              | Promotes a website, displayed with the server message and openable in-game.           | www\.longvinter\.com          | `example.com`, `http://example.com`, `https://example.com/path`  |
+| CFG_SERVER_TAG                     | Adds a tag for easier server searching.                                               | None                          | "string"                                                         |
+| CFG_COOP_PLAY                      | Enables or disables cooperative play mode(CFG_ENABLE_PVP must be set to false)        | false                         | true/false                                                       |
+| CFG_COOP_SPAWN                     | Sets the cooperative spawn point on the island.                                       | 0                             | 0(West), 1(South), 2(East). (I haven't checked it out)           |
+| CFG_CHECK_VPN                      | Enables or disables VPN checking for connecting players.                              | true                          | true/false                                                       |
+| CFG_CHEST_RESPAWN_TIME             | Sets the maximum respawn time (in seconds) for loot chests.                           | 600                           | ?~                                                               |
+| CFG_DISABLE_WANDERING_TRADERS      | Disables wandering traders from spawning                                              | false                         | true/false                                                       |
+| CFG_SERVER_REGION                  | Display server in a list of specified country in the server browser                   | _(empty)_                     | AS, NA, SA, EU, OC, AF, AN or nothing                            |
+| CFG_ADMIN_STEAM_ID                 | Assigns admin privileges to specified EOS IDs. You can get EOS ID from game settings. | _(empty)_                     | 0-9, a-f, " "(Space)                                             |
+| CFG_ENABLE_PVP                     | Enables or disables Player versus Player combat.                                      | true                          | true/false                                                       |
+| CFG_TENT_DECAY                     | Enables or disables tent decay to manage abandoned tents.                             | true                          | true/false                                                       |
+| CFG_MAX_TENTS                      | Sets the maximum number of tents players can place on the server.                     | 2                             | 1~                                                               |
+| CFG_HARDCORE                       | Enables or disables Hardcore mode                                                     | false                         | true/false                                                       |
+| CFG_MONEY_DROP_MULTIPLIER\*        | Sets MK drop multiplier on death                                                      | 0.0                           | 0.0~1.0                                                          |
+| CFG_WEAPON_DAMAGE_MULTIPLIER\*     | Sets weapon damage multiplier                                                         | 1.0                           | 0.0~                                                             |
+| CFG_ENERGY_DRAIN_MULTIPLIER\*      | Sets energy drain multiplier                                                          | 1.0                           | 0.0~                                                             |
+| CFG_PRICE_FLUCTUATION_MULTIPLIER\* | Sets Items price fluctuation multiplier                                               | 1.0                           | 0.0~                                                             |
+
+\* Applies only in hardcore mode
 
 ### Manually
 
 When the server starts, a `Game.ini` file will be created in the following location: `<mount_folder>/Longvinter/Saved/Config/LinuxServer/Game.ini`.
 By default, the `Game.ini` file consists of the [this environment variables](#with-environment-variables),
 but if the DISABLE_GENERATE_SETTINGS value is set to 'true', the file can be modified and set directly.
+
+See [Official Wiki](https://wiki.longvinter.com/server/configuration#server-configuration)
 
 > [!IMPORTANT]
 > Changes can only be made to `Game.ini` while the server is off.
