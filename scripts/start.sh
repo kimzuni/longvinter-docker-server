@@ -10,18 +10,7 @@ dirExists "$DATA_DIR" || exit
 isWritable "$DATA_DIR" || exit
 isExecutable "$DATA_DIR" || exit
 
-cd "$GIT_REPO_PATH" || exit 1
-
-if [ -n "$TARGET_COMMIT_ID" ] && ! IsValidCommitID "$TARGET_COMMIT_ID"; then
-	LogError "Invalid TARGET_COMMIT_ID($TARGET_COMMIT_ID)"
-	LogError "Please change the value and restart the server."
-	DiscordMessage "Error" "Invalid TARGET_COMMIT_ID($TARGET_COMMIT_ID). Please change the value and restart the server." "failure"
-	# This is written because GitHub API can only be used 60 times per hour
-	sleep infinity
-	exit 1
-fi
-
-InstallSteamapp
+cd "$DATA_DIR" || exit 1
 
 IsInstalled
 ServerInstalled=$?
@@ -37,22 +26,27 @@ if [ "$ServerInstalled" == 0 ] && [ "${UPDATE_ON_BOOT,,}" == true ]; then
 	IsUpdateRequired=$?
 	if [ "$IsUpdateRequired" == 0 ]; then
 		LogAction "Starting Update"
-		UpdateServer
+		InstallServer
 	fi
 fi
 
 # Check if the architecture is arm64
 if [ "$ARCHITECTURE" == "arm64" ]; then
-	sed -i "s|^\(\"\$UE4_PROJECT_ROOT\/Longvinter\/Binaries\/Linux\/LongvinterServer-Linux-Shipping\" Longvinter \"\$@\"\)|LD_LIBRARY_PATH=/home/steam/steamcmd/linux64:\$LD_LIBRARY_PATH /usr/local/bin/box64 \1|" "./LongvinterServer.sh"
-fi
-STARTCOMMAND=("./LongvinterServer.sh")
+	# create an arm64 version of ./LongvinterServer.sh
+	cp ./LongvinterServer.sh ./LongvinterServer-arm64.sh
 
-#Validate Installation
+	sed -i "s|^\(\"\$UE4_PROJECT_ROOT\/Longvinter\/Binaries\/Linux\/LongvinterServer-Linux-Shipping\" Longvinter \"\$@\"\)|LD_LIBRARY_PATH=/home/steam/steamcmd/linux64:\$LD_LIBRARY_PATH /usr/local/bin/box64 \1|" "./LongvinterServer-arm64.sh"
+	chmod +x ./LongvinterServer-arm64.sh
+	STARTCOMMAND=("./LongvinterServer-arm64.sh")
+else
+	STARTCOMMAND=("./LongvinterServer.sh")
+fi
+
+# Validate Installation
 if ! fileExists "${STARTCOMMAND[0]}"; then
 	LogError "Server Not Installed Properly"
 	exit 1
 fi
-chmod +x "${STARTCOMMAND[0]}"
 
 isReadable "${STARTCOMMAND[0]}" || exit
 isExecutable "${STARTCOMMAND[0]}" || exit
@@ -62,10 +56,6 @@ if [ -n "${PORT}" ]; then
 	STARTCOMMAND+=("-Port=${PORT}")
 fi
 
-if [ -n "${QUERY_PORT}" ]; then
-	STARTCOMMAND+=("-QueryPort=${QUERY_PORT}")
-fi
-
 LogAction "Checking for available container updates"
 container_version_check
 
@@ -73,7 +63,7 @@ LogAction "GENERATING CONFIG"
 if [ "${DISABLE_GENERATE_SETTINGS,,}" = true ]; then
 	LogWarn "Env vars will not be applied due to DISABLE_GENERATE_SETTINGS being set to TRUE!"
 	if [ ! -f "$CONFIG_FILE_FULL_PATH" ]; then
-		cp "$CONFIG_FILE_FULL_PATH".default "$CONFIG_FILE_FULL_PATH"
+		/home/steam/server/compile-settings.sh || exit
 	fi
 else
 	LogInfo "Using Env vars to create Game.ini"
@@ -100,7 +90,7 @@ fi
 if [ "${AUTO_REBOOT_ENABLED,,}" = true ]; then
 	LogInfo "AUTO_REBOOT_ENABLED=${AUTO_REBOOT_ENABLED,,}"
 	LogInfo "Adding cronjob for auto rebooting"
-	echo "$AUTO_REBOOT_CRON_EXPRESSION bash /usr/local/bin/reboot" >> "/home/steam/server/crontab"
+	echo "$AUTO_REBOOT_CRON_EXPRESSION bash /home/steam/server/auto_reboot.sh" >> "/home/steam/server/crontab"
 	supercronic -quiet -test "/home/steam/server/crontab" || exit
 fi
 
@@ -112,7 +102,11 @@ else
 fi
 
 if [ "${ENABLE_PLAYER_LOGGING,,}" = true ] && [[ "${PLAYER_LOGGING_POLL_PERIOD}" =~ ^[0-9]+$ ]]; then
-	/home/steam/server/player_logging.sh &
+	if [[ "$(id -u)" -eq 0 ]]; then
+		su steam -c /home/steam/server/player_logging.sh &
+	else
+		/home/steam/server/player_logging.sh &
+	fi
 fi
 
 

@@ -6,10 +6,10 @@ source "/home/steam/server/variables.sh"
 source "/home/steam/server/helper_functions.sh"
 
 # Restore path
-RESTORE_PATH="$GIT_REPO_PATH/Longvinter"
+RESTORE_PATH="$DATA_DIR/Longvinter"
 
 # Copy the save file before restore temporary path
-TMP_SAVE_PATH="$BACKUP_DIRECTORY_PATH/restore-"$(date +"%s")
+TMP_SAVE_PATH="$BACKUP_DIR/restore-$(date +"%Y-%m-%d_%H-%M-%S")"
 
 # shellcheck disable=SC2317
 term_error_handler() {
@@ -35,18 +35,9 @@ restore_error_handler() {
 	exit 1
 }
 
-# Timestamp included in the file name is converted to date and added
-add_date() {
-	local stamp
-	while read -r path; do
-		stamp=$(basename "$path" | tr -cd "0-9")
-		echo "$path ($(date -d @"$stamp" "+%Y.%m.%d %H:%M:%S"))"
-	done
-}
-
 # Show up backup list
 LogInfo "Backup List:"
-mapfile -t BACKUP_FILES < <(find "$BACKUP_DIRECTORY_PATH" -type f -name "*.tar.gz" | sort | add_date)
+mapfile -t BACKUP_FILES < <(find "$BACKUP_DIR" -type f -name "*.tar.gz" | sort)
 select BACKUP_FILE in "${BACKUP_FILES[@]}"; do
 	if [ -n "$BACKUP_FILE" ]; then
 		LogInfo "Selected backup: $BACKUP_FILE"
@@ -56,7 +47,6 @@ select BACKUP_FILE in "${BACKUP_FILES[@]}"; do
 	fi
 done
 
-BACKUP_FILE="${BACKUP_FILE%.tar.gz*}.tar.gz"
 if [ -f "$BACKUP_FILE" ]; then
 	LogInfo "This script has been designed to help you restore; however, I am not responsible for any data loss. It is recommended that you create a backup beforehand, and in the event of script failure, be prepared to restore it manually."
 	LogInfo "Do you understand the above and would you like to proceed with this command?"
@@ -100,7 +90,7 @@ if [ -f "$BACKUP_FILE" ]; then
 			fi
 
 			# Create tmp directory
-			TMP_PATH=$(mktemp -d -p "$BACKUP_DIRECTORY_PATH")
+			TMP_PATH=$(mktemp -d -p "$BACKUP_DIR")
 			if [ "$(id -u)" -eq 0 ]; then
 				chown steam:steam "$TMP_PATH"
 			fi

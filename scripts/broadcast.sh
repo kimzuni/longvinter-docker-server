@@ -7,4 +7,8 @@ source "/home/steam/server/helper_functions.sh"
 message="$1"
 level="$2"
 
-DiscordMessage "Broadcast" "$message" "$level" "$DISCORD_BROADCAST_MESSAGE_ENABLE" "$DISCORD_BROADCAST_MESSAGE_URL"
+if [ -z "$message" ]; then
+    INFO "Usage: ${0} Message [LEVEL]"
+else
+    DiscordMessage "Broadcast" "$message" "$level" "$DISCORD_BROADCAST_MESSAGE_ENABLE" "$DISCORD_BROADCAST_MESSAGE_URL"
+fi

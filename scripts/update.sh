@@ -22,14 +22,13 @@ if [ "${UPDATE_ON_BOOT,,}" != true ]; then
 	exit 1
 fi
 
-TARGET_COMMIT="${TARGET_COMMIT_ID:-$LATEST_COMMIT}"
-
 countdown_message "${AUTO_UPDATE_WARN_MINUTES}" "${AUTO_UPDATE_WARN_MESSAGE}" "${AUTO_UPDATE_WARN_REMAINING_TIMES}"
 countdown_exit_code=$?
 case "${countdown_exit_code}" in
 	0 )
 		wait_save "Update" "Waiting for the server to be saved before update..." "warn" "$DISCORD_PRE_UPDATE_BOOT_MESSAGE_ENABLED" "$DISCORD_PRE_UPDATE_BOOT_MESSAGE_URL"
-		LogAction "Updating the server from ${CURRENT_COMMIT:0:7} to ${TARGET_COMMIT:0:7}"
+		LogAction "Updating the server from $CURRENT_MANIFEST to $TARGET_MANIFEST."
+		rm "$MANIFEST_PATH"
 		backup
 		shutdown_server
 		;;

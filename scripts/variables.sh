@@ -2,16 +2,14 @@
 
 export HOME="/home/steam"
 export DATA_DIR="/data"
-export GIT_REPO_NAME="longvinter-linux-server"
-export GIT_REPO_BRANCH="main"
-export GIT_REPO_URL="https://github.com/Uuvana-Studios/$GIT_REPO_NAME"
-export GIT_REPO_PATH="$DATA_DIR"
-export GIT_REPO_API="${GIT_REPO_URL/github\.com/api.github.com\/repos}"
-export BACKUP_DIRECTORY_PATH="$GIT_REPO_PATH/Longvinter/Backup"
-export SERVER_LOG_DIR="$GIT_REPO_PATH/Longvinter/Saved/Logs"
+export BACKUP_DIR="$DATA_DIR/backups"
+export SERVER_LOG_DIR="$DATA_DIR/Longvinter/Saved/Logs"
 export SERVER_LOG_PATH="$SERVER_LOG_DIR/Longvinter.log"
 export SERVER_CONFIG_PATH="/Longvinter/Saved/Config/LinuxServer/Game.ini"
-export CONFIG_FILE_FULL_PATH="$GIT_REPO_PATH$SERVER_CONFIG_PATH"
+export CONFIG_FILE_FULL_PATH="$DATA_DIR$SERVER_CONFIG_PATH"
+export APPID=1639880
+export DEPOTID=1639882
+export MANIFEST_PATH="$DATA_DIR/steamapps/appmanifest_$APPID.acf"
 
 ARCHITECTURE=$(dpkg --print-architecture)
 PAGESIZE=$(getconf PAGESIZE)
@@ -38,7 +36,7 @@ export CFG_ADMIN_STEAM_ID=${CFG_ADMIN_STEAM_ID}
 export CFG_ENABLE_PVP=${CFG_ENABLE_PVP:-true}
 export CFG_TENT_DECAY=${CFG_TENT_DECAY:-true}
 export CFG_MAX_TENTS=${CFG_MAX_TENTS:-2}
-export CFG_RESTART_TIME_24H=${CFG_RESTART_TIME_24H}
+export CFG_RESTART_TIME_24H=${CFG_RESTART_TIME_24H:-"-1"}
 export CFG_SAVE_BACKUPS=${CFG_SAVE_BACKUPS:-false}
 export CFG_HARDCORE=${CFG_HARDCORE:-false}
 export CFG_MONEY_DROP_MULTIPLIER=${CFG_MONEY_DROP_MULTIPLIER:-"0.0"}

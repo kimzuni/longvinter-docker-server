@@ -64,10 +64,6 @@ else
 	COLOR=$DISCORD_BLUE
 fi
 
-if [ "${TITLE,,}" == "start" ]; then
-	MESSAGE=$(echo -e "$MESSAGE\n"; Server_Info | sed -E "s/([^:]+):(.+)/**\1**:\2/g")
-fi
-
 JSON=$(jo embeds[]="$(jo title="$TITLE" description="$MESSAGE" color=$COLOR)" flags="$DISCORD_FLAGS")
 
 if [ "$ENABLED" = true ]; then
