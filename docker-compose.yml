@@ -12,14 +12,11 @@ services:
         max-file: "3"
     ports:
       - "7777:7777/udp"
-      - "27016:27016/tcp"
-      - "27016:27016/udp"
     environment:
       TZ: "UTC"
       PUID: 1000
       PGID: 1000
       PORT: 7777  # Optional but recommended
-      QUERY_PORT: 27016  # Optional but recommended
       CFG_SERVER_NAME: "Unnamed Island"
       CFG_MAX_PLAYERS: 32
       CFG_SERVER_MOTD: "Welcome to Longvinter Island!"
