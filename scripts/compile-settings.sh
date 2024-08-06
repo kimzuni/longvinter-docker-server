@@ -2,7 +2,7 @@
 # shellcheck source=scripts/helper_functions.sh
 source "/home/steam/server/helper_functions.sh"
 
-config_file="$FIG_FILE_FULL_PATH"
+config_file="$CONFIG_FILE_FULL_PATH"
 config_dir=$(dirname "$config_file")
 
 mkdir -p "$config_dir" || exit
@@ -30,7 +30,7 @@ ServerMOTD="$CFG_SERVER_MOTD"
 MaxPlayers=$CFG_MAX_PLAYERS
 Password="$CFG_PASSWORD"
 CommunityWebsite="${CFG_COMMUNITY_WEBSITE#http*://}"
-Tag="$CFG_SERVER_TAG"
+Tag="$CFG_TAG"
 CoopPlay=$CFG_COOP_PLAY
 CoopSpawn=$CFG_COOP_SPAWN
 CheckVPN=$CFG_CHECK_VPN
@@ -40,7 +40,7 @@ $CFG_SERVER_REGION_FULL
 
 [/Game/Blueprints/Server/GM_Longvinter.GM_Longvinter_C]
 AdminSteamID="$CFG_ADMIN_STEAM_ID"
-PVP=$CFG_ENABLE_PVP
+PVP=$CFG_PVP
 TentDecay=$CFG_TENT_DECAY
 MaxTents=$CFG_MAX_TENTS
 RestartTime24h=$CFG_RESTART_TIME_24H
