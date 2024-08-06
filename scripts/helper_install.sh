@@ -117,13 +117,32 @@ UpdateRequired() {
 }
 
 InstallServer() {
+	local DISCORD_PRE_MESSAGE DISCORD_PRE_MESSAGE_ENABLED DISCORD_PRE_MESSAGE_URL
+	local DISCORD_POST_MESSAGE DISCORD_POST_MESSAGE_ENABLED DISCORD_POST_MESSAGE_URL
+
+	if IsInstalled; then
+		DISCORD_PRE_MESSAGE="$DISCORD_PRE_UPDATE_BOOT_MESSAGE"
+		DISCORD_PRE_MESSAGE_ENABLED="$DISCORD_PRE_UPDATE_BOOT_MESSAGE_ENABLED"
+		DISCORD_PRE_MESSAGE_URL="$DISCORD_PRE_UPDATE_BOOT_MESSAGE_URL"
+		DISCORD_POST_MESSAGE="$DISCORD_POST_UPDATE_BOOT_MESSAGE"
+		DISCORD_POST_MESSAGE_ENABLED="$DISCORD_POST_UPDATE_BOOT_MESSAGE_ENABLED"
+		DISCORD_POST_MESSAGE_URL="$DISCORD_POST_UPDATE_BOOT_MESSAGE_URL"
+	else
+		DISCORD_PRE_MESSAGE="$DISCORD_PRE_INSTALL_MESSAGE"
+		DISCORD_PRE_MESSAGE_ENABLED="$DISCORD_PRE_INSTALL_MESSAGE_ENABLED"
+		DISCORD_PRE_MESSAGE_URL="$DISCORD_PRE_INSTALL_MESSAGE_URL"
+		DISCORD_POST_MESSAGE="$DISCORD_POST_INSTALL_MESSAGE"
+		DISCORD_POST_MESSAGE_ENABLED="$DISCORD_POST_INSTALL_MESSAGE_ENABLED"
+		DISCORD_POST_MESSAGE_URL="$DISCORD_POST_INSTALL_MESSAGE_URL"
+	fi
+
 	# Check kernel page size for arm64 hosts before running steamcmd
 	if [ "$ARCHITECTURE" == "arm64" ] && [ "$PAGESIZE" != "4096" ] && [ "${USE_DEPOT_DOWNLOADER}" != true ]; then
 		LogWarn "WARNING: Only ARM64 hosts with 4k page size is supported when running steamcmd. Please set USE_DEPOT_DOWNLOADER to true."
 	fi
 
 	if [ -z "${TARGET_MANIFEST_ID}" ]; then
-		DiscordMessage "Install" "${DISCORD_PRE_UPDATE_BOOT_MESSAGE}" "in-progress" "${DISCORD_PRE_UPDATE_BOOT_MESSAGE_ENABLED}" "${DISCORD_PRE_UPDATE_BOOT_MESSAGE_URL}"
+		DiscordMessage "Install" "${DISCORD_PRE_MESSAGE}" "in-progress" "${DISCORD_PRE_MESSAGE_ENABLED}" "${DISCORD_PRE_MESSAGE_URL}"
 		# If INSTALL_BETA_VERSION is set to true, install the latest beta version
 		if [ "${INSTALL_BETA_VERSION}" == true ]; then
 			LogWarn "Installing latest beta version"
@@ -165,7 +184,7 @@ InstallServer() {
 			fi
 		fi
 
-		DiscordMessage "Install" "${DISCORD_POST_UPDATE_BOOT_MESSAGE}" "success" "${DISCORD_POST_UPDATE_BOOT_MESSAGE_ENABLED}" "${DISCORD_POST_UPDATE_BOOT_MESSAGE_URL}"
+		DiscordMessage "Install" "${DISCORD_POST_MESSAGE}" "success" "${DISCORD_POST_MESSAGE_ENABLED}" "${DISCORD_POST_MESSAGE_URL}"
 		return
 	fi
 
@@ -173,15 +192,15 @@ InstallServer() {
 	targetManifest="${TARGET_MANIFEST_ID}"
 
 	LogWarn "Installing Target Version: $targetManifest"
-	DiscordMessage "Install" "${DISCORD_PRE_UPDATE_BOOT_MESSAGE}" "in-progress" "${DISCORD_PRE_UPDATE_BOOT_MESSAGE_ENABLED}" "${DISCORD_PRE_UPDATE_BOOT_MESSAGE_URL}"
+	DiscordMessage "Install" "${DISCORD_PRE_MESSAGE}" "in-progress" "${DISCORD_PRE_MESSAGE_ENABLED}" "${DISCORD_PRE_MESSAGE_URL}"
 	if [ "${USE_DEPOT_DOWNLOADER}" == true ]; then
 		LogWarn "Downloading server files using DepotDownloader"
 		DepotDownloader -app "$APPID" -depot "$DEPOTID" -manifest "$targetManifest" -osarch 64 -dir "$DATA_DIR" -validate
 		DepotDownloader -app "$APPID" -depot 1006 -osarch 64 -dir "$DATA_DIR" -validate
 	else
 		/home/steam/steamcmd/steamcmd.sh +@sSteamCmdForcePlatformType linux +@sSteamCmdForcePlatformBitness 64 +force_install_dir "$DATA_DIR" +login anonymous +download_depot "$APPID" "$DEPOTID" "$targetManifest" +quit
-		cp -vr "/home/steam/steamcmd/linux32/steamapps/content/app_$APPID/depot_$DEPOTID/." "$DATA_DIR"
+		cp -vr "/home/steam/steamcmd/linux32/steamapps/content/app_$APPID/depot_$DEPOTID/Longvinter/Server/." "$DATA_DIR"
 	fi
 	CreateACFFile "$targetManifest"
-	DiscordMessage "Install" "${DISCORD_POST_UPDATE_BOOT_MESSAGE}" "success" "${DISCORD_POST_UPDATE_BOOT_MESSAGE_ENABLED}" "${DISCORD_POST_UPDATE_BOOT_MESSAGE_URL}"
+	DiscordMessage "Install" "${DISCORD_POST_MESSAGE}" "success" "${DISCORD_POST_MESSAGE_ENABLED}" "${DISCORD_POST_MESSAGE_URL}"
 }
