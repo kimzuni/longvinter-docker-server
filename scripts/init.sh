@@ -2,11 +2,15 @@
 # shellcheck source=scripts/variables.sh
 source "/home/steam/server/variables.sh"
 
+# shellcheck source=scripts/major_update.sh
+source "/home/steam/server/major_update.sh"
+
 # shellcheck source=scripts/helper_functions.sh
 source "/home/steam/server/helper_functions.sh"
 
 
 
+mkdir -p "$BACKUP_DIR"
 if [[ "$(id -u)" -eq 0 ]] && [[ "$(id -g)" -eq 0 ]]; then
 	if [[ "${PUID}" -ne 0 ]] && [[ "${PGID}" -ne 0 ]]; then
 		LogAction "EXECUTING USERMOD"
@@ -26,8 +30,6 @@ if ! [ -w "$DATA_DIR" ]; then
 	LogError "$DATA_DIR is not writable."
 	exit 1
 fi
-
-mkdir -p "$BACKUP_DIR"
 
 
 
