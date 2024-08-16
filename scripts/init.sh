@@ -2,17 +2,14 @@
 # shellcheck source=scripts/variables.sh
 source "/home/steam/server/variables.sh"
 
+# shellcheck source=scripts/major_update.sh
+source "/home/steam/server/major_update.sh"
+
 # shellcheck source=scripts/helper_functions.sh
 source "/home/steam/server/helper_functions.sh"
 
 
 
-if ! dirExists "$DATA_DIR"; then
-	LogError "$DATA_DIR is not mounted."
-	exit 1
-fi
-
-mkdir -p "$BACKUP_DIRECTORY_PATH"
 if [[ "$(id -u)" -eq 0 ]] && [[ "$(id -g)" -eq 0 ]]; then
 	if [[ "${PUID}" -ne 0 ]] && [[ "${PGID}" -ne 0 ]]; then
 		LogAction "EXECUTING USERMOD"
@@ -28,16 +25,19 @@ elif [[ "$(id -u)" -eq 0 ]] || [[ "$(id -g)" -eq 0 ]]; then
 	exit 1
 fi
 
+if ! [ -w "$DATA_DIR" ]; then
+	LogError "$DATA_DIR is not writable."
+	exit 1
+fi
+
+mkdir -p "$BACKUP_DIR"
+
 
 
 term_handler() {
 	DiscordMessage "Shutdown" "${DISCORD_PRE_SHUTDOWN_MESSAGE}" "in-progress" "${DISCORD_PRE_SHUTDOWN_MESSAGE_ENABLED}" "${DISCORD_PRE_SHUTDOWN_MESSAGE_URL}"
 
-	if ! shutdown_server; then
-		LogWarn "Unable to shutdown the server for unknown reasons."
-		DiscordMessage "Shutdown" "Unable to shutdown the server for unknown reasons." "failure" "${DISCORD_PRE_SHUTDOWN_MESSAGE_ENABLED}" "${DISCORD_PRE_SHUTDOWN_MESSAGE_URL}"
-		return 1
-	fi
+	shutdown_server
 
 	tail --pid="$killpid" -f 2>/dev/null
 }
@@ -69,6 +69,14 @@ mapfile -t restore_pids < <(pgrep restore)
 if [ "${#restore_pids[@]}" -ne 0 ]; then
 	LogInfo "Waiting for restore to finish"
 	for pid in "${restore_pids[@]}"; do
+		tail --pid="$pid" -f 2>/dev/null
+	done
+fi
+
+mapfile -t discord_pids < <(pgrep discord)
+if [ "${#discord_pids[@]}" -ne 0 ]; then
+	LogInfo "Waiting for discord to finish"
+	for pid in "${discord_pids[@]}"; do
 		tail --pid="$pid" -f 2>/dev/null
 	done
 fi

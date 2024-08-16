@@ -11,18 +11,17 @@ get_eosid() {
 	sed -E "s/.*([0-9a-f]{32}).*/\1/g" <<< "$log"
 }
 
-get_playername() {
+eosid_to_playername() {
 	local eosid="$1"
 	grep "Login request.*$eosid" "$SERVER_LOG_PATH" | tail -1 | awk -F "Name=| userId:" '{print $2}' | tr -d "\r"
 }
 
 # Wait until game port is open
-while ! nc -uz 127.0.0.1 "${PORT}"; do
+while ! port_check; do
 	sleep 5s
 	LogInfo "Waiting for server start for show player logging..."
 done
 
-# joins=()
 last_line=0
 while true; do
 	server_pid=$(pidof LongvinterServer-Linux-Shipping)
@@ -37,9 +36,6 @@ while true; do
 				# Notify Discord and log all players who have joined
 				*"Join succeeded"* )
 					player_name="$(awk -F "Join succeeded: " '{print $NF}' <<< "$log")"
-					# eosid="$(get_eosid "$(grep -m 1 "?Name=$player_name userId:" "$SERVER_LOG_PATH")")"
-					# joins+=("$eosid")
-
 					LogInfo "${player_name} has joined"
 
 					# Replace ${player_name} with actual player's name
@@ -48,9 +44,7 @@ while true; do
 				# Notify Discord and log all players who have left
 				*"RemovePlayer"* )
 					eosid="$(get_eosid "$log")"
-					player_name="$(get_playername "$eosid")"
-					# mapfile -t joins < <(tr ' ' '\n' <<< "${joins[@]/$eosid}" | grep -v ^$)
-
+					player_name="$(eosid_to_playername "$eosid")"
 					LogInfo "${player_name} has left"
 
 					# Replace ${player_name} with actual player's name

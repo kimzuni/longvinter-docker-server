@@ -56,16 +56,16 @@ if [ -n "${LEVEL}" ]; then
 			COLOR=$DISCORD_GREEN
 			;;
 		* )
-			LogWarn "Could not find \"${LEVEL}\", using \"${DEFAULT_LEVEL}\""
-			COLOR=$DISCORD_BLUE
+			if [[ "${LEVEL,,}" =~ ^[0-9a-f]{1,6}$ ]]; then
+				COLOR=$(( 16#$LEVEL ))
+			else
+				LogWarn "Could not find \"${LEVEL}\", using \"${DEFAULT_LEVEL}\""
+				COLOR=$DISCORD_BLUE
+			fi
 			;;
 	esac
 else
 	COLOR=$DISCORD_BLUE
-fi
-
-if [ "${TITLE,,}" == "start" ]; then
-	MESSAGE=$(echo -e "$MESSAGE\n"; Server_Info | sed -E "s/([^:]+):(.+)/**\1**:\2/g")
 fi
 
 JSON=$(jo embeds[]="$(jo title="$TITLE" description="$MESSAGE" color=$COLOR)" flags="$DISCORD_FLAGS")

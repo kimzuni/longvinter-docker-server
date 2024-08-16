@@ -24,9 +24,9 @@ services:
       CFG_COMMUNITY_WEBSITE: "www.longvinter.com"
       CFG_COOP_PLAY: false
       CFG_COOP_SPAWN: 0
-      CFG_SERVER_TAG: "none"
+      CFG_TAG: "none"
       CFG_ADMIN_STEAM_ID: ""
-      CFG_ENABLE_PVP: true
+      CFG_PVP: true
       CFG_TENT_DECAY: true
       CFG_MAX_TENTS: 2
     volumes:

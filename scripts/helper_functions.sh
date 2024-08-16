@@ -127,7 +127,7 @@ Log() {
 DiscordMessage() {
 	local title="$1"
 	local message="$2"
-	local level="${3:-info}"
+	local level="$3"
 	local enabled="$4"
 	local webhook_url="$5"
 	if [ -n "${DISCORD_WEBHOOK_URL}" ]; then
@@ -227,23 +227,18 @@ get_latest_version() {
 
 # Use it when you have to wait for it to be saved automatically because it does not support RCON.
 wait_save() {
-	local title="$1"
-	local message="$2"
-	local level="$3"
-	local enabled="$4"
-	local webhook_url="$5"
-	local timestamp livetime
+	local curr_time timestamp
 
 	if ! player_check; then
-		livetime="$(date "+%s")"
+		curr_time="$(date "+%s")"
 		timestamp="$(grep "RemovePlayer" "$SERVER_LOG_PATH" | tail -1 | awk -F "\\\[|\\\]|\.|-|:" '{printf("%s/%s/%s %s:%s:%s\n", $2, $3, $4, $5, $6, $7)}' | date_to_timestamp UTC)"
-		if [ -z "$timestamp" ] || save_check "$((livetime - timestamp))"; then
+		if [ -z "$timestamp" ] || save_check "$((curr_time - timestamp))"; then
 			return
 		fi
 	fi
 
 	LogWarn "$message"
-	DiscordMessage "$title" "$message" "$level" "$enabled" "$webhook_url"
+	DiscordMessage "$@"
 
 	while ! save_check; do
 		sleep 1s
@@ -255,10 +250,10 @@ wait_save() {
 # Returns 1 if not find save log
 save_check() {
 	local spare="${1:-10}"
-	local livetime savetime
+	local curr_time save_time
 
-	livetime="$(date "+%s")"
-	savetime=$(
+	curr_time="$(date "+%s")"
+	save_time=$(
 		grep -rE ^"\[[a-zA-Z]{3} [0-9, :]+ [AP]M\] Game saved!" "$SERVER_LOG_DIR" \
 		| awk -F "\\\[|\\\]" '{print $2}' \
 		| sed "s/Jan/1/g; s/Feb/2/g; s/Mar/3/g; s/Apr/4/g; s/May/5/g; s/Jun/6/g; s/Jul/7/g; s/Aug/8/g; s/Sep/9/g; s/Oct/10/g; s/Nov/11/g; s/Dec/12/g" \
@@ -266,7 +261,7 @@ save_check() {
 		| sort --version-sort | tail -1 | date_to_timestamp
 	)
 
-	if [ $((livetime - savetime)) -ge $((spare - 5)) ]; then
+	if [ $((curr_time - save_time)) -ge $((spare - 5)) ]; then
 		return 1
 	fi
 	return 0
@@ -284,40 +279,9 @@ date_to_timestamp() {
 	fi
 }
 
-Server_Info() {
-	local IP INFO
-	local HTTP URL="$CFG_COMMUNITY_WEBSITE"
-
-	if ! [[ "$URL" =~ ^https?:// ]] && [ -n "$URL" ]; then
-		HTTP="http://"
-	fi
-
-	if [ -n "$DISCORD_PRE_START_MESSAGE_WITH_DOMAIN" ]; then
-		IP="${DISCORD_PRE_START_MESSAGE_WITH_DOMAIN#http*://}"
-	elif [ "$DISCORD_PRE_START_MESSAGE_WITH_SERVER_IP" = true ]; then
-		IP="$(curl -sfSL ipv4.icanhazip.com)"
-	fi
-	if [ -n "$IP" ]; then
-		INFO="Server IP: $IP"$'\n'"Server Port: $PORT"$'\n'
-	fi
-
-	if [ "$DISCORD_PRE_START_MESSAGE_WITH_GAME_SETTINGS" = true ]; then
-		INFO=$(
-cat << END
-Server Name: $CFG_SERVER_NAME
-${INFO}Server Password: $CFG_PASSWORD
-
-Message of the Day: $CFG_SERVER_MOTD
-Community URL: $HTTP${URL:-None}
-Max Player: $CFG_MAX_PLAYERS
-PVP: $CFG_ENABLE_PVP
-Tent Decay: $CFG_TENT_DECAY
-Max Tent: $CFG_MAX_TENTS
-Coop Play: $CFG_COOP_PLAY
-Coop Spawn: $CFG_COOP_SPAWN
-END
-		)
-	fi
-
-	echo "$INFO"
+# Returns 0 if port is open
+# Returns not 0 if port is not open
+port_check() {
+	nc -uz 127.0.0.1 "${PORT}"
+	return $?
 }

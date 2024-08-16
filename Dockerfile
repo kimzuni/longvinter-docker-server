@@ -18,20 +18,20 @@ LABEL maintainer="me@kimzuni.com" \
 
 # set envs
 # SUPERCRONIC: Latest releases available at https://github.com/aptible/supercronic/releases
+# DEPOT_DOWNLOADER: Latest releases available at https://github.com/SteamRE/DepotDownloader/releases
 # NOTICE: edit SUPERCRONIC_SHA1SUM when using binaries of another version or arch.
 ARG SUPERCRONIC_SHA1SUM_ARM64="d5e02aa760b3d434bc7b991777aa89ef4a503e49"
 ARG SUPERCRONIC_SHA1SUM_AMD64="9f27ad28c5c57cd133325b2a66bba69ba2235799"
 ARG SUPERCRONIC_VERSION="0.2.30"
-
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+ARG DEPOT_DOWNLOADER_VERSION="2.6.0"
 
 # update and install dependencies
 # hadolint ignore=DL3008
 RUN apt-get update && \
     apt-get install --no-install-recommends --no-install-suggests -y \
-      curl \
-      net-tools \
-      ca-certificates \
+      wget \
+      net-tools=2.10-0.1 \
+      ca-certificates=20230311 \
       lib32gcc-s1-amd64-cross=12.2.0-14cross1 \
       procps=2:4.0.2-3 \
       gettext-base=0.21-12 \
@@ -39,29 +39,40 @@ RUN apt-get update && \
       jo=1.9-1 \
       jq=1.6-2.1 \
       netcat-traditional=1.10-47 \
- && curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash \
- && apt-get --no-install-recommends  --no-install-suggests -y \
-      install git git-lfs \
+      libicu72=72.1-3 \
+      unzip=6.0-28 \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-# install supercronic
+# install supercronic and DepotDownloader
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 ARG TARGETARCH
-RUN case ${TARGETARCH} in \
-        "amd64") SUPERCRONIC_SHA1SUM=${SUPERCRONIC_SHA1SUM_AMD64} ;; \
-        "arm64") SUPERCRONIC_SHA1SUM=${SUPERCRONIC_SHA1SUM_ARM64} ;; \
+RUN case "${TARGETARCH}" in \
+        "amd64") SUPERCRONIC_SHA1SUM="${SUPERCRONIC_SHA1SUM_AMD64}" ;; \
+        "arm64") SUPERCRONIC_SHA1SUM="${SUPERCRONIC_SHA1SUM_ARM64}" ;; \
     esac \
-    && curl -sfSL "https://github.com/aptible/supercronic/releases/download/v${SUPERCRONIC_VERSION}/supercronic-linux-${TARGETARCH}" -o supercronic \
+    && wget --progress=dot:giga "https://github.com/aptible/supercronic/releases/download/v${SUPERCRONIC_VERSION}/supercronic-linux-${TARGETARCH}" -O supercronic \
     && echo "${SUPERCRONIC_SHA1SUM}" supercronic | sha1sum -c - \
     && chmod +x supercronic \
     && mv supercronic /usr/local/bin/supercronic
 
+RUN case "${TARGETARCH}" in \
+        "amd64") DEPOT_DOWNLOADER_FILENAME="DepotDownloader-linux-x64.zip" ;; \
+        "arm64") DEPOT_DOWNLOADER_FILENAME="DepotDownloader-linux-arm64.zip" ;; \
+    esac \
+    && wget --progress=dot:giga "https://github.com/SteamRE/DepotDownloader/releases/download/DepotDownloader_${DEPOT_DOWNLOADER_VERSION}/${DEPOT_DOWNLOADER_FILENAME}" -O DepotDownloader.zip \
+    && unzip DepotDownloader.zip \
+    && rm -rf DepotDownloader.zip DepotDownloader.xml \
+    && chmod +x DepotDownloader \
+    && mv DepotDownloader /usr/local/bin/DepotDownloader
+
 # hadolint ignore=DL3044
-ENV TZ="UTC" \
+ENV HOME=/home/steam \
+    TZ="UTC" \
     PUID=1000 \
     PGID=1000 \
     PORT=7777 \
-    QUERY_PORT=27016 \
     UPDATE_ON_BOOT=true \
     BACKUP_ENABLED=true \
     BACKUP_CRON_EXPRESSION="0 0 * * *" \
@@ -80,7 +91,7 @@ ENV TZ="UTC" \
     AUTO_REBOOT_EVEN_IF_PLAYERS_ONLINE=false \
     BROADCAST_COUNTDOWN_SUSPEND_MESSAGE="Suspends countdown because there are no players." \
     BROADCAST_COUNTDOWN_SUSPEND_MESSAGE_ENABLE=true \
-    TARGET_COMMIT_ID= \
+    TARGET_MANIFEST_ID= \
     DISCORD_WEBHOOK_URL="" \
     DISCORD_SUPPRESS_NOTIFICATIONS=false \
     DISCORD_CONNECT_TIMEOUT=30 \
@@ -100,9 +111,6 @@ ENV TZ="UTC" \
     DISCORD_PRE_START_MESSAGE="Server has been started!" \
     DISCORD_PRE_START_MESSAGE_ENABLED=true \
     DISCORD_PRE_START_MESSAGE_URL="" \
-    DISCORD_PRE_START_MESSAGE_WITH_GAME_SETTINGS=true \
-    DISCORD_PRE_START_MESSAGE_WITH_SERVER_IP=false \
-    DISCORD_PRE_START_MESSAGE_WITH_DOMAIN="" \
     DISCORD_PRE_SHUTDOWN_MESSAGE="Server is shutting down..." \
     DISCORD_PRE_SHUTDOWN_MESSAGE_ENABLED=true \
     DISCORD_PRE_SHUTDOWN_MESSAGE_URL="" \
@@ -135,7 +143,9 @@ ENV TZ="UTC" \
     DISABLE_GENERATE_SETTINGS=false \
     ENABLE_PLAYER_LOGGING=true \
     PLAYER_LOGGING_POLL_PERIOD=5 \
-    ARM64_DEVICE=generic
+    ARM64_DEVICE=generic \
+    USE_DEPOT_DOWNLOADER=false \
+    INSTALL_BETA_VERSION=false
 
 # Sane Box64 config defaults
 # hadolint ignore=DL3044
@@ -150,7 +160,7 @@ ENV BOX64_DYNAREC_STRONGMEM=1 \
 ARG GIT_VERSION_TAG=unspecified
 
 COPY --chmod=755 ./scripts /home/steam/server
-RUN for file in backup.sh update.sh restore.sh reboot.sh broadcast.sh; do \
+RUN for file in backup.sh update.sh restore.sh broadcast.sh; do \
         mv /home/steam/server/"$file" /usr/local/bin/"${file%.sh}"; \
     done
 
