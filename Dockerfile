@@ -30,8 +30,8 @@ ARG DEPOT_DOWNLOADER_VERSION="2.6.0"
 RUN apt-get update && \
     apt-get install --no-install-recommends --no-install-suggests -y \
       wget \
-      net-tools \
-      ca-certificates \
+      net-tools=2.10-0.1 \
+      ca-certificates=20230311 \
       lib32gcc-s1-amd64-cross=12.2.0-14cross1 \
       procps=2:4.0.2-3 \
       gettext-base=0.21-12 \
@@ -68,7 +68,8 @@ RUN case "${TARGETARCH}" in \
     && mv DepotDownloader /usr/local/bin/DepotDownloader
 
 # hadolint ignore=DL3044
-ENV TZ="UTC" \
+ENV HOME=/home/steam \
+    TZ="UTC" \
     PUID=1000 \
     PGID=1000 \
     PORT=7777 \
