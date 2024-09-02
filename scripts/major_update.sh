@@ -49,3 +49,12 @@ if dirExists "$DATA_DIR/.git" > /dev/null; then
 	find "$DATA_DIR/steamapps" -name "*1007*" -exec rm -rf {} \; 2> /dev/null
 	rm -rf "$DATA_DIR/Steam" "$DATA_DIR"/.git*
 fi
+if dirExists "$BACKUP_DIR" > /dev/null; then
+	mapfile -t backup_files < <(ls -A "$BACKUP_DIR")
+	for file in "${backup_files[@]}"; do
+		rename="$file"
+		if [[ "$file" =~ ^Saved-Backup-.+\.tar\.gz$ ]]; then
+			mv "$file" "${file/Saved-Backup/longvinter-save}"
+		fi
+	done
+fi

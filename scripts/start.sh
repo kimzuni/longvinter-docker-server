@@ -26,7 +26,7 @@ if [ "$ServerInstalled" == 0 ] && [ "${UPDATE_ON_BOOT,,}" == true ]; then
 	IsUpdateRequired=$?
 	if [ "$IsUpdateRequired" == 0 ]; then
 		LogAction "Starting Update"
-		InstallServer
+		InstallServer update
 	fi
 fi
 
