@@ -54,7 +54,7 @@ if dirExists "$BACKUP_DIR" > /dev/null; then
 	for file in "${backup_files[@]}"; do
 		rename="$file"
 		if [[ "$file" =~ ^Saved-Backup-.+\.tar\.gz$ ]]; then
-			mv "$file" "${file/Saved-Backup/longvinter-save}"
+			mv "$BACKUP_DIR/$file" "$BACKUP_DIR/${file/Saved-Backup/longvinter-save}"
 		fi
 	done
 fi
